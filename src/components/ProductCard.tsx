@@ -131,8 +131,8 @@ const ProductCard = ({
 
         {/* Add to cart */}
         <Button 
-          variant="outline" 
-          className="w-full rounded-full border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary font-medium h-10 transition-all"
+          variant="ghost" 
+          className="w-full rounded-full bg-muted hover:bg-primary hover:text-primary-foreground font-medium h-10 transition-all"
           onClick={(e) => e.stopPropagation()}
         >
           В корзину
