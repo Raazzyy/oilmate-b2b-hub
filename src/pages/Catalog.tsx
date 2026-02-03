@@ -3,204 +3,12 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SlidersHorizontal } from "lucide-react";
-import { useParams } from "react-router-dom";
-import oilProductImage from "@/assets/oil-product.png";
+import { SlidersHorizontal, X } from "lucide-react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { allProducts, categoryNames, type ProductData } from "@/data/products";
 
-interface ProductData {
-  name: string;
-  brand: string;
-  volume: string;
-  price: number;
-  oldPrice?: number;
-  image: string;
-  inStock: boolean;
-  oilType: string;
-  isUniversal?: boolean;
-  category: string;
-  viscosity?: string;
-  approvals?: string;
-  specification?: string;
-  viscosityClass?: string;
-  application?: string;
-  standard?: string;
-  color?: string;
-  type?: string;
-}
-
-const allProducts: ProductData[] = [
-  {
-    name: "Shell Helix Ultra 5W-40 синтетическое",
-    brand: "Shell",
-    volume: "4 л",
-    price: 3299,
-    oldPrice: 3899,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "motor",
-    viscosity: "5W-40",
-    approvals: "MB 229.5",
-  },
-  {
-    name: "Mobil 1 ESP Formula 5W-30 синтетическое",
-    brand: "Mobil",
-    volume: "4 л",
-    price: 4150,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "motor",
-    viscosity: "5W-30",
-    approvals: "ACEA C3",
-  },
-  {
-    name: "Castrol EDGE 5W-30 LL синтетическое",
-    brand: "Castrol",
-    volume: "4 л",
-    price: 3850,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: false,
-    category: "motor",
-    viscosity: "5W-30",
-    approvals: "BMW LL-04",
-  },
-  {
-    name: "Лукойл Genesis Armortech 5W-40",
-    brand: "Лукойл",
-    volume: "4 л",
-    price: 1890,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Полусинтетика",
-    isUniversal: true,
-    category: "motor",
-    viscosity: "5W-40",
-    approvals: "API SN",
-  },
-  {
-    name: "Total Quartz INEO ECS 5W-30",
-    brand: "Total",
-    volume: "5 л",
-    price: 4299,
-    oldPrice: 4799,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "motor",
-    viscosity: "5W-30",
-    approvals: "ACEA C3",
-  },
-  {
-    name: "Mannol Extra Getriebeoel 75W-90",
-    brand: "Mannol",
-    volume: "1 л",
-    price: 890,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "transmission",
-    viscosity: "75W-90",
-    specification: "GL-5",
-  },
-  {
-    name: "Liqui Moly Hypoid GL5 75W-90",
-    brand: "Liqui Moly",
-    volume: "1 л",
-    price: 1250,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "transmission",
-    viscosity: "75W-90",
-    specification: "GL-5",
-  },
-  {
-    name: "Shell Spirax S6 AXME 75W-90",
-    brand: "Shell",
-    volume: "1 л",
-    price: 1490,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: false,
-    category: "transmission",
-    viscosity: "75W-90",
-    specification: "GL-4",
-  },
-  {
-    name: "Mobil ATF 3309",
-    brand: "Mobil",
-    volume: "1 л",
-    price: 780,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-    category: "hydraulic",
-    viscosityClass: "HLP 46",
-  },
-  {
-    name: "Fuchs Renolin B 46 HVI",
-    brand: "Fuchs",
-    volume: "20 л",
-    price: 8900,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Минеральное",
-    isUniversal: true,
-    category: "industrial",
-    application: "Компрессорное",
-  },
-  {
-    name: "Felix Prolonger G12+ красный",
-    brand: "Felix",
-    volume: "5 л",
-    price: 690,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Готовый",
-    isUniversal: true,
-    category: "antifreeze",
-    type: "Готовый",
-    standard: "G12+",
-    color: "Красный",
-  },
-  {
-    name: "Sintec Antifreeze Ultra G11 зеленый",
-    brand: "Sintec",
-    volume: "5 л",
-    price: 590,
-    oldPrice: 750,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Готовый",
-    isUniversal: true,
-    category: "antifreeze",
-    type: "Готовый",
-    standard: "G11",
-    color: "Зеленый",
-  },
-];
-
-const categoryNames: Record<string, string> = {
-  motor: "Моторные масла",
-  transmission: "Трансмиссионные масла",
-  hydraulic: "Гидравлические масла",
-  industrial: "Индустриальные масла",
-  antifreeze: "Антифризы",
-  all: "Все товары",
-  promo: "Все акции",
-  new: "Новинки",
-};
+// Filters configuration is now local, products data is imported from @/data/products
 
 const filterCategories = [
   { id: "motor", name: "Моторные" },
@@ -294,6 +102,9 @@ const ChipFilter = ({
 
 const Catalog = () => {
   const { category } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+  
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categoryFilters, setCategoryFilters] = useState<Record<string, string[]>>({});
@@ -302,7 +113,16 @@ const Catalog = () => {
   const [priceTo, setPriceTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  const categoryTitle = category ? categoryNames[category] || "Каталог" : "Все товары";
+  const clearSearch = () => {
+    searchParams.delete("search");
+    setSearchParams(searchParams);
+  };
+
+  const categoryTitle = searchQuery 
+    ? `Результаты поиска: «${searchQuery}»`
+    : category 
+      ? categoryNames[category] || "Каталог" 
+      : "Все товары";
 
   const toggleFilter = (value: string, selected: string[], setSelected: (v: string[]) => void) => {
     if (selected.includes(value)) {
@@ -338,8 +158,21 @@ const Catalog = () => {
     || (category && category !== "all" && category !== "promo" && category !== "new" ? category : null);
 
   const filteredProducts = allProducts.filter((product) => {
-    // Фильтр по URL категории (если не выбрана категория в фильтрах)
-    if (category && category !== "all" && category !== "promo" && category !== "new") {
+    // Фильтр по поисковому запросу
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      const matchesSearch = 
+        product.name.toLowerCase().includes(lowerQuery) ||
+        product.brand.toLowerCase().includes(lowerQuery) ||
+        product.oilType.toLowerCase().includes(lowerQuery) ||
+        (product.viscosity && product.viscosity.toLowerCase().includes(lowerQuery)) ||
+        (product.approvals && product.approvals.toLowerCase().includes(lowerQuery));
+      
+      if (!matchesSearch) return false;
+    }
+    
+    // Фильтр по URL категории (если не выбрана категория в фильтрах и нет поиска)
+    if (!searchQuery && category && category !== "all" && category !== "promo" && category !== "new") {
       if (!selectedCategory && product.category !== category) return false;
     }
     
@@ -392,7 +225,18 @@ const Catalog = () => {
 
           {/* Title and filter toggle */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-foreground">{categoryTitle}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-foreground">{categoryTitle}</h1>
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                  Сбросить поиск
+                </button>
+              )}
+            </div>
             <Button
               variant="outline"
               className="md:hidden gap-2"

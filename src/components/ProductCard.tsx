@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 interface ProductCardProps {
-  id?: string;
+  id?: string | number;
   name: string;
   brand: string;
   volume: string;
@@ -24,7 +24,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({
-  id = "1",
+  id = 1,
   name,
   brand,
   volume,
