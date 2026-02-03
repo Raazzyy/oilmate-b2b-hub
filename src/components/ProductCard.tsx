@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
@@ -7,20 +6,21 @@ interface ProductCardProps {
   volume: string;
   price: number;
   oldPrice?: number;
-  rating: number;
   image: string;
   inStock: boolean;
-  discount?: number;
+  oilType: string;
+  isUniversal?: boolean;
 }
 
 const ProductCard = ({
   name,
+  brand,
   volume,
   price,
   oldPrice,
-  rating,
   image,
-  discount,
+  oilType,
+  isUniversal = true,
 }: ProductCardProps) => {
   // Разделяем цену на рубли и копейки
   const rubles = Math.floor(price);
@@ -32,27 +32,29 @@ const ProductCard = ({
   return (
     <div className="group relative flex flex-col p-2">
       {/* Image container */}
-      <div className="relative mb-4">
-        <div className="aspect-square overflow-hidden rounded-[40%_40%_40%_40%/30%_30%_30%_30%] bg-muted">
+      <div className="relative mb-3">
+        <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
           <img
             src={image}
             alt={name}
-            className="h-full w-full object-contain p-6 transition-transform group-hover:scale-105"
+            className="h-full w-full object-contain p-4 transition-transform group-hover:scale-105"
           />
         </div>
-        
-        {/* Discount badge */}
-        {discount && (
-          <span className="absolute right-2 bottom-2 rounded-md bg-warning px-2 py-1 text-xs font-bold text-warning-foreground">
-            % от 2 шт
-          </span>
-        )}
       </div>
 
-      {/* Rating */}
-      <div className="mb-2 flex items-center gap-1">
-        <Star className="h-4 w-4 fill-warning text-warning" />
-        <span className="text-sm text-foreground">{rating.toFixed(2)}</span>
+      {/* Parameters */}
+      <div className="mb-2 flex flex-wrap gap-1">
+        <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+          {oilType}
+        </span>
+        <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+          {brand}
+        </span>
+        {isUniversal && (
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            Универсальное
+          </span>
+        )}
       </div>
 
       {/* Name */}
