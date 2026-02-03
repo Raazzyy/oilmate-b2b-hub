@@ -141,7 +141,7 @@ const Header = () => {
               <div className="relative">
                 <Input
                   placeholder="Поиск товаров..."
-                  className="h-12 pl-4 pr-12 rounded-full border-2 border-border focus:border-primary bg-background w-full"
+                  className="h-12 pl-4 pr-12 rounded-full border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
