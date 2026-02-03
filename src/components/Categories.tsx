@@ -57,20 +57,22 @@ const Categories = () => {
   return (
     <section className="py-4 md:py-6">
       <div className="container">
-        {/* Horizontal scroll on mobile, grid on desktop */}
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 md:pb-0 md:overflow-visible md:grid md:grid-cols-7 scrollbar-hide">
+        {/* Mobile: horizontal scroll, Desktop: even grid */}
+        <div className="flex md:grid md:grid-cols-7 gap-4 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
           {categories.map((category, index) => (
             <Link
               key={index}
               to={category.href}
-              className="group flex flex-col items-center text-center shrink-0 w-20 md:w-auto"
+              className="group flex flex-col items-center text-center shrink-0 w-[72px] md:w-auto"
             >
               <div
-                className={`mb-2 md:mb-3 flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
+                className={`mb-2 md:mb-3 flex h-16 w-16 md:h-[72px] md:w-[72px] items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
               >
-                <category.icon className={`h-7 w-7 md:h-9 md:w-9 ${category.color}`} />
+                <category.icon className={`h-7 w-7 md:h-8 md:w-8 ${category.color}`} strokeWidth={1.5} />
               </div>
-              <span className="text-xs md:text-sm font-medium text-foreground max-w-[80px] md:max-w-[90px] leading-tight">{category.title}</span>
+              <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center w-full">
+                {category.title}
+              </span>
             </Link>
           ))}
         </div>
