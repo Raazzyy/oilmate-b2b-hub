@@ -55,12 +55,12 @@ const Categories = () => {
   return (
     <section className="py-6">
       <div className="container">
-        <div className="flex items-center justify-center gap-6 overflow-x-auto pb-2">
+        <div className="flex items-start justify-between overflow-x-auto pb-2">
           {categories.map((category, index) => (
             <a
               key={index}
               href="#"
-              className="group flex flex-col items-center text-center shrink-0"
+              className="group flex flex-col items-center text-center flex-1 min-w-0"
             >
               <div
                 className={`mb-3 flex h-20 w-20 items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:shadow-md group-hover:scale-105`}
