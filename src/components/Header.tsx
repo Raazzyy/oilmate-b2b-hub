@@ -27,19 +27,19 @@ const Header = () => {
 
       {/* Main header */}
       <div className="container py-4">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           {/* Catalog button */}
-          <Button className="hidden md:flex gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-12 rounded-full">
+          <Button className="hidden md:flex gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0">
             <Menu className="h-5 w-5" />
             Каталог
           </Button>
 
-          {/* Search */}
-          <div className="flex-1 max-w-2xl">
+          {/* Search - takes all available space */}
+          <div className="flex-1">
             <div className="relative">
               <Input
                 placeholder="Поиск"
-                className="h-12 pl-4 pr-12 rounded-full border-2 border-border focus:border-primary bg-background"
+                className="h-12 pl-4 pr-12 rounded-full border-2 border-border focus:border-primary bg-background w-full"
               />
               <Button
                 size="icon"
@@ -52,7 +52,7 @@ const Header = () => {
           </div>
 
           {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative h-10 w-10">
+          <Button variant="ghost" size="icon" className="relative h-12 w-12 shrink-0">
             <ShoppingCart className="h-6 w-6" />
             {cartCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
