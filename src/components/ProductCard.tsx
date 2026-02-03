@@ -29,6 +29,9 @@ const ProductCard = ({
   const oldRubles = oldPrice ? Math.floor(oldPrice) : null;
   const oldKopecks = oldPrice ? Math.round((oldPrice - Math.floor(oldPrice)) * 100) || 99 : null;
 
+  // Рассчитываем процент скидки
+  const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
+
   return (
     <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl">
       {/* Image container */}
@@ -40,6 +43,13 @@ const ProductCard = ({
             className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
           />
         </div>
+        
+        {/* Discount badge */}
+        {discountPercent && discountPercent > 0 && (
+          <span className="absolute left-2 bottom-2 rounded-md bg-warning px-2 py-1 text-xs font-bold text-warning-foreground">
+            -{discountPercent}%
+          </span>
+        )}
       </div>
 
       {/* Name - fixed height for alignment */}
@@ -55,20 +65,20 @@ const ProductCard = ({
       {/* Spacer to push price and button to bottom */}
       <div className="mt-auto">
         {/* Price */}
-        <div className="mb-3 flex items-baseline gap-2">
+        <div className="mb-3 flex flex-col">
           {oldPrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-sm text-muted-foreground line-through mb-0.5">
               {oldRubles}<sup className="text-[10px]">{oldKopecks}</sup>₽
             </span>
           )}
           <div className="flex items-baseline">
-            <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+            <span className={`text-xl font-bold ${oldPrice ? 'text-foreground' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")}
             </span>
-            <sup className={`text-xs font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+            <sup className={`text-xs font-bold text-foreground`}>
               {kopecks.toString().padStart(2, '0')}
             </sup>
-            <span className={`text-lg font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
+            <span className={`text-lg font-bold text-foreground`}>₽</span>
           </div>
         </div>
 
