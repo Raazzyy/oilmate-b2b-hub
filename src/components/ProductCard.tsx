@@ -46,29 +46,9 @@ const ProductCard = ({
   standard,
   color,
 }: ProductCardProps) => {
-  // Формируем строку характеристик в зависимости от категории
+  // Формируем строку характеристик
   const getSpecsLine = () => {
-    const specs: string[] = [volume, oilType, brand];
-    
-    if (category === "motor" && viscosity) {
-      specs.push(viscosity);
-    }
-    if (category === "transmission" && specification) {
-      specs.push(specification);
-    }
-    if (category === "hydraulic" && viscosityClass) {
-      specs.push(viscosityClass);
-    }
-    if (category === "industrial" && application) {
-      specs.push(application);
-    }
-    if (category === "antifreeze") {
-      if (standard) specs.push(standard);
-      if (color) specs.push(color);
-    }
-    if (isUniversal) specs.push("Универсальное");
-    
-    return specs.join(" · ");
+    return `${volume} ${oilType}`;
   };
   // Разделяем цену на рубли и копейки
   const rubles = Math.floor(price);
