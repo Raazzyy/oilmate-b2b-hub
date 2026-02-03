@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-card border-t border-border">
+    <footer className="bg-card">
       <div className="container py-10">
         <div className="grid gap-8 md:grid-cols-3">
           {/* For buyers */}
