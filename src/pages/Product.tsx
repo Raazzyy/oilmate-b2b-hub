@@ -92,7 +92,7 @@ const Product = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-28 py-6">
+      <main className="py-6">
         <div className="container">
           {/* Breadcrumbs */}
           <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
