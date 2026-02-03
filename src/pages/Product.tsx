@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, Minus, Plus, Check } from "lucide-react";
 import oilProductImage from "@/assets/oil-product.png";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCart } from "@/contexts/CartContext";
+import SEO from "@/components/SEO";
 
 // Временные данные товаров (в реальном приложении будут из API)
 const productsData: Record<string, {
@@ -124,10 +125,50 @@ const Product = () => {
     setIsCartOpen(true);
   };
 
+  const structuredData = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand
+    },
+    "image": product.image,
+    "sku": product.id.toString(),
+    "offers": {
+      "@type": "Offer",
+      "url": `https://oilmate-b2b-hub.lovable.app/product/${id}`,
+      "priceCurrency": "RUB",
+      "price": product.price,
+      "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      "availability": product.inStock 
+        ? "https://schema.org/InStock" 
+        : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "OilMate"
+      }
+    },
+    "additionalProperty": product.specifications.map(spec => ({
+      "@type": "PropertyValue",
+      "name": spec.label,
+      "value": spec.value
+    }))
+  }), [product, id]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${product.name} — купить оптом | OilMate`}
+        description={`${product.name} ${product.volume} по цене ${product.price}₽. ${product.description.slice(0, 120)}...`}
+        keywords={`${product.brand}, ${product.oilType}, ${product.volume}, моторное масло, купить`}
+        canonicalUrl={`https://oilmate-b2b-hub.lovable.app/product/${id}`}
+        ogType="product"
+        structuredData={structuredData}
+      />
       <Header />
-      <main className="py-4 md:py-6">
+      <main className="py-4 md:py-6" itemScope itemType="https://schema.org/Product">
         <div className="container">
           {/* Breadcrumbs */}
           <nav className="mb-4 md:mb-6 flex items-center gap-2 text-sm text-muted-foreground">
