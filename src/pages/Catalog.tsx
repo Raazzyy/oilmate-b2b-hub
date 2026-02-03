@@ -44,7 +44,6 @@ const categorySpecificFilters: Record<string, { label: string; options: string[]
   ],
   lubricants: [
     { label: "Тип смазки", options: ["Пластичная", "Литиевая", "Молибденовая", "Силиконовая"] },
-    { label: "Применение", options: ["Универсальная", "Подшипники", "Шарниры", "Цепи"] },
     { label: "Вес", options: ["100 г", "400 г", "800 г", "1 кг", "5 кг"] },
   ],
   antifreeze: [
@@ -317,16 +316,18 @@ const Catalog = () => {
                   />
                 </div>
                 
-                {/* Volume filter */}
-                <div className="mb-6">
-                  <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
-                  <ChipFilter
-                    items={volumes}
-                    selected={selectedVolumes}
-                    onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
-                    visibleCount={4}
-                  />
-                </div>
+                {/* Volume filter - hide for lubricants */}
+                {activeCategory !== 'lubricants' && (
+                  <div className="mb-6">
+                    <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
+                    <ChipFilter
+                      items={volumes}
+                      selected={selectedVolumes}
+                      onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
+                      visibleCount={4}
+                    />
+                  </div>
+                )}
 
                 {/* Category-specific filters */}
                 {activeCategory && categorySpecificFilters[activeCategory] && (
