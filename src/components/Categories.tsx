@@ -1,66 +1,73 @@
-import { Car, Cog, Droplets, Factory, Snowflake, Package } from "lucide-react";
+import { Percent, Sparkles, Car, Cog, Droplets, Factory, Snowflake, LayoutGrid } from "lucide-react";
 
 const categories = [
   {
+    icon: Percent,
+    title: "Все акции",
+    color: "text-primary",
+    bgColor: "bg-primary/10",
+  },
+  {
+    icon: Sparkles,
+    title: "Новинки",
+    color: "text-success",
+    bgColor: "bg-success/10",
+  },
+  {
     icon: Car,
     title: "Моторные масла",
-    count: "1 250",
-    gradient: "from-blue-500 to-blue-600",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
   {
     icon: Cog,
     title: "Трансмиссионные",
-    count: "420",
-    gradient: "from-green-500 to-green-600",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
   {
     icon: Droplets,
     title: "Гидравлические",
-    count: "380",
-    gradient: "from-purple-500 to-purple-600",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
   {
     icon: Factory,
     title: "Индустриальные",
-    count: "290",
-    gradient: "from-orange-500 to-orange-600",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
   {
     icon: Snowflake,
     title: "Антифризы",
-    count: "180",
-    gradient: "from-cyan-500 to-cyan-600",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
   {
-    icon: Package,
-    title: "Смазки",
-    count: "340",
-    gradient: "from-rose-500 to-rose-600",
+    icon: LayoutGrid,
+    title: "Все товары",
+    color: "text-foreground",
+    bgColor: "bg-muted",
   },
 ];
 
 const Categories = () => {
   return (
-    <section className="py-8">
+    <section className="py-6">
       <div className="container">
-        <h2 className="mb-6 text-2xl font-bold text-foreground">
-          Категории товаров
-        </h2>
-
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
+        <div className="flex items-center justify-center gap-6 overflow-x-auto pb-2">
           {categories.map((category, index) => (
             <a
               key={index}
               href="#"
-              className="group flex flex-col items-center rounded-2xl bg-card border border-border p-5 text-center transition-all hover:shadow-lg hover:-translate-y-1"
+              className="group flex flex-col items-center text-center shrink-0"
             >
               <div
-                className={`mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${category.gradient} transition-transform group-hover:scale-110`}
+                className={`mb-3 flex h-20 w-20 items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:shadow-md group-hover:scale-105`}
               >
-                <category.icon className="h-7 w-7 text-white" />
+                <category.icon className={`h-9 w-9 ${category.color}`} />
               </div>
-              <h3 className="mb-1 text-sm font-semibold text-foreground">{category.title}</h3>
-              <p className="text-xs text-muted-foreground">{category.count} товаров</p>
+              <span className="text-sm text-foreground max-w-[90px] leading-tight">{category.title}</span>
             </a>
           ))}
         </div>
