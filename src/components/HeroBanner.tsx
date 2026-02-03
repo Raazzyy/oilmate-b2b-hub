@@ -57,29 +57,18 @@ const HeroBanner = () => {
           {/* Side banner */}
           <div className="h-[380px] rounded-3xl overflow-hidden bg-gradient-to-br from-accent to-accent/80 p-6 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-sm">М</span>
-                </div>
-                <span className="text-primary-foreground font-semibold">маслопт</span>
-              </div>
-              
-              <div className="inline-block bg-card text-foreground font-bold px-4 py-2 rounded-lg mb-4">
-                До +7% кешбэка
-              </div>
-              
-              <h3 className="text-2xl font-bold text-primary-foreground leading-snug mb-2">
-                за оплату покупок<br/>
-                картой партнёра
+              <h3 className="text-2xl font-bold text-primary-foreground leading-snug mb-4">
+                Широкий ассортимент<br/>
+                моторных масел
               </h3>
               
               <p className="text-primary-foreground/80 text-sm">
-                Легко оформить,<br/>выгодно платить
+                Для легковых и грузовых<br/>автомобилей, спецтехники
               </p>
             </div>
 
             <Button className="bg-card text-foreground hover:bg-card/90 font-semibold w-fit px-8 h-11 rounded-xl">
-              Оформить
+              Смотреть каталог
             </Button>
           </div>
         </div>
