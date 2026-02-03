@@ -29,7 +29,7 @@ const Header = () => {
       <div className="container py-4">
         <div className="flex items-center gap-4">
           {/* Catalog button */}
-          <Button className="hidden md:flex gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0">
+          <Button className="hidden md:flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0 shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30">
             <Menu className="h-5 w-5" />
             Каталог
           </Button>
