@@ -15,96 +15,129 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 20% 15%;
+    /* Apple-inspired clean palette */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 0 0% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 217 91% 55%;
+    /* Primary - elegant dark */
+    --primary: 0 0% 11%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 25% 95%;
-    --secondary-foreground: 220 20% 15%;
+    /* Secondary - soft warm gray */
+    --secondary: 30 6% 96%;
+    --secondary-foreground: 0 0% 11%;
 
-    --muted: 215 20% 95%;
-    --muted-foreground: 220 10% 45%;
+    /* Muted - neutral gray */
+    --muted: 220 9% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 199 89% 48%;
+    /* Accent - vibrant blue (Apple blue) */
+    --accent: 211 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    /* Destructive - Apple red */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
-    --ring: 217 91% 55%;
+    /* Success - Apple green */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Apple orange */
+    --warning: 32 95% 54%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Borders - very subtle */
+    --border: 220 9% 93%;
+    --input: 220 9% 93%;
+    --ring: 211 100% 50%;
 
     --radius: 1rem;
 
-    --success: 160 84% 39%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 220 20% 15%;
-
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 217 91% 55%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 0 0% 11%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 95%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 215 20% 88%;
-    --sidebar-ring: 217 91% 55%;
+    --sidebar-accent: 220 9% 96%;
+    --sidebar-accent-foreground: 0 0% 11%;
+    --sidebar-border: 220 9% 93%;
+    --sidebar-ring: 211 100% 50%;
 
-    /* Gradient colors */
-    --gradient-start: 217 91% 55%;
-    --gradient-end: 199 89% 48%;
+    /* Gradient colors - Apple style blue to purple */
+    --gradient-start: 211 100% 50%;
+    --gradient-mid: 259 94% 61%;
+    --gradient-end: 328 85% 57%;
+
+    /* Additional Apple colors */
+    --apple-blue: 211 100% 50%;
+    --apple-purple: 280 87% 65%;
+    --apple-pink: 340 82% 59%;
+    --apple-orange: 32 95% 54%;
+    --apple-green: 142 71% 45%;
+    --apple-teal: 170 77% 44%;
   }
 
   .dark {
-    --background: 220 20% 8%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 98%;
 
-    --card: 220 20% 12%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 220 20% 12%;
+    --popover: 0 0% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 11%;
 
-    --secondary: 220 20% 18%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 15% 60%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 199 89% 55%;
+    --accent: 211 100% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 30%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 217 91% 60%;
+    --success: 142 71% 50%;
+    --success-foreground: 0 0% 100%;
 
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --warning: 32 95% 58%;
+    --warning-foreground: 0 0% 11%;
 
-    --gradient-start: 217 91% 60%;
-    --gradient-end: 199 89% 55%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 211 100% 55%;
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 11%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 211 100% 55%;
+
+    --gradient-start: 211 100% 55%;
+    --gradient-mid: 259 94% 66%;
+    --gradient-end: 328 85% 62%;
+
+    --apple-blue: 211 100% 55%;
+    --apple-purple: 280 87% 70%;
+    --apple-pink: 340 82% 64%;
+    --apple-orange: 32 95% 58%;
+    --apple-green: 142 71% 50%;
+    --apple-teal: 170 77% 49%;
   }
 }
 
@@ -119,38 +152,67 @@
 }
 
 @layer utilities {
+  /* Apple-style multi-color gradient */
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(217, 91%, 55%) 0%, hsl(199, 89%, 48%) 100%);
+    background: linear-gradient(135deg, hsl(211, 100%, 50%) 0%, hsl(259, 94%, 61%) 50%, hsl(328, 85%, 57%) 100%);
   }
   
   .gradient-primary-hover {
-    background: linear-gradient(135deg, hsl(217, 91%, 50%) 0%, hsl(199, 89%, 43%) 100%);
+    background: linear-gradient(135deg, hsl(211, 100%, 45%) 0%, hsl(259, 94%, 56%) 50%, hsl(328, 85%, 52%) 100%);
   }
   
+  /* Subtle gradient for text */
   .gradient-text {
-    background: linear-gradient(135deg, hsl(217, 91%, 55%) 0%, hsl(199, 89%, 48%) 100%);
+    background: linear-gradient(135deg, hsl(211, 100%, 50%) 0%, hsl(259, 94%, 61%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
-  .gradient-border {
-    border-image: linear-gradient(135deg, hsl(217, 91%, 55%) 0%, hsl(199, 89%, 48%) 100%) 1;
+  /* Elegant mesh gradient for hero sections */
+  .gradient-mesh {
+    background: 
+      radial-gradient(at 0% 0%, hsl(211, 100%, 95%) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsl(280, 87%, 95%) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(340, 82%, 95%) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(170, 77%, 95%) 0, transparent 50%),
+      hsl(0, 0%, 100%);
   }
-  
+
+  .dark .gradient-mesh {
+    background: 
+      radial-gradient(at 0% 0%, hsl(211, 100%, 15%) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsl(280, 87%, 15%) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(340, 82%, 15%) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(170, 77%, 15%) 0, transparent 50%),
+      hsl(0, 0%, 7%);
+  }
+
+  /* Subtle animated shimmer */
   .shimmer {
     background: linear-gradient(
       90deg,
-      hsl(217, 91%, 55%) 0%,
-      hsl(199, 89%, 60%) 50%,
-      hsl(217, 91%, 55%) 100%
+      hsl(211, 100%, 50%) 0%,
+      hsl(259, 94%, 61%) 50%,
+      hsl(211, 100%, 50%) 100%
     );
     background-size: 200% 100%;
-    animation: shimmer 2s ease-in-out infinite;
+    animation: shimmer 3s ease-in-out infinite;
   }
   
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+
+  /* Glassmorphism utility */
+  .glass {
+    background: hsl(0 0% 100% / 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .dark .glass {
+    background: hsl(0 0% 10% / 0.8);
   }
 }

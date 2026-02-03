@@ -68,6 +68,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Apple-inspired color palette
+        apple: {
+          blue: "hsl(var(--apple-blue))",
+          purple: "hsl(var(--apple-purple))",
+          pink: "hsl(var(--apple-pink))",
+          orange: "hsl(var(--apple-orange))",
+          green: "hsl(var(--apple-green))",
+          teal: "hsl(var(--apple-teal))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -91,12 +100,17 @@ export default {
           from: { opacity: "0", transform: "translateX(-20px)" },
           to: { opacity: "1", transform: "translateX(0)" },
         },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.5s ease-out forwards",
         "slide-in": "slide-in 0.4s ease-out forwards",
+        "float": "float 6s ease-in-out infinite",
       },
     },
   },
