@@ -187,6 +187,7 @@ const Product = () => {
                   </sup>
                   <span className={`text-xl md:text-2xl font-bold ml-1 ${product.oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-1">Цена указана с НДС 22%</p>
               </div>
 
               {/* Quantity and cart */}
