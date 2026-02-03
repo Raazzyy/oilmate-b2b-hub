@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { Check } from "lucide-react";
+import { useState } from "react";
 
 interface ProductCardProps {
   id?: string | number;
@@ -31,6 +34,7 @@ const ProductCard = ({
   price,
   oldPrice,
   image,
+  inStock,
   oilType,
   isUniversal = true,
   category,
@@ -129,16 +133,53 @@ const ProductCard = ({
           </div>
         </div>
 
-        {/* Add to cart */}
-        <Button 
-          variant="ghost" 
-          className="w-full rounded-full bg-muted hover:bg-primary hover:text-primary-foreground font-medium h-10 transition-all"
-          onClick={(e) => e.stopPropagation()}
-        >
-          В корзину
-        </Button>
+        {/* Add to cart - implemented in wrapper component */}
+        <AddToCartButton product={{ id: Number(id), name, brand, volume, price, oldPrice, image, inStock, oilType, isUniversal, category: category || '' }} />
       </div>
     </div>
+  );
+};
+
+// Separate component for add to cart button to use hooks
+const AddToCartButton = ({ product }: { product: any }) => {
+  const { addToCart, setIsCartOpen } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    addToCart(product);
+    setAdded(true);
+    
+    setTimeout(() => setAdded(false), 1500);
+  };
+
+  const handleOpenCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsCartOpen(true);
+  };
+
+  return (
+    <Button 
+      variant="ghost" 
+      className={`w-full rounded-full font-medium h-10 transition-all ${
+        added 
+          ? "bg-green-100 text-green-700 hover:bg-green-100" 
+          : "bg-muted hover:bg-primary hover:text-primary-foreground"
+      }`}
+      onClick={added ? handleOpenCart : handleAddToCart}
+    >
+      {added ? (
+        <>
+          <Check className="h-4 w-4 mr-1" />
+          Добавлено
+        </>
+      ) : (
+        "В корзину"
+      )}
+    </Button>
   );
 };
 

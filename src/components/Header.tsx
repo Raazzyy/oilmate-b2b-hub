@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { searchProducts, categoryNames } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
 
 const catalogCategories = [
   { id: "motor", name: "Моторные масла", icon: Droplet, description: "Синтетика, полусинтетика, минеральные" },
@@ -14,7 +15,7 @@ const catalogCategories = [
 ];
 
 const Header = () => {
-  const [cartCount] = useState(3);
+  const { getTotalItems, setIsCartOpen } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
@@ -22,6 +23,7 @@ const Header = () => {
   const catalogRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const cartCount = getTotalItems();
   const searchResults = searchProducts(searchQuery);
   const showResults = isSearchFocused && searchQuery.trim().length > 0;
 
@@ -225,11 +227,16 @@ const Header = () => {
           </div>
 
           {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative h-12 w-12 shrink-0">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative h-12 w-12 shrink-0"
+            onClick={() => setIsCartOpen(true)}
+          >
             <ShoppingCart className="h-6 w-6" />
             {cartCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                {cartCount}
+                {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
           </Button>
