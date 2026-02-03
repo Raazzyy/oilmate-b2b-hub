@@ -57,23 +57,23 @@ const products = [
 
 const ProductsSection = () => {
   return (
-    <section className="py-8">
+    <section className="py-8 bg-card">
       <div className="container">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-foreground italic">
             Что интересного
           </h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full border border-border">
+            <Button variant="ghost" size="icon" className="rounded-full border border-border h-10 w-10">
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full border border-border">
+            <Button variant="ghost" size="icon" className="rounded-full border border-border h-10 w-10">
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {products.map((product, index) => (
             <ProductCard key={index} {...product} />
           ))}
