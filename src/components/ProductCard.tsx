@@ -103,7 +103,7 @@ const ProductCard = ({
         </div>
 
         {/* Name - fixed height for alignment */}
-        <h3 className="line-clamp-2 text-sm text-foreground leading-snug mb-2 h-10 group-hover:text-primary transition-colors">
+        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-2 h-10 group-hover:text-primary transition-colors">
           {name}
         </h3>
         

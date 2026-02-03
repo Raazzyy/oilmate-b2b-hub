@@ -68,14 +68,14 @@ const ProductsSection = () => {
     <section className="py-8 bg-card">
       <div className="container">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground italic">
-            Что интересного
+          <h2 className="text-2xl font-semibold text-foreground">
+            Популярные товары
           </h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full border border-border h-10 w-10">
+            <Button variant="ghost" size="icon" className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10">
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full border border-border h-10 w-10">
+            <Button variant="ghost" size="icon" className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10">
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>

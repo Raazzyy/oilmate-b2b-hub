@@ -76,7 +76,7 @@ const Categories = () => {
               >
                 <category.icon className={`h-9 w-9 ${category.color}`} />
               </div>
-              <span className="text-sm text-foreground max-w-[90px] leading-tight">{category.title}</span>
+              <span className="text-sm font-medium text-foreground max-w-[90px] leading-tight">{category.title}</span>
             </Link>
           ))}
         </div>
