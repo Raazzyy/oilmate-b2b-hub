@@ -12,6 +12,15 @@ interface ProductCardProps {
   inStock: boolean;
   oilType: string;
   isUniversal?: boolean;
+  category?: string;
+  viscosity?: string;
+  approvals?: string;
+  specification?: string;
+  viscosityClass?: string;
+  application?: string;
+  standard?: string;
+  color?: string;
+  type?: string;
 }
 
 const ProductCard = ({
@@ -24,7 +33,39 @@ const ProductCard = ({
   image,
   oilType,
   isUniversal = true,
+  category,
+  viscosity,
+  approvals,
+  specification,
+  viscosityClass,
+  application,
+  standard,
+  color,
 }: ProductCardProps) => {
+  // Формируем строку характеристик в зависимости от категории
+  const getSpecsLine = () => {
+    const specs: string[] = [volume, oilType, brand];
+    
+    if (category === "motor" && viscosity) {
+      specs.push(viscosity);
+    }
+    if (category === "transmission" && specification) {
+      specs.push(specification);
+    }
+    if (category === "hydraulic" && viscosityClass) {
+      specs.push(viscosityClass);
+    }
+    if (category === "industrial" && application) {
+      specs.push(application);
+    }
+    if (category === "antifreeze") {
+      if (standard) specs.push(standard);
+      if (color) specs.push(color);
+    }
+    if (isUniversal) specs.push("Универсальное");
+    
+    return specs.join(" · ");
+  };
   // Разделяем цену на рубли и копейки
   const rubles = Math.floor(price);
   const kopecks = Math.round((price - rubles) * 100) || 99;
@@ -64,7 +105,7 @@ const ProductCard = ({
         
         {/* Volume and parameters inline - fixed height */}
         <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
-          {volume} · {oilType} · {brand}{isUniversal && " · Универсальное"}
+          {getSpecsLine()}
         </p>
       </Link>
 

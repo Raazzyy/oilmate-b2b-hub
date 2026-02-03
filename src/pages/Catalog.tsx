@@ -8,7 +8,28 @@ import { useParams } from "react-router-dom";
 import oilProductImage from "@/assets/oil-product.png";
 import { useState } from "react";
 
-const allProducts = [
+interface ProductData {
+  name: string;
+  brand: string;
+  volume: string;
+  price: number;
+  oldPrice?: number;
+  image: string;
+  inStock: boolean;
+  oilType: string;
+  isUniversal?: boolean;
+  category: string;
+  viscosity?: string;
+  approvals?: string;
+  specification?: string;
+  viscosityClass?: string;
+  application?: string;
+  standard?: string;
+  color?: string;
+  type?: string;
+}
+
+const allProducts: ProductData[] = [
   {
     name: "Shell Helix Ultra 5W-40 синтетическое",
     brand: "Shell",
@@ -20,6 +41,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "motor",
+    viscosity: "5W-40",
+    approvals: "MB 229.5",
   },
   {
     name: "Mobil 1 ESP Formula 5W-30 синтетическое",
@@ -31,6 +54,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "motor",
+    viscosity: "5W-30",
+    approvals: "ACEA C3",
   },
   {
     name: "Castrol EDGE 5W-30 LL синтетическое",
@@ -42,6 +67,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: false,
     category: "motor",
+    viscosity: "5W-30",
+    approvals: "BMW LL-04",
   },
   {
     name: "Лукойл Genesis Armortech 5W-40",
@@ -53,6 +80,8 @@ const allProducts = [
     oilType: "Полусинтетика",
     isUniversal: true,
     category: "motor",
+    viscosity: "5W-40",
+    approvals: "API SN",
   },
   {
     name: "Total Quartz INEO ECS 5W-30",
@@ -65,6 +94,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "motor",
+    viscosity: "5W-30",
+    approvals: "ACEA C3",
   },
   {
     name: "Mannol Extra Getriebeoel 75W-90",
@@ -76,6 +107,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "transmission",
+    viscosity: "75W-90",
+    specification: "GL-5",
   },
   {
     name: "Liqui Moly Hypoid GL5 75W-90",
@@ -87,6 +120,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "transmission",
+    viscosity: "75W-90",
+    specification: "GL-5",
   },
   {
     name: "Shell Spirax S6 AXME 75W-90",
@@ -98,6 +133,8 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: false,
     category: "transmission",
+    viscosity: "75W-90",
+    specification: "GL-4",
   },
   {
     name: "Mobil ATF 3309",
@@ -109,6 +146,7 @@ const allProducts = [
     oilType: "Синтетическое",
     isUniversal: true,
     category: "hydraulic",
+    viscosityClass: "HLP 46",
   },
   {
     name: "Fuchs Renolin B 46 HVI",
@@ -120,6 +158,7 @@ const allProducts = [
     oilType: "Минеральное",
     isUniversal: true,
     category: "industrial",
+    application: "Компрессорное",
   },
   {
     name: "Felix Prolonger G12+ красный",
@@ -131,6 +170,9 @@ const allProducts = [
     oilType: "Готовый",
     isUniversal: true,
     category: "antifreeze",
+    type: "Готовый",
+    standard: "G12+",
+    color: "Красный",
   },
   {
     name: "Sintec Antifreeze Ultra G11 зеленый",
@@ -143,6 +185,9 @@ const allProducts = [
     oilType: "Готовый",
     isUniversal: true,
     category: "antifreeze",
+    type: "Готовый",
+    standard: "G11",
+    color: "Зеленый",
   },
 ];
 
@@ -250,7 +295,7 @@ const ChipFilter = ({
 const Catalog = () => {
   const { category } = useParams();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categoryFilters, setCategoryFilters] = useState<Record<string, string[]>>({});
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
   const [priceFrom, setPriceFrom] = useState("");
@@ -267,6 +312,16 @@ const Catalog = () => {
     }
   };
 
+  const selectCategory = (catId: string) => {
+    if (selectedCategory === catId) {
+      setSelectedCategory(null);
+      setCategoryFilters({});
+    } else {
+      setSelectedCategory(catId);
+      setCategoryFilters({});
+    }
+  };
+
   const toggleCategoryFilter = (filterLabel: string, value: string) => {
     setCategoryFilters(prev => {
       const current = prev[filterLabel] || [];
@@ -278,19 +333,18 @@ const Catalog = () => {
     });
   };
 
-  // Определяем активные категории для показа специфичных фильтров
-  const activeCategories = selectedCategories.length > 0 
-    ? selectedCategories 
-    : (category && category !== "all" && category !== "promo" && category !== "new" ? [category] : []);
+  // Определяем активную категорию для показа специфичных фильтров
+  const activeCategory = selectedCategory 
+    || (category && category !== "all" && category !== "promo" && category !== "new" ? category : null);
 
   const filteredProducts = allProducts.filter((product) => {
-    // Фильтр по URL категории (если не выбраны категории в фильтрах)
+    // Фильтр по URL категории (если не выбрана категория в фильтрах)
     if (category && category !== "all" && category !== "promo" && category !== "new") {
-      if (selectedCategories.length === 0 && product.category !== category) return false;
+      if (!selectedCategory && product.category !== category) return false;
     }
     
-    // Фильтр по выбранным категориям
-    if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
+    // Фильтр по выбранной категории
+    if (selectedCategory && product.category !== selectedCategory) {
       return false;
     }
     
@@ -315,14 +369,14 @@ const Catalog = () => {
 
   const resetFilters = () => {
     setSelectedBrands([]);
-    setSelectedCategories([]);
+    setSelectedCategory(null);
     setCategoryFilters({});
     setSelectedVolumes([]);
     setPriceFrom("");
     setPriceTo("");
   };
 
-  const hasActiveFilters = selectedBrands.length > 0 || selectedCategories.length > 0 || Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || selectedVolumes.length > 0 || priceFrom || priceTo;
+  const hasActiveFilters = selectedBrands.length > 0 || selectedCategory || Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || selectedVolumes.length > 0 || priceFrom || priceTo;
 
   return (
     <div className="min-h-screen bg-background">
@@ -385,15 +439,21 @@ const Catalog = () => {
                 {/* Category filter */}
                 <div className="mb-6">
                   <span className="text-sm text-muted-foreground mb-3 block">Категория</span>
-                  <ChipFilter
-                    items={filterCategories.map(c => c.name)}
-                    selected={selectedCategories.map(id => filterCategories.find(c => c.id === id)?.name || "")}
-                    onToggle={(name) => {
-                      const cat = filterCategories.find(c => c.name === name);
-                      if (cat) toggleFilter(cat.id, selectedCategories, setSelectedCategories);
-                    }}
-                    visibleCount={5}
-                  />
+                  <div className="flex flex-wrap gap-2">
+                    {filterCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => selectCategory(cat.id)}
+                        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                          selectedCategory === cat.id
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background border-border text-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Brand filter */}
@@ -419,28 +479,24 @@ const Catalog = () => {
                 </div>
 
                 {/* Category-specific filters */}
-                {activeCategories.length > 0 && activeCategories.map(catId => {
-                  const filters = categorySpecificFilters[catId];
-                  if (!filters) return null;
-                  return (
-                    <div key={catId} className="mb-4">
-                      <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
-                        {categoryNames[catId]}
-                      </div>
-                      {filters.map(filter => (
-                        <div key={filter.label} className="mb-4">
-                          <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
-                          <ChipFilter
-                            items={filter.options}
-                            selected={categoryFilters[`${catId}_${filter.label}`] || []}
-                            onToggle={(item) => toggleCategoryFilter(`${catId}_${filter.label}`, item)}
-                            visibleCount={4}
-                          />
-                        </div>
-                      ))}
+                {activeCategory && categorySpecificFilters[activeCategory] && (
+                  <div className="mb-4">
+                    <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
+                      {categoryNames[activeCategory]}
                     </div>
-                  );
-                })}
+                    {categorySpecificFilters[activeCategory].map(filter => (
+                      <div key={filter.label} className="mb-4">
+                        <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
+                        <ChipFilter
+                          items={filter.options}
+                          selected={categoryFilters[`${activeCategory}_${filter.label}`] || []}
+                          onToggle={(item) => toggleCategoryFilter(`${activeCategory}_${filter.label}`, item)}
+                          visibleCount={4}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Apply button */}
                 <Button className="w-full rounded-xl gradient-primary text-primary-foreground">
