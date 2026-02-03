@@ -30,40 +30,27 @@ const ProductCard = ({
   const oldKopecks = oldPrice ? Math.round((oldPrice - Math.floor(oldPrice)) * 100) || 99 : null;
 
   return (
-    <div className="group relative flex flex-col p-2">
+    <div className="group relative flex flex-col p-3">
       {/* Image container */}
       <div className="relative mb-3">
         <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
           <img
             src={image}
             alt={name}
-            className="h-full w-full object-contain p-4 transition-transform group-hover:scale-105"
+            className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
           />
         </div>
       </div>
 
-      {/* Parameters */}
-      <div className="mb-2 flex flex-wrap gap-1">
-        <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-          {oilType}
-        </span>
-        <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-          {brand}
-        </span>
-        {isUniversal && (
-          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            Универсальное
-          </span>
-        )}
-      </div>
-
       {/* Name */}
-      <h3 className="line-clamp-3 text-sm text-foreground leading-snug mb-1 min-h-[3.75rem]">
+      <h3 className="line-clamp-3 text-sm text-foreground leading-snug mb-2 min-h-[3.75rem]">
         {name}
       </h3>
       
-      {/* Volume */}
-      <p className="text-xs text-muted-foreground mb-3">{volume}</p>
+      {/* Volume and parameters inline */}
+      <p className="text-xs text-muted-foreground mb-3">
+        {volume} · {oilType} · {brand}{isUniversal && " · Универсальное"}
+      </p>
 
       {/* Price */}
       <div className="mb-3 flex items-baseline gap-2">
