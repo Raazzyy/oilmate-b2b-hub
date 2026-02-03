@@ -36,12 +36,12 @@ const ProductCard = ({
   const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
 
   return (
-    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl">
+    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
       {/* Clickable area for product page */}
       <Link to={`/product/${id}`} className="block">
         {/* Image container */}
         <div className="relative mb-3">
-          <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
+          <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-muted to-muted/50">
             <img
               src={image}
               alt={name}
@@ -51,7 +51,7 @@ const ProductCard = ({
           
           {/* Discount badge */}
           {discountPercent && discountPercent > 0 && (
-            <span className="absolute left-2 bottom-2 rounded-md bg-warning px-2 py-1 text-xs font-bold text-warning-foreground">
+            <span className="absolute left-2 bottom-2 rounded-md bg-gradient-to-r from-primary to-accent px-2 py-1 text-xs font-bold text-primary-foreground shadow-md">
               -{discountPercent}%
             </span>
           )}
@@ -77,21 +77,21 @@ const ProductCard = ({
               {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
             </span>
           )}
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-warning px-1.5 py-0.5 rounded' : ''}`}>
-            <span className="text-xl font-bold text-foreground">
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-1.5 py-0.5 rounded' : ''}`}>
+            <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")}
             </span>
-            <sup className="text-[10px] font-bold text-foreground ml-px">
+            <sup className={`text-[10px] font-bold ml-px ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
               {kopecks.toString().padStart(2, '0')}
             </sup>
-            <span className="text-base font-bold text-foreground ml-0.5">₽</span>
+            <span className={`text-base font-bold ml-0.5 ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
           </div>
         </div>
 
         {/* Add to cart */}
         <Button 
           variant="outline" 
-          className="w-full rounded-full border border-border hover:bg-muted font-medium h-10"
+          className="w-full rounded-full border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary font-medium h-10 transition-all"
           onClick={(e) => e.stopPropagation()}
         >
           В корзину
