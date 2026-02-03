@@ -9,6 +9,7 @@ import Catalog from "./pages/Catalog";
 import Product from "./pages/Product";
 import NotFound from "./pages/NotFound";
 import CartDrawer from "./components/CartDrawer";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <CartDrawer />
+        <CookieConsent />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
