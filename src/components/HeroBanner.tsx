@@ -19,13 +19,13 @@ const HeroBanner = () => {
             {/* Navigation arrows */}
             <button 
               onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center shadow-lg hover:bg-card transition-colors backdrop-blur-sm"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button 
               onClick={() => setCurrentSlide(prev => Math.min(2, prev + 1))}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center shadow-lg hover:bg-card transition-colors backdrop-blur-sm"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -38,7 +38,7 @@ const HeroBanner = () => {
               </div>
 
               <div className="relative z-10">
-                <h2 className="text-5xl font-black text-primary-foreground leading-tight drop-shadow-lg">
+                <h2 className="text-5xl font-black text-primary-foreground leading-tight">
                   ЦЕНТР<br/>
                   НИЗКИХ<br/>
                   ЦЕН
@@ -46,12 +46,12 @@ const HeroBanner = () => {
               </div>
 
               <div className="relative z-10 flex items-end justify-between">
-                <Button className="bg-card text-foreground hover:bg-card/90 font-semibold px-8 h-12 rounded-xl text-lg shadow-xl">
+                <Button className="bg-card text-foreground hover:bg-card/90 font-semibold px-8 h-12 rounded-xl text-lg">
                   Подробнее
                 </Button>
 
                 <div className="text-right text-primary-foreground">
-                  <p className="text-lg mb-2 drop-shadow">Ищите товары со<br/>специальным ценником</p>
+                  <p className="text-lg mb-2">Ищите товары со<br/>специальным ценником</p>
                   <div className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
                     <span className="text-lg font-semibold">Выгодно</span>
                   </div>
@@ -67,7 +67,7 @@ const HeroBanner = () => {
             <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             
             <div className="relative z-10">
-              <h3 className="text-2xl font-bold text-primary-foreground leading-snug mb-4 drop-shadow">
+              <h3 className="text-2xl font-bold text-primary-foreground leading-snug mb-4">
                 Широкий ассортимент<br/>
                 моторных масел
               </h3>
@@ -77,7 +77,7 @@ const HeroBanner = () => {
               </p>
             </div>
 
-            <Button className="relative z-10 bg-card text-foreground hover:bg-card/90 font-semibold w-fit px-8 h-11 rounded-xl shadow-lg">
+            <Button className="relative z-10 bg-card text-foreground hover:bg-card/90 font-semibold w-fit px-8 h-11 rounded-xl">
               Смотреть каталог
             </Button>
           </div>
