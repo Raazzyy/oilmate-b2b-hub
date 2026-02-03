@@ -61,7 +61,7 @@ const ProductCard = ({
   const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
 
   return (
-    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl transition-all duration-300">
+    <div className="group relative flex flex-col h-full p-3 transition-all duration-300">
       {/* Clickable area for product page */}
       <Link to={`/product/${id}`} className="block">
         {/* Image container */}
