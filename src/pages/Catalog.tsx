@@ -226,7 +226,7 @@ const Catalog = () => {
           {/* Title and filter toggle */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-foreground">{categoryTitle}</h1>
+              <h1 className="text-2xl font-semibold text-foreground">{categoryTitle}</h1>
               {searchQuery && (
                 <button
                   onClick={clearSearch}
@@ -251,7 +251,7 @@ const Catalog = () => {
             {/* Filters sidebar */}
             <aside className={`w-64 shrink-0 ${showFilters ? 'block' : 'hidden'} md:block`}>
               <div className="sticky top-24 bg-card rounded-2xl p-5">
-                <h3 className="font-semibold text-foreground mb-5">Фильтры</h3>
+                <h3 className="font-medium text-foreground mb-5">Фильтры</h3>
                 
                 {/* Price filter */}
                 <div className="mb-6">
