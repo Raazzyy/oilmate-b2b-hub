@@ -58,19 +58,20 @@ const Categories = () => {
     <section className="py-4 md:py-6">
       <div className="container">
         {/* Mobile: horizontal scroll, Desktop: even grid */}
-        <div className="flex md:grid md:grid-cols-7 gap-4 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
+        <div className="flex md:grid md:grid-cols-7 gap-6 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
           {categories.map((category, index) => (
             <Link
               key={index}
               to={category.href}
-              className="group flex flex-col items-center text-center shrink-0 w-[72px] md:w-auto"
+              className="group flex flex-col items-center text-center shrink-0"
+              style={{ minWidth: '80px' }}
             >
               <div
                 className={`mb-2 md:mb-3 flex h-16 w-16 md:h-[72px] md:w-[72px] items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
               >
                 <category.icon className={`h-7 w-7 md:h-8 md:w-8 ${category.color}`} strokeWidth={1.5} />
               </div>
-              <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center w-full">
+              <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center whitespace-nowrap">
                 {category.title}
               </span>
             </Link>
