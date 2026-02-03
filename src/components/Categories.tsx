@@ -1,4 +1,5 @@
 import { Percent, Sparkles, Car, Cog, Droplets, Factory, Snowflake, LayoutGrid } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const categories = [
   {
@@ -6,48 +7,56 @@ const categories = [
     title: "Все акции",
     color: "text-primary",
     bgColor: "bg-primary/10",
+    href: "/catalog/promo",
   },
   {
     icon: Sparkles,
     title: "Новинки",
     color: "text-success",
     bgColor: "bg-success/10",
+    href: "/catalog/new",
   },
   {
     icon: Car,
     title: "Моторные масла",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/motor",
   },
   {
     icon: Cog,
     title: "Трансмиссионные",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/transmission",
   },
   {
     icon: Droplets,
     title: "Гидравлические",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/hydraulic",
   },
   {
     icon: Factory,
     title: "Индустриальные",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/industrial",
   },
   {
     icon: Snowflake,
     title: "Антифризы",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/antifreeze",
   },
   {
     icon: LayoutGrid,
     title: "Все товары",
     color: "text-foreground",
     bgColor: "bg-muted",
+    href: "/catalog/all",
   },
 ];
 
@@ -57,9 +66,9 @@ const Categories = () => {
       <div className="container">
         <div className="flex items-start justify-between overflow-x-auto pb-2">
           {categories.map((category, index) => (
-            <a
+            <Link
               key={index}
-              href="#"
+              to={category.href}
               className="group flex flex-col items-center text-center flex-1 min-w-0"
             >
               <div
@@ -68,7 +77,7 @@ const Categories = () => {
                 <category.icon className={`h-9 w-9 ${category.color}`} />
               </div>
               <span className="text-sm text-foreground max-w-[90px] leading-tight">{category.title}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </div>
