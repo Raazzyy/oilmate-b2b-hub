@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { allProducts, categoryNames, type ProductData } from "@/data/products";
 
 // Filters configuration is now local, products data is imported from @/data/products
@@ -118,6 +118,18 @@ const Catalog = () => {
   const [priceTo, setPriceTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
+  // Lock body scroll when mobile filters are open
+  useEffect(() => {
+    if (showFilters) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showFilters]);
+
   const clearSearch = () => {
     searchParams.delete("search");
     setSearchParams(searchParams);
@@ -216,26 +228,139 @@ const Catalog = () => {
 
   const hasActiveFilters = selectedBrands.length > 0 || selectedCategory || Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || selectedVolumes.length > 0 || priceFrom || priceTo;
 
+  const FiltersContent = () => (
+    <>
+      {/* Price filter */}
+      <div className="mb-6">
+        <span className="text-sm text-muted-foreground mb-3 block">Цена</span>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              type="number"
+              placeholder="от"
+              value={priceFrom}
+              onChange={(e) => setPriceFrom(e.target.value)}
+              className="pr-6 rounded-xl"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
+          </div>
+          <div className="relative flex-1">
+            <Input
+              type="number"
+              placeholder="до"
+              value={priceTo}
+              onChange={(e) => setPriceTo(e.target.value)}
+              className="pr-6 rounded-xl"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Category filter */}
+      <div className="mb-6">
+        <span className="text-sm text-muted-foreground mb-3 block">Категория</span>
+        <div className="flex flex-wrap gap-2">
+          {filterCategories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => selectCategory(cat.id)}
+              className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                selectedCategory === cat.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-foreground hover:bg-muted-foreground/20"
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Brand filter */}
+      <div className="mb-6">
+        <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
+        <ChipFilter
+          items={brands}
+          selected={selectedBrands}
+          onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
+          visibleCount={5}
+        />
+      </div>
+      
+      {/* Volume filter - hide for lubricants */}
+      {activeCategory !== 'lubricants' && (
+        <div className="mb-6">
+          <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
+          <ChipFilter
+            items={volumes}
+            selected={selectedVolumes}
+            onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
+            visibleCount={4}
+          />
+        </div>
+      )}
+
+      {/* Category-specific filters */}
+      {activeCategory && categorySpecificFilters[activeCategory] && (
+        <div className="mb-4">
+          <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
+            {categoryNames[activeCategory]}
+          </div>
+          {categorySpecificFilters[activeCategory].map(filter => (
+            <div key={filter.label} className="mb-4">
+              <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
+              <ChipFilter
+                items={filter.options}
+                selected={categoryFilters[`${activeCategory}_${filter.label}`] || []}
+                onToggle={(item) => toggleCategoryFilter(`${activeCategory}_${filter.label}`, item)}
+                visibleCount={4}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Apply button */}
+      <Button 
+        className="w-full rounded-xl gradient-primary text-primary-foreground"
+        onClick={() => setShowFilters(false)}
+      >
+        Применить
+      </Button>
+
+      {hasActiveFilters && (
+        <Button
+          variant="ghost"
+          className="w-full text-primary mt-2"
+          onClick={resetFilters}
+        >
+          Сбросить фильтры
+        </Button>
+      )}
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="py-6">
+      <main className="py-4 md:py-6">
         <div className="container">
           {/* Breadcrumbs */}
-          <nav className="mb-4 text-sm text-muted-foreground">
+          <nav className="mb-3 md:mb-4 text-sm text-muted-foreground">
             <a href="/" className="hover:text-primary">Главная</a>
             <span className="mx-2">/</span>
             <span className="text-foreground">{categoryTitle}</span>
           </nav>
 
           {/* Title and filter toggle */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-foreground">{categoryTitle}</h1>
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+              <h1 className="text-xl md:text-2xl font-semibold text-foreground">{categoryTitle}</h1>
               {searchQuery && (
                 <button
                   onClick={clearSearch}
-                  className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+                  className="flex items-center gap-1 px-2 md:px-3 py-1 bg-primary/10 text-primary rounded-full text-xs md:text-sm hover:bg-primary/20 transition-colors"
                 >
                   <X className="h-3 w-3" />
                   Сбросить поиск
@@ -244,125 +369,23 @@ const Catalog = () => {
             </div>
             <Button
               variant="outline"
-              className="md:hidden gap-2"
-              onClick={() => setShowFilters(!showFilters)}
+              className="md:hidden gap-2 shrink-0"
+              onClick={() => setShowFilters(true)}
             >
               <SlidersHorizontal className="h-4 w-4" />
               Фильтры
+              {hasActiveFilters && (
+                <span className="w-2 h-2 bg-primary rounded-full" />
+              )}
             </Button>
           </div>
 
           <div className="flex gap-8">
-            {/* Filters sidebar */}
-            <aside className={`w-64 shrink-0 ${showFilters ? 'block' : 'hidden'} md:block`}>
+            {/* Filters sidebar - desktop */}
+            <aside className="hidden md:block w-64 shrink-0">
               <div className="sticky top-24 bg-card rounded-2xl p-5">
                 <h3 className="font-medium text-foreground mb-5">Фильтры</h3>
-                
-                {/* Price filter */}
-                <div className="mb-6">
-                  <span className="text-sm text-muted-foreground mb-3 block">Цена</span>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        type="number"
-                        placeholder="от"
-                        value={priceFrom}
-                        onChange={(e) => setPriceFrom(e.target.value)}
-                        className="pr-6 rounded-xl"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
-                    </div>
-                    <div className="relative flex-1">
-                      <Input
-                        type="number"
-                        placeholder="до"
-                        value={priceTo}
-                        onChange={(e) => setPriceTo(e.target.value)}
-                        className="pr-6 rounded-xl"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Category filter */}
-                <div className="mb-6">
-                  <span className="text-sm text-muted-foreground mb-3 block">Категория</span>
-                  <div className="flex flex-wrap gap-2">
-                    {filterCategories.map((cat) => (
-                      <button
-                        key={cat.id}
-                        onClick={() => selectCategory(cat.id)}
-                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                          selectedCategory === cat.id
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-foreground hover:bg-muted-foreground/20"
-                        }`}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Brand filter */}
-                <div className="mb-6">
-                  <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
-                  <ChipFilter
-                    items={brands}
-                    selected={selectedBrands}
-                    onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
-                    visibleCount={5}
-                  />
-                </div>
-                
-                {/* Volume filter - hide for lubricants */}
-                {activeCategory !== 'lubricants' && (
-                  <div className="mb-6">
-                    <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
-                    <ChipFilter
-                      items={volumes}
-                      selected={selectedVolumes}
-                      onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
-                      visibleCount={4}
-                    />
-                  </div>
-                )}
-
-                {/* Category-specific filters */}
-                {activeCategory && categorySpecificFilters[activeCategory] && (
-                  <div className="mb-4">
-                    <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
-                      {categoryNames[activeCategory]}
-                    </div>
-                    {categorySpecificFilters[activeCategory].map(filter => (
-                      <div key={filter.label} className="mb-4">
-                        <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
-                        <ChipFilter
-                          items={filter.options}
-                          selected={categoryFilters[`${activeCategory}_${filter.label}`] || []}
-                          onToggle={(item) => toggleCategoryFilter(`${activeCategory}_${filter.label}`, item)}
-                          visibleCount={4}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Apply button */}
-                <Button className="w-full rounded-xl gradient-primary text-primary-foreground">
-                  Применить
-                </Button>
-
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    className="w-full text-primary mt-2"
-                    onClick={resetFilters}
-                  >
-                    Сбросить фильтры
-                  </Button>
-                )}
+                <FiltersContent />
               </div>
             </aside>
 
@@ -373,7 +396,7 @@ const Catalog = () => {
               </div>
               
               {filteredProducts.length > 0 ? (
-                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filteredProducts.map((product, index) => (
                     <ProductCard key={index} {...product} />
                   ))}
@@ -395,6 +418,37 @@ const Catalog = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Mobile Filters Panel */}
+      {showFilters && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowFilters(false)}
+          />
+          
+          {/* Panel */}
+          <div className="absolute right-0 top-0 bottom-0 w-[90%] max-w-sm bg-card overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card z-10">
+              <span className="font-semibold text-lg">Фильтры</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowFilters(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+
+            {/* Filters */}
+            <div className="p-4">
+              <FiltersContent />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

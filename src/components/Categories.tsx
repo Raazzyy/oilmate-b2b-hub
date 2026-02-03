@@ -55,21 +55,22 @@ const categories = [
 
 const Categories = () => {
   return (
-    <section className="py-6">
+    <section className="py-4 md:py-6">
       <div className="container">
-        <div className="flex items-start justify-between overflow-x-auto pb-2">
+        {/* Horizontal scroll on mobile, grid on desktop */}
+        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 md:pb-0 md:overflow-visible md:grid md:grid-cols-7 scrollbar-hide">
           {categories.map((category, index) => (
             <Link
               key={index}
               to={category.href}
-              className="group flex flex-col items-center text-center flex-1 min-w-0"
+              className="group flex flex-col items-center text-center shrink-0 w-20 md:w-auto"
             >
               <div
-                className={`mb-3 flex h-20 w-20 items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
+                className={`mb-2 md:mb-3 flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
               >
-                <category.icon className={`h-9 w-9 ${category.color}`} />
+                <category.icon className={`h-7 w-7 md:h-9 md:w-9 ${category.color}`} />
               </div>
-              <span className="text-sm font-medium text-foreground max-w-[90px] leading-tight">{category.title}</span>
+              <span className="text-xs md:text-sm font-medium text-foreground max-w-[80px] md:max-w-[90px] leading-tight">{category.title}</span>
             </Link>
           ))}
         </div>

@@ -20,6 +20,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const catalogRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -43,9 +44,22 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleProductClick = (productId: number) => {
     setSearchQuery("");
     setIsSearchFocused(false);
+    setIsMobileMenuOpen(false);
     navigate(`/product/${productId}`);
   };
 
@@ -53,6 +67,7 @@ const Header = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setIsSearchFocused(false);
+      setIsMobileMenuOpen(false);
       navigate(`/catalog?search=${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -63,184 +78,274 @@ const Header = () => {
 
   const handleCategoryClick = (categoryId: string) => {
     setIsCatalogOpen(false);
+    setIsMobileMenuOpen(false);
     navigate(`/catalog/${categoryId}`);
   };
 
   return (
-    <header className="w-full bg-card">
-      {/* Top navigation */}
-      <div>
-        <div className="container">
-          <nav className="flex items-center gap-6 py-2 text-sm">
-            {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
+    <>
+      <header className="w-full bg-card">
+        {/* Top navigation - hidden on mobile */}
+        <div className="hidden md:block">
+          <div className="container">
+            <nav className="flex items-center gap-6 py-2 text-sm">
+              {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {item}
+                </a>
+              ))}
+            </nav>
+          </div>
         </div>
-      </div>
 
-      {/* Main header */}
-      <div className="container py-4">
-        <div className="flex items-center gap-4">
-          {/* Catalog button with dropdown */}
-          <div className="relative" ref={catalogRef}>
-            <Button 
-              className="hidden md:flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0 transition-all"
-              onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+        {/* Main header */}
+        <div className="container py-3 md:py-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-10 w-10 shrink-0"
+              onClick={() => setIsMobileMenuOpen(true)}
             >
-              {isCatalogOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              Каталог
+              <Menu className="h-6 w-6" />
             </Button>
 
-            {/* Catalog Dropdown */}
-            {isCatalogOpen && (
-              <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50">
-                <div className="p-2">
-                  {catalogCategories.map((category) => {
-                    const IconComponent = category.icon;
-                    return (
-                      <button
-                        key={category.id}
-                        className="w-full flex items-center gap-4 p-4 hover:bg-muted rounded-xl transition-colors text-left group"
-                        onClick={() => handleCategoryClick(category.id)}
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                          <IconComponent className="h-5 w-5 text-primary" />
-                        </div>
-                        <p className="font-medium text-foreground flex-1">{category.name}</p>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="p-2 border-t border-border">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      setIsCatalogOpen(false);
-                      navigate("/catalog");
-                    }}
-                  >
-                    Смотреть все товары
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+            {/* Catalog button with dropdown - desktop only */}
+            <div className="relative hidden md:block" ref={catalogRef}>
+              <Button 
+                className="flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0 transition-all"
+                onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+              >
+                {isCatalogOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                Каталог
+              </Button>
 
-          {/* Search - takes all available space */}
-          <div className="flex-1 relative" ref={searchRef}>
-            <form onSubmit={handleSearchSubmit}>
-              <div className="relative">
-                <Input
-                  placeholder="Поиск товаров..."
-                  className="h-12 pl-4 pr-12 rounded-full border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                />
-                {searchQuery && (
+              {/* Catalog Dropdown */}
+              {isCatalogOpen && (
+                <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50 shadow-lg">
+                  <div className="p-2">
+                    {catalogCategories.map((category) => {
+                      const IconComponent = category.icon;
+                      return (
+                        <button
+                          key={category.id}
+                          className="w-full flex items-center gap-4 p-4 hover:bg-muted rounded-xl transition-colors text-left group"
+                          onClick={() => handleCategoryClick(category.id)}
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                            <IconComponent className="h-5 w-5 text-primary" />
+                          </div>
+                          <p className="font-medium text-foreground flex-1">{category.name}</p>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="p-2 border-t border-border">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
+                      onClick={() => {
+                        setIsCatalogOpen(false);
+                        navigate("/catalog");
+                      }}
+                    >
+                      Смотреть все товары
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Search - takes all available space */}
+            <div className="flex-1 relative" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit}>
+                <div className="relative">
+                  <Input
+                    placeholder="Поиск..."
+                    className="h-10 md:h-12 pl-4 pr-10 md:pr-12 rounded-full border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full text-sm md:text-base"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsSearchFocused(true)}
+                  />
+                  {searchQuery && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="absolute right-9 md:right-11 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
+                      onClick={clearSearch}
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  )}
                   <Button
-                    type="button"
+                    type="submit"
                     size="icon"
                     variant="ghost"
-                    className="absolute right-11 top-1 h-10 w-10 rounded-full hover:bg-muted"
-                    onClick={clearSearch}
+                    className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
                   >
-                    <X className="h-4 w-4 text-muted-foreground" />
+                    <Search className="h-5 w-5 text-muted-foreground" />
                   </Button>
-                )}
-                <Button
-                  type="submit"
-                  size="icon"
-                  variant="ghost"
-                  className="absolute right-1 top-1 h-10 w-10 rounded-full hover:bg-muted"
-                >
-                  <Search className="h-5 w-5 text-muted-foreground" />
-                </Button>
-              </div>
-            </form>
+                </div>
+              </form>
 
-            {/* Search Results Dropdown */}
-            {showResults && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-2xl overflow-hidden z-50">
-                {searchResults.length > 0 ? (
-                  <>
-                    <div className="p-2">
-                      {searchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
-                          onClick={() => handleProductClick(product.id)}
-                        >
-                          <img 
-                            src={product.image} 
-                            alt={product.name}
-                            className="w-12 h-12 object-contain bg-muted rounded-lg"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">{product.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {categoryNames[product.category]} • {product.volume}
-                            </p>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <p className="font-bold text-primary">{product.price.toLocaleString()} ₽</p>
-                            {product.oldPrice && (
-                              <p className="text-xs text-muted-foreground line-through">
-                                {product.oldPrice.toLocaleString()} ₽
+              {/* Search Results Dropdown */}
+              {showResults && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-2xl overflow-hidden z-50 shadow-lg max-h-[70vh] overflow-y-auto">
+                  {searchResults.length > 0 ? (
+                    <>
+                      <div className="p-2">
+                        {searchResults.map((product) => (
+                          <button
+                            key={product.id}
+                            className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
+                            onClick={() => handleProductClick(product.id)}
+                          >
+                            <img 
+                              src={product.image} 
+                              alt={product.name}
+                              className="w-10 h-10 md:w-12 md:h-12 object-contain bg-muted rounded-lg"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{product.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {categoryNames[product.category]} • {product.volume}
                               </p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="font-bold text-primary text-sm">{product.price.toLocaleString()} ₽</p>
+                              {product.oldPrice && (
+                                <p className="text-xs text-muted-foreground line-through">
+                                  {product.oldPrice.toLocaleString()} ₽
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="border-t border-border p-2">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
+                          onClick={() => {
+                            setIsSearchFocused(false);
+                            navigate(`/catalog?search=${encodeURIComponent(searchQuery)}`);
+                          }}
+                        >
+                          Показать все результаты
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-6 text-center text-muted-foreground">
+                      По запросу «{searchQuery}» ничего не найдено
                     </div>
-                    <div className="border-t border-border p-2">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
-                        onClick={() => {
-                          setIsSearchFocused(false);
-                          navigate(`/catalog?search=${encodeURIComponent(searchQuery)}`);
-                        }}
-                      >
-                        Показать все результаты
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="p-6 text-center text-muted-foreground">
-                    По запросу «{searchQuery}» ничего не найдено
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-          {/* Cart */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative h-12 w-12 shrink-0"
-            onClick={() => setIsCartOpen(true)}
-          >
-            <ShoppingCart className="h-6 w-6" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            )}
-          </Button>
+            {/* Cart */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative h-10 w-10 md:h-12 md:w-12 shrink-0"
+              onClick={() => setIsCartOpen(true)}
+            >
+              <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Menu Panel */}
+          <div className="absolute left-0 top-0 bottom-0 w-[85%] max-w-sm bg-card overflow-y-auto">
+            {/* Menu Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <span className="font-semibold text-lg">Меню</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+
+            {/* Categories */}
+            <div className="p-4">
+              <p className="text-sm text-muted-foreground mb-3">Каталог</p>
+              <div className="space-y-1">
+                {catalogCategories.map((category) => {
+                  const IconComponent = category.icon;
+                  return (
+                    <button
+                      key={category.id}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
+                      onClick={() => handleCategoryClick(category.id)}
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <IconComponent className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="font-medium">{category.name}</span>
+                    </button>
+                  );
+                })}
+                <button
+                  className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left text-primary"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/catalog");
+                  }}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Menu className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="font-medium">Все товары</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="p-4 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-3">Информация</p>
+              <div className="space-y-1">
+                {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
+                  <a
+                    key={item}
+                    href="#"
+                    className="block p-3 text-foreground hover:bg-muted rounded-xl transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
