@@ -1,21 +1,7 @@
-import { Percent, Sparkles, Car, Cog, Droplets, Factory, Snowflake, LayoutGrid } from "lucide-react";
+import { Car, Cog, Droplets, Factory, Snowflake } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const categories = [
-  {
-    icon: Percent,
-    title: "Все акции",
-    color: "text-primary",
-    bgColor: "bg-gradient-to-br from-primary/20 to-accent/20",
-    href: "/catalog/promo",
-  },
-  {
-    icon: Sparkles,
-    title: "Новинки",
-    color: "text-accent",
-    bgColor: "bg-gradient-to-br from-accent/20 to-primary/10",
-    href: "/catalog/new",
-  },
   {
     icon: Car,
     title: "Моторные масла",
@@ -50,13 +36,6 @@ const categories = [
     color: "text-accent",
     bgColor: "bg-muted hover:bg-accent/10",
     href: "/catalog/antifreeze",
-  },
-  {
-    icon: LayoutGrid,
-    title: "Все товары",
-    color: "text-foreground",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/all",
   },
 ];
 
