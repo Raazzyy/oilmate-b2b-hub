@@ -1,60 +1,44 @@
-import { Truck, Shield, CreditCard, Headphones, Package, Clock } from "lucide-react";
+import { Shield, Wallet, Truck } from "lucide-react";
 
 const benefits = [
   {
-    icon: Truck,
-    title: "Бесплатная доставка",
-    description: "По всей России при заказе от 50 000 ₽",
-  },
-  {
     icon: Shield,
+    iconBg: "bg-blue-500",
     title: "Гарантия качества",
     description: "Только сертифицированная продукция от официальных дилеров",
   },
   {
-    icon: CreditCard,
-    title: "Удобная оплата",
-    description: "Безналичный расчёт, отсрочка платежа для постоянных клиентов",
+    icon: Wallet,
+    iconBg: "bg-amber-500",
+    title: "Вернём деньги",
+    description: "Если не устраивает качество товара",
   },
   {
-    icon: Headphones,
-    title: "Персональный менеджер",
-    description: "Индивидуальный подход к каждому клиенту",
-  },
-  {
-    icon: Package,
-    title: "Широкий ассортимент",
-    description: "Более 5000 позиций от ведущих мировых брендов",
-  },
-  {
-    icon: Clock,
-    title: "Быстрая обработка",
-    description: "Отгрузка в день заказа при наличии товара на складе",
+    icon: Truck,
+    iconBg: "bg-purple-500",
+    title: "Быстрая доставка",
+    description: "Отгрузка в день заказа по всей России",
   },
 ];
 
 const Benefits = () => {
   return (
-    <section className="py-12">
+    <section className="py-8">
       <div className="container">
-        <h2 className="mb-8 text-center text-2xl font-bold text-foreground md:text-3xl">
-          Почему выбирают нас
-        </h2>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="flex gap-4 rounded-xl bg-card p-6 shadow-sm transition-all hover:shadow-md"
+              className="flex items-center justify-between gap-4 rounded-2xl bg-card p-6 border border-border hover:shadow-md transition-shadow"
             >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                <benefit.icon className="h-6 w-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="mb-2 font-semibold text-foreground">{benefit.title}</h3>
+              <div className="flex-1">
+                <h3 className="mb-1 font-bold text-foreground text-lg">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {benefit.description}
                 </p>
+              </div>
+              <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${benefit.iconBg}`}>
+                <benefit.icon className="h-8 w-8 text-white" />
               </div>
             </div>
           ))}

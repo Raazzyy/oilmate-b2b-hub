@@ -4,63 +4,63 @@ const categories = [
   {
     icon: Car,
     title: "Моторные масла",
-    count: "1 250 товаров",
-    color: "bg-blue-500",
+    count: "1 250",
+    gradient: "from-blue-500 to-blue-600",
   },
   {
     icon: Cog,
     title: "Трансмиссионные",
-    count: "420 товаров",
-    color: "bg-green-500",
+    count: "420",
+    gradient: "from-green-500 to-green-600",
   },
   {
     icon: Droplets,
     title: "Гидравлические",
-    count: "380 товаров",
-    color: "bg-purple-500",
+    count: "380",
+    gradient: "from-purple-500 to-purple-600",
   },
   {
     icon: Factory,
     title: "Индустриальные",
-    count: "290 товаров",
-    color: "bg-orange-500",
+    count: "290",
+    gradient: "from-orange-500 to-orange-600",
   },
   {
     icon: Snowflake,
     title: "Антифризы",
-    count: "180 товаров",
-    color: "bg-cyan-500",
+    count: "180",
+    gradient: "from-cyan-500 to-cyan-600",
   },
   {
     icon: Package,
-    title: "Смазки и присадки",
-    count: "340 товаров",
-    color: "bg-rose-500",
+    title: "Смазки",
+    count: "340",
+    gradient: "from-rose-500 to-rose-600",
   },
 ];
 
 const Categories = () => {
   return (
-    <section className="py-12">
+    <section className="py-8">
       <div className="container">
-        <h2 className="mb-8 text-2xl font-bold text-foreground md:text-3xl">
+        <h2 className="mb-6 text-2xl font-bold text-foreground">
           Категории товаров
         </h2>
 
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
           {categories.map((category, index) => (
             <a
               key={index}
               href="#"
-              className="group flex flex-col items-center rounded-xl bg-card p-6 text-center shadow-sm transition-all hover:shadow-md hover:-translate-y-1"
+              className="group flex flex-col items-center rounded-2xl bg-card border border-border p-5 text-center transition-all hover:shadow-lg hover:-translate-y-1"
             >
               <div
-                className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl ${category.color} transition-transform group-hover:scale-110`}
+                className={`mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${category.gradient} transition-transform group-hover:scale-110`}
               >
                 <category.icon className="h-7 w-7 text-white" />
               </div>
-              <h3 className="mb-1 font-semibold text-foreground">{category.title}</h3>
-              <p className="text-sm text-muted-foreground">{category.count}</p>
+              <h3 className="mb-1 text-sm font-semibold text-foreground">{category.title}</h3>
+              <p className="text-xs text-muted-foreground">{category.count} товаров</p>
             </a>
           ))}
         </div>
