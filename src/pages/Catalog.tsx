@@ -157,9 +157,43 @@ const categoryNames: Record<string, string> = {
   new: "Новинки",
 };
 
+const filterCategories = [
+  { id: "motor", name: "Моторные" },
+  { id: "transmission", name: "Трансмиссионные" },
+  { id: "hydraulic", name: "Гидравлические" },
+  { id: "industrial", name: "Индустриальные" },
+  { id: "antifreeze", name: "Антифризы" },
+];
+
 const brands = ["Shell", "Mobil", "Castrol", "Лукойл", "Total", "Mannol", "Liqui Moly", "Felix", "Sintec", "Fuchs"];
-const oilTypes = ["Синтетическое", "Полусинтетика", "Минеральное", "Готовый"];
 const volumes = ["1 л", "4 л", "5 л", "20 л"];
+
+// Специфичные фильтры для каждой категории
+const categorySpecificFilters: Record<string, { label: string; options: string[] }[]> = {
+  motor: [
+    { label: "Тип масла", options: ["Синтетическое", "Полусинтетика", "Минеральное"] },
+    { label: "Вязкость", options: ["0W-20", "0W-30", "5W-30", "5W-40", "10W-40", "15W-40"] },
+    { label: "Допуски", options: ["API SN", "API SP", "ACEA C3", "MB 229.5", "VW 502/505", "BMW LL-04"] },
+  ],
+  transmission: [
+    { label: "Тип масла", options: ["Синтетическое", "Полусинтетика", "Минеральное"] },
+    { label: "Вязкость", options: ["75W-80", "75W-90", "80W-90"] },
+    { label: "Спецификация", options: ["GL-4", "GL-5", "ATF"] },
+  ],
+  hydraulic: [
+    { label: "Тип масла", options: ["Синтетическое", "Минеральное"] },
+    { label: "Класс вязкости", options: ["HLP 32", "HLP 46", "HLP 68", "HVLP 46"] },
+  ],
+  industrial: [
+    { label: "Тип масла", options: ["Синтетическое", "Минеральное"] },
+    { label: "Применение", options: ["Компрессорное", "Редукторное", "Турбинное", "Цепное"] },
+  ],
+  antifreeze: [
+    { label: "Тип", options: ["Готовый", "Концентрат"] },
+    { label: "Стандарт", options: ["G11", "G12", "G12+", "G12++", "G13"] },
+    { label: "Цвет", options: ["Красный", "Зеленый", "Синий", "Желтый"] },
+  ],
+};
 
 const ChipFilter = ({ 
   items, 
@@ -216,7 +250,8 @@ const ChipFilter = ({
 const Catalog = () => {
   const { category } = useParams();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categoryFilters, setCategoryFilters] = useState<Record<string, string[]>>({});
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
@@ -232,16 +267,34 @@ const Catalog = () => {
     }
   };
 
+  const toggleCategoryFilter = (filterLabel: string, value: string) => {
+    setCategoryFilters(prev => {
+      const current = prev[filterLabel] || [];
+      if (current.includes(value)) {
+        return { ...prev, [filterLabel]: current.filter(v => v !== value) };
+      } else {
+        return { ...prev, [filterLabel]: [...current, value] };
+      }
+    });
+  };
+
+  // Определяем активные категории для показа специфичных фильтров
+  const activeCategories = selectedCategories.length > 0 
+    ? selectedCategories 
+    : (category && category !== "all" && category !== "promo" && category !== "new" ? [category] : []);
+
   const filteredProducts = allProducts.filter((product) => {
+    // Фильтр по URL категории (если не выбраны категории в фильтрах)
     if (category && category !== "all" && category !== "promo" && category !== "new") {
-      if (product.category !== category) return false;
+      if (selectedCategories.length === 0 && product.category !== category) return false;
     }
     
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
+    // Фильтр по выбранным категориям
+    if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
       return false;
     }
     
-    if (selectedTypes.length > 0 && !selectedTypes.includes(product.oilType)) {
+    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
       return false;
     }
     
@@ -262,13 +315,14 @@ const Catalog = () => {
 
   const resetFilters = () => {
     setSelectedBrands([]);
-    setSelectedTypes([]);
+    setSelectedCategories([]);
+    setCategoryFilters({});
     setSelectedVolumes([]);
     setPriceFrom("");
     setPriceTo("");
   };
 
-  const hasActiveFilters = selectedBrands.length > 0 || selectedTypes.length > 0 || selectedVolumes.length > 0 || priceFrom || priceTo;
+  const hasActiveFilters = selectedBrands.length > 0 || selectedCategories.length > 0 || Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || selectedVolumes.length > 0 || priceFrom || priceTo;
 
   return (
     <div className="min-h-screen bg-background">
@@ -328,6 +382,20 @@ const Catalog = () => {
                   </div>
                 </div>
 
+                {/* Category filter */}
+                <div className="mb-6">
+                  <span className="text-sm text-muted-foreground mb-3 block">Категория</span>
+                  <ChipFilter
+                    items={filterCategories.map(c => c.name)}
+                    selected={selectedCategories.map(id => filterCategories.find(c => c.id === id)?.name || "")}
+                    onToggle={(name) => {
+                      const cat = filterCategories.find(c => c.name === name);
+                      if (cat) toggleFilter(cat.id, selectedCategories, setSelectedCategories);
+                    }}
+                    visibleCount={5}
+                  />
+                </div>
+
                 {/* Brand filter */}
                 <div className="mb-6">
                   <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
@@ -336,17 +404,6 @@ const Catalog = () => {
                     selected={selectedBrands}
                     onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
                     visibleCount={5}
-                  />
-                </div>
-                
-                {/* Oil type filter */}
-                <div className="mb-6">
-                  <span className="text-sm text-muted-foreground mb-3 block">Тип масла</span>
-                  <ChipFilter
-                    items={oilTypes}
-                    selected={selectedTypes}
-                    onToggle={(item) => toggleFilter(item, selectedTypes, setSelectedTypes)}
-                    visibleCount={4}
                   />
                 </div>
                 
@@ -360,6 +417,30 @@ const Catalog = () => {
                     visibleCount={4}
                   />
                 </div>
+
+                {/* Category-specific filters */}
+                {activeCategories.length > 0 && activeCategories.map(catId => {
+                  const filters = categorySpecificFilters[catId];
+                  if (!filters) return null;
+                  return (
+                    <div key={catId} className="mb-4">
+                      <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
+                        {categoryNames[catId]}
+                      </div>
+                      {filters.map(filter => (
+                        <div key={filter.label} className="mb-4">
+                          <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
+                          <ChipFilter
+                            items={filter.options}
+                            selected={categoryFilters[`${catId}_${filter.label}`] || []}
+                            onToggle={(item) => toggleCategoryFilter(`${catId}_${filter.label}`, item)}
+                            visibleCount={4}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
 
                 {/* Apply button */}
                 <Button className="w-full rounded-xl gradient-primary text-primary-foreground">
