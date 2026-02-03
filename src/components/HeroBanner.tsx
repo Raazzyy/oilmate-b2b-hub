@@ -1,81 +1,100 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Truck, Shield, Percent } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 const HeroBanner = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/90 py-12 md:py-20">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute -left-20 -top-20 h-80 w-80 rounded-full bg-accent" />
-        <div className="absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-accent" />
-      </div>
+    <section className="py-6">
+      <div className="container">
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Main banner */}
+          <div className="relative lg:col-span-2 h-[380px] rounded-3xl overflow-hidden bg-gradient-to-br from-success via-success to-success/80">
+            {/* Navigation arrows */}
+            <button 
+              onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center shadow-lg hover:bg-card transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={() => setCurrentSlide(prev => Math.min(2, prev + 1))}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/90 flex items-center justify-center shadow-lg hover:bg-card transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
 
-      <div className="container relative">
-        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-          {/* Content */}
-          <div className="space-y-6 text-primary-foreground">
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-2 text-sm font-medium text-accent">
-              <Percent className="h-4 w-4" />
-              Скидка до 15% на первый заказ
-            </div>
-            
-            <h1 className="text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
-              Оптовые поставки
-              <span className="block text-accent">моторных масел</span>
-            </h1>
-            
-            <p className="max-w-lg text-lg text-primary-foreground/80 md:text-xl">
-              Прямые поставки от производителей. Shell, Mobil, Castrol, Лукойл и другие бренды со склада в Москве.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold gap-2 h-14 px-8">
-                Смотреть каталог
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-2 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 h-14 px-8">
-                Запросить прайс
-              </Button>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                icon: Truck,
-                title: "Доставка по России",
-                desc: "Бесплатная доставка от 50 000 ₽",
-              },
-              {
-                icon: Shield,
-                title: "Гарантия качества",
-                desc: "Только оригинальная продукция",
-              },
-              {
-                icon: Percent,
-                title: "Оптовые цены",
-                desc: "Специальные условия для B2B",
-              },
-              {
-                icon: ArrowRight,
-                title: "Быстрая отгрузка",
-                desc: "Отправка в день заказа",
-              },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="group rounded-xl bg-primary-foreground/10 p-5 backdrop-blur-sm transition-all hover:bg-primary-foreground/15"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-accent">
-                  <feature.icon className="h-6 w-6 text-accent-foreground" />
-                </div>
-                <h3 className="mb-1 font-semibold text-primary-foreground">{feature.title}</h3>
-                <p className="text-sm text-primary-foreground/70">{feature.desc}</p>
+            <div className="relative h-full p-8 flex flex-col justify-between">
+              {/* Pattern background */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-yellow-400/30 to-transparent" />
               </div>
-            ))}
+
+              <div className="relative z-10">
+                <h2 className="text-5xl font-black text-primary-foreground leading-tight">
+                  ЦЕНТР<br/>
+                  НИЗКИХ<br/>
+                  ЦЕН
+                </h2>
+              </div>
+
+              <div className="relative z-10 flex items-end justify-between">
+                <Button className="bg-card text-foreground hover:bg-card/90 font-semibold px-8 h-12 rounded-xl text-lg">
+                  Подробнее
+                </Button>
+
+                <div className="text-right text-primary-foreground">
+                  <p className="text-lg mb-2">Ищите товары со<br/>специальным ценником</p>
+                  <div className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <span className="text-lg font-semibold">Выгодно</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Side banner */}
+          <div className="h-[380px] rounded-3xl overflow-hidden bg-gradient-to-br from-accent to-accent/80 p-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">М</span>
+                </div>
+                <span className="text-primary-foreground font-semibold">маслопт</span>
+              </div>
+              
+              <div className="inline-block bg-card text-foreground font-bold px-4 py-2 rounded-lg mb-4">
+                До +7% кешбэка
+              </div>
+              
+              <h3 className="text-2xl font-bold text-primary-foreground leading-snug mb-2">
+                за оплату покупок<br/>
+                картой партнёра
+              </h3>
+              
+              <p className="text-primary-foreground/80 text-sm">
+                Легко оформить,<br/>выгодно платить
+              </p>
+            </div>
+
+            <Button className="bg-card text-foreground hover:bg-card/90 font-semibold w-fit px-8 h-11 rounded-xl">
+              Оформить
+            </Button>
+          </div>
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center gap-2 mt-4">
+          {[0, 1, 2].map((dot) => (
+            <button
+              key={dot}
+              onClick={() => setCurrentSlide(dot)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                currentSlide === dot ? "bg-foreground" : "bg-border"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>

@@ -1,10 +1,9 @@
 import Header from "@/components/Header";
 import HeroBanner from "@/components/HeroBanner";
 import PromoBanner from "@/components/PromoBanner";
+import Benefits from "@/components/Benefits";
 import Categories from "@/components/Categories";
 import ProductsSection from "@/components/ProductsSection";
-import Benefits from "@/components/Benefits";
-import Brands from "@/components/Brands";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -14,10 +13,9 @@ const Index = () => {
       <main>
         <HeroBanner />
         <PromoBanner />
+        <Benefits />
         <Categories />
         <ProductsSection />
-        <Benefits />
-        <Brands />
       </main>
       <Footer />
     </div>

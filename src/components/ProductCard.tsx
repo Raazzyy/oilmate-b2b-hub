@@ -1,4 +1,4 @@
-import { Star, ShoppingCart } from "lucide-react";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
@@ -21,20 +21,19 @@ const ProductCard = ({
   oldPrice,
   rating,
   image,
-  inStock,
   discount,
 }: ProductCardProps) => {
   return (
-    <div className="group relative flex flex-col rounded-xl bg-card p-4 shadow-sm transition-all hover:shadow-lg">
+    <div className="group relative flex flex-col rounded-2xl bg-card border border-border p-4 transition-all hover:shadow-lg">
       {/* Discount badge */}
       {discount && (
-        <span className="absolute left-3 top-3 z-10 rounded-md bg-accent px-2 py-1 text-xs font-bold text-accent-foreground">
-          -{discount}%
+        <span className="absolute left-3 top-3 z-10 rounded-lg bg-accent px-2 py-1 text-xs font-bold text-accent-foreground">
+          % от 2 шт
         </span>
       )}
 
       {/* Image */}
-      <div className="relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted">
+      <div className="relative mb-4 aspect-square overflow-hidden rounded-xl bg-muted">
         <img
           src={image}
           alt={name}
@@ -50,21 +49,20 @@ const ProductCard = ({
 
       {/* Info */}
       <div className="mb-3 flex-1">
-        <p className="mb-1 text-xs font-medium text-muted-foreground">{brand}</p>
-        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug">
+        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-1">
           {name}
         </h3>
-        <p className="mt-1 text-xs text-muted-foreground">{volume}</p>
+        <p className="text-xs text-muted-foreground">{volume}</p>
       </div>
 
       {/* Price */}
-      <div className="mb-3">
+      <div className="mb-4">
         {oldPrice && (
-          <span className="text-sm text-muted-foreground line-through">
+          <span className="text-sm text-muted-foreground line-through mr-2">
             {oldPrice.toLocaleString("ru-RU")}₽
           </span>
         )}
-        <div className="flex items-baseline gap-1">
+        <div className="flex items-baseline gap-0.5">
           <span className="text-xl font-bold text-foreground">
             {price.toLocaleString("ru-RU")}
           </span>
@@ -72,14 +70,11 @@ const ProductCard = ({
         </div>
       </div>
 
-      {/* Stock status */}
-      <p className={`mb-3 text-xs font-medium ${inStock ? "text-success" : "text-muted-foreground"}`}>
-        {inStock ? "В наличии" : "Под заказ"}
-      </p>
-
       {/* Add to cart */}
-      <Button className="w-full gap-2 bg-primary hover:bg-primary/90">
-        <ShoppingCart className="h-4 w-4" />
+      <Button 
+        variant="outline" 
+        className="w-full rounded-xl border-2 hover:bg-muted font-medium"
+      >
         В корзину
       </Button>
     </div>
