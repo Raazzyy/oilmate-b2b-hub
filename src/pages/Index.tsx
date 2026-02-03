@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import HeroBanner from "@/components/HeroBanner";
-import PromoBanner from "@/components/PromoBanner";
 import Categories from "@/components/Categories";
 import ProductsSection from "@/components/ProductsSection";
 import Footer from "@/components/Footer";
@@ -11,7 +10,6 @@ const Index = () => {
       <Header />
       <main>
         <HeroBanner />
-        <PromoBanner />
         <Categories />
         <ProductsSection />
       </main>
