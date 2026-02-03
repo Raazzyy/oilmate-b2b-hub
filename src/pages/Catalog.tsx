@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { allProducts, categoryNames, type ProductData } from "@/data/products";
+import SEO from "@/components/SEO";
 
 // Filters configuration is now local, products data is imported from @/data/products
 
@@ -141,6 +142,18 @@ const Catalog = () => {
       ? categoryNames[category] || "Каталог" 
       : "Все товары";
 
+  const seoTitle = searchQuery
+    ? `${searchQuery} — поиск | OilMate`
+    : category && categoryNames[category]
+      ? `${categoryNames[category]} — купить оптом | OilMate`
+      : "Каталог масел и автохимии | OilMate";
+
+  const seoDescription = searchQuery
+    ? `Результаты поиска «${searchQuery}» в каталоге OilMate. Моторные масла, автохимия и смазочные материалы оптом.`
+    : category && categoryNames[category]
+      ? `${categoryNames[category]} — купить оптом в OilMate. Широкий ассортимент, выгодные цены, быстрая доставка.`
+      : "Каталог моторных масел, трансмиссионных масел, антифризов и смазок. Оптовые цены от OilMate.";
+
   const toggleFilter = (value: string, selected: string[], setSelected: (v: string[]) => void) => {
     if (selected.includes(value)) {
       setSelected(selected.filter((v) => v !== value));
@@ -216,6 +229,34 @@ const Catalog = () => {
     
     return true;
   });
+
+  const structuredData = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": categoryTitle,
+    "description": seoDescription,
+    "numberOfItems": filteredProducts.length,
+    "itemListElement": filteredProducts.slice(0, 10).map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": product.name,
+        "brand": {
+          "@type": "Brand",
+          "name": product.brand
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": product.price,
+          "priceCurrency": "RUB",
+          "availability": product.inStock 
+            ? "https://schema.org/InStock" 
+            : "https://schema.org/OutOfStock"
+        }
+      }
+    }))
+  }), [categoryTitle, seoDescription, filteredProducts]);
 
   const resetFilters = () => {
     setSelectedBrands([]);
@@ -343,8 +384,15 @@ const Catalog = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={seoTitle}
+        description={seoDescription}
+        keywords="моторное масло, трансмиссионное масло, антифриз, смазки, автохимия, опт"
+        canonicalUrl={`https://oilmate-b2b-hub.lovable.app/catalog/${category || 'all'}`}
+        structuredData={structuredData}
+      />
       <Header />
-      <main className="py-4 md:py-6">
+      <main className="py-4 md:py-6" itemScope itemType="https://schema.org/ItemList">
         <div className="container">
           {/* Breadcrumbs */}
           <nav className="mb-3 md:mb-4 text-sm text-muted-foreground">
