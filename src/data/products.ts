@@ -194,6 +194,19 @@ export const allProducts: ProductData[] = [
     standard: "G11",
     color: "Зеленый",
   },
+  {
+    id: 13,
+    name: "Liqui Moly LM 47 Langzeitfett + MoS2",
+    brand: "Liqui Moly",
+    volume: "400 г",
+    price: 890,
+    image: oilProductImage,
+    inStock: true,
+    oilType: "Пластичная",
+    isUniversal: true,
+    category: "lubricants",
+    application: "Универсальная",
+  },
 ];
 
 export const categoryNames: Record<string, string> = {
