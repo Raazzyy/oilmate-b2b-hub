@@ -67,18 +67,18 @@ const ProductCard = ({
         {/* Price */}
         <div className="mb-3 flex flex-col">
           {oldPrice && (
-            <span className="text-sm text-muted-foreground line-through mb-0.5">
-              {oldRubles}<sup className="text-[10px]">{oldKopecks}</sup>₽
+            <span className="text-xs text-muted-foreground line-through mb-1">
+              {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
             </span>
           )}
-          <div className="flex items-baseline">
-            <span className={`text-xl font-bold ${oldPrice ? 'text-foreground' : 'text-foreground'}`}>
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-warning px-1.5 py-0.5 rounded' : ''}`}>
+            <span className="text-xl font-bold text-foreground">
               {rubles.toLocaleString("ru-RU")}
             </span>
-            <sup className={`text-xs font-bold text-foreground`}>
+            <sup className="text-[10px] font-bold text-foreground ml-px">
               {kopecks.toString().padStart(2, '0')}
             </sup>
-            <span className={`text-lg font-bold text-foreground`}>₽</span>
+            <span className="text-base font-bold text-foreground ml-0.5">₽</span>
           </div>
         </div>
 
