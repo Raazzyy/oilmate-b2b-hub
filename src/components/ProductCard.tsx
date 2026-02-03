@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
+  id?: string;
   name: string;
   brand: string;
   volume: string;
@@ -13,6 +15,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({
+  id = "1",
   name,
   brand,
   volume,
@@ -34,33 +37,36 @@ const ProductCard = ({
 
   return (
     <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl">
-      {/* Image container */}
-      <div className="relative mb-3">
-        <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
-          />
+      {/* Clickable area for product page */}
+      <Link to={`/product/${id}`} className="block">
+        {/* Image container */}
+        <div className="relative mb-3">
+          <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
+            <img
+              src={image}
+              alt={name}
+              className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
+            />
+          </div>
+          
+          {/* Discount badge */}
+          {discountPercent && discountPercent > 0 && (
+            <span className="absolute left-2 bottom-2 rounded-md bg-warning px-2 py-1 text-xs font-bold text-warning-foreground">
+              -{discountPercent}%
+            </span>
+          )}
         </div>
-        
-        {/* Discount badge */}
-        {discountPercent && discountPercent > 0 && (
-          <span className="absolute left-2 bottom-2 rounded-md bg-warning px-2 py-1 text-xs font-bold text-warning-foreground">
-            -{discountPercent}%
-          </span>
-        )}
-      </div>
 
-      {/* Name - fixed height for alignment */}
-      <h3 className="line-clamp-2 text-sm text-foreground leading-snug mb-2 h-10">
-        {name}
-      </h3>
-      
-      {/* Volume and parameters inline - fixed height */}
-      <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
-        {volume} · {oilType} · {brand}{isUniversal && " · Универсальное"}
-      </p>
+        {/* Name - fixed height for alignment */}
+        <h3 className="line-clamp-2 text-sm text-foreground leading-snug mb-2 h-10 group-hover:text-primary transition-colors">
+          {name}
+        </h3>
+        
+        {/* Volume and parameters inline - fixed height */}
+        <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
+          {volume} · {oilType} · {brand}{isUniversal && " · Универсальное"}
+        </p>
+      </Link>
 
       {/* Spacer to push price and button to bottom */}
       <div className="mt-auto">
@@ -86,6 +92,7 @@ const ProductCard = ({
         <Button 
           variant="outline" 
           className="w-full rounded-full border border-border hover:bg-muted font-medium h-10"
+          onClick={(e) => e.stopPropagation()}
         >
           В корзину
         </Button>

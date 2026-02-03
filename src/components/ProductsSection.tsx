@@ -5,6 +5,7 @@ import oilProductImage from "@/assets/oil-product.png";
 
 const products = [
   {
+    id: "1",
     name: "Shell Helix Ultra 5W-40 синтетическое",
     brand: "Shell",
     volume: "4 л",
@@ -16,6 +17,7 @@ const products = [
     isUniversal: true,
   },
   {
+    id: "2",
     name: "Mobil 1 ESP Formula 5W-30 синтетическое",
     brand: "Mobil",
     volume: "4 л",
@@ -26,6 +28,7 @@ const products = [
     isUniversal: true,
   },
   {
+    id: "3",
     name: "Castrol EDGE 5W-30 LL синтетическое",
     brand: "Castrol",
     volume: "4 л",
@@ -36,6 +39,7 @@ const products = [
     isUniversal: false,
   },
   {
+    id: "4",
     name: "Лукойл Genesis Armortech 5W-40",
     brand: "Лукойл",
     volume: "4 л",
@@ -46,6 +50,7 @@ const products = [
     isUniversal: true,
   },
   {
+    id: "5",
     name: "Total Quartz INEO ECS 5W-30",
     brand: "Total",
     volume: "5 л",
@@ -77,8 +82,8 @@ const ProductsSection = () => {
         </div>
 
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {products.map((product, index) => (
-            <ProductCard key={index} {...product} />
+          {products.map((product) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       </div>
