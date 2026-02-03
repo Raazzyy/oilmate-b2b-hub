@@ -48,7 +48,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   // Формируем строку характеристик
   const getSpecsLine = () => {
-    return `${volume} ${oilType}`;
+    return `${oilType} · ${volume}`;
   };
   // Разделяем цену на рубли и копейки
   const rubles = Math.floor(price);
