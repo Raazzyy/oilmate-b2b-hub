@@ -48,6 +48,10 @@ const ProductCard = ({
 }: ProductCardProps) => {
   // Формируем строку характеристик
   const getSpecsLine = () => {
+    // Для смазок показываем вес вместо объема
+    if (category === 'lubricants') {
+      return `${oilType} · ${volume}`;
+    }
     return `${oilType} · ${volume}`;
   };
   // Разделяем цену на рубли и копейки
