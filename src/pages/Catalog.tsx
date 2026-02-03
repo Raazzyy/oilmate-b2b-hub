@@ -15,6 +15,7 @@ const filterCategories = [
   { id: "transmission", name: "Трансмиссионные" },
   { id: "hydraulic", name: "Гидравлические" },
   { id: "industrial", name: "Индустриальные" },
+  { id: "lubricants", name: "Смазки" },
   { id: "antifreeze", name: "Антифризы" },
 ];
 

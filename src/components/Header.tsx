@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
@@ -7,11 +7,12 @@ import { searchProducts, categoryNames } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 
 const catalogCategories = [
-  { id: "motor", name: "Моторные масла", icon: Droplet, description: "Синтетика, полусинтетика, минеральные" },
-  { id: "transmission", name: "Трансмиссионные масла", icon: Cog, description: "Для МКПП, АКПП, редукторов" },
-  { id: "hydraulic", name: "Гидравлические масла", icon: Gauge, description: "HLP, HVLP, ATF" },
-  { id: "industrial", name: "Индустриальные масла", icon: Factory, description: "Компрессорные, турбинные, редукторные" },
-  { id: "antifreeze", name: "Антифризы", icon: Snowflake, description: "G11, G12, G12+, G13" },
+  { id: "motor", name: "Моторные масла", icon: Droplet },
+  { id: "transmission", name: "Трансмиссионные масла", icon: Cog },
+  { id: "hydraulic", name: "Гидравлические масла", icon: Gauge },
+  { id: "industrial", name: "Индустриальные масла", icon: Factory },
+  { id: "lubricants", name: "Смазки", icon: Wrench },
+  { id: "antifreeze", name: "Антифризы", icon: Snowflake },
 ];
 
 const Header = () => {
