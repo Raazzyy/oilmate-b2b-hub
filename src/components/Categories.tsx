@@ -1,4 +1,4 @@
-import { Car, Cog, Droplets, Factory, Snowflake } from "lucide-react";
+import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const categories = [
@@ -31,11 +31,25 @@ const categories = [
     href: "/catalog/industrial",
   },
   {
+    icon: Wrench,
+    title: "Смазки",
+    color: "text-primary",
+    bgColor: "bg-muted hover:bg-primary/10",
+    href: "/catalog/lubricants",
+  },
+  {
     icon: Snowflake,
     title: "Антифризы",
     color: "text-accent",
     bgColor: "bg-muted hover:bg-accent/10",
     href: "/catalog/antifreeze",
+  },
+  {
+    icon: LayoutGrid,
+    title: "Все товары",
+    color: "text-foreground",
+    bgColor: "bg-muted hover:bg-primary/10",
+    href: "/catalog/all",
   },
 ];
 

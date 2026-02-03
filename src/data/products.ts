@@ -201,6 +201,7 @@ export const categoryNames: Record<string, string> = {
   transmission: "Трансмиссионные масла",
   hydraulic: "Гидравлические масла",
   industrial: "Индустриальные масла",
+  lubricants: "Смазки",
   antifreeze: "Антифризы",
   all: "Все товары",
   promo: "Все акции",
