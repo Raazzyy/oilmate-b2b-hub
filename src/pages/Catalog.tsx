@@ -2,8 +2,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { SlidersHorizontal } from "lucide-react";
 import { useParams } from "react-router-dom";
 import oilProductImage from "@/assets/oil-product.png";
 import { useState } from "react";
@@ -161,38 +161,68 @@ const brands = ["Shell", "Mobil", "Castrol", "Лукойл", "Total", "Mannol", 
 const oilTypes = ["Синтетическое", "Полусинтетика", "Минеральное", "Готовый"];
 const volumes = ["1 л", "4 л", "5 л", "20 л"];
 
+const ChipFilter = ({ 
+  items, 
+  selected, 
+  onToggle,
+  visibleCount = 5 
+}: {
+  items: string[];
+  selected: string[];
+  onToggle: (item: string) => void;
+  visibleCount?: number;
+}) => {
+  const [showAll, setShowAll] = useState(false);
+  const visibleItems = showAll ? items : items.slice(0, visibleCount);
+  const hiddenCount = items.length - visibleCount;
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2">
+        {visibleItems.map((item) => (
+          <button
+            key={item}
+            onClick={() => onToggle(item)}
+            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+              selected.includes(item)
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background border-border text-foreground hover:border-primary/50"
+            }`}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      {hiddenCount > 0 && !showAll && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="text-primary text-sm mt-2 hover:underline"
+        >
+          Ещё {hiddenCount}
+        </button>
+      )}
+      {showAll && hiddenCount > 0 && (
+        <button
+          onClick={() => setShowAll(false)}
+          className="text-primary text-sm mt-2 hover:underline"
+        >
+          Свернуть
+        </button>
+      )}
+    </div>
+  );
+};
+
 const Catalog = () => {
   const { category } = useParams();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
+  const [priceFrom, setPriceFrom] = useState("");
+  const [priceTo, setPriceTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const categoryTitle = category ? categoryNames[category] || "Каталог" : "Все товары";
-
-  const filteredProducts = allProducts.filter((product) => {
-    // Filter by category
-    if (category && category !== "all" && category !== "promo" && category !== "new") {
-      if (product.category !== category) return false;
-    }
-    
-    // Filter by brand
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-      return false;
-    }
-    
-    // Filter by oil type
-    if (selectedTypes.length > 0 && !selectedTypes.includes(product.oilType)) {
-      return false;
-    }
-    
-    // Filter by volume
-    if (selectedVolumes.length > 0 && !selectedVolumes.includes(product.volume)) {
-      return false;
-    }
-    
-    return true;
-  });
 
   const toggleFilter = (value: string, selected: string[], setSelected: (v: string[]) => void) => {
     if (selected.includes(value)) {
@@ -202,30 +232,43 @@ const Catalog = () => {
     }
   };
 
-  const FilterSection = ({ title, items, selected, setSelected }: {
-    title: string;
-    items: string[];
-    selected: string[];
-    setSelected: (v: string[]) => void;
-  }) => (
-    <div className="mb-6">
-      <button className="flex items-center justify-between w-full mb-3">
-        <span className="font-medium text-foreground">{title}</span>
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-      </button>
-      <div className="space-y-2">
-        {items.map((item) => (
-          <label key={item} className="flex items-center gap-2 cursor-pointer">
-            <Checkbox
-              checked={selected.includes(item)}
-              onCheckedChange={() => toggleFilter(item, selected, setSelected)}
-            />
-            <span className="text-sm text-muted-foreground">{item}</span>
-          </label>
-        ))}
-      </div>
-    </div>
-  );
+  const filteredProducts = allProducts.filter((product) => {
+    if (category && category !== "all" && category !== "promo" && category !== "new") {
+      if (product.category !== category) return false;
+    }
+    
+    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
+      return false;
+    }
+    
+    if (selectedTypes.length > 0 && !selectedTypes.includes(product.oilType)) {
+      return false;
+    }
+    
+    if (selectedVolumes.length > 0 && !selectedVolumes.includes(product.volume)) {
+      return false;
+    }
+
+    if (priceFrom && product.price < parseInt(priceFrom)) {
+      return false;
+    }
+
+    if (priceTo && product.price > parseInt(priceTo)) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  const resetFilters = () => {
+    setSelectedBrands([]);
+    setSelectedTypes([]);
+    setSelectedVolumes([]);
+    setPriceFrom("");
+    setPriceTo("");
+  };
+
+  const hasActiveFilters = selectedBrands.length > 0 || selectedTypes.length > 0 || selectedVolumes.length > 0 || priceFrom || priceTo;
 
   return (
     <div className="min-h-screen bg-background">
@@ -256,38 +299,78 @@ const Catalog = () => {
             {/* Filters sidebar */}
             <aside className={`w-64 shrink-0 ${showFilters ? 'block' : 'hidden'} md:block`}>
               <div className="sticky top-24 bg-card rounded-2xl p-5">
-                <h3 className="font-semibold text-foreground mb-4">Фильтры</h3>
+                <h3 className="font-semibold text-foreground mb-5">Фильтры</h3>
                 
-                <FilterSection
-                  title="Бренд"
-                  items={brands}
-                  selected={selectedBrands}
-                  setSelected={setSelectedBrands}
-                />
-                
-                <FilterSection
-                  title="Тип масла"
-                  items={oilTypes}
-                  selected={selectedTypes}
-                  setSelected={setSelectedTypes}
-                />
-                
-                <FilterSection
-                  title="Объем"
-                  items={volumes}
-                  selected={selectedVolumes}
-                  setSelected={setSelectedVolumes}
-                />
+                {/* Price filter */}
+                <div className="mb-6">
+                  <span className="text-sm text-muted-foreground mb-3 block">Цена</span>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type="number"
+                        placeholder="от"
+                        value={priceFrom}
+                        onChange={(e) => setPriceFrom(e.target.value)}
+                        className="pr-6 rounded-xl"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
+                    </div>
+                    <div className="relative flex-1">
+                      <Input
+                        type="number"
+                        placeholder="до"
+                        value={priceTo}
+                        onChange={(e) => setPriceTo(e.target.value)}
+                        className="pr-6 rounded-xl"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₽</span>
+                    </div>
+                  </div>
+                </div>
 
-                {(selectedBrands.length > 0 || selectedTypes.length > 0 || selectedVolumes.length > 0) && (
+                {/* Brand filter */}
+                <div className="mb-6">
+                  <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
+                  <ChipFilter
+                    items={brands}
+                    selected={selectedBrands}
+                    onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
+                    visibleCount={5}
+                  />
+                </div>
+                
+                {/* Oil type filter */}
+                <div className="mb-6">
+                  <span className="text-sm text-muted-foreground mb-3 block">Тип масла</span>
+                  <ChipFilter
+                    items={oilTypes}
+                    selected={selectedTypes}
+                    onToggle={(item) => toggleFilter(item, selectedTypes, setSelectedTypes)}
+                    visibleCount={4}
+                  />
+                </div>
+                
+                {/* Volume filter */}
+                <div className="mb-6">
+                  <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
+                  <ChipFilter
+                    items={volumes}
+                    selected={selectedVolumes}
+                    onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
+                    visibleCount={4}
+                  />
+                </div>
+
+                {/* Apply button */}
+                <Button className="w-full rounded-xl gradient-primary text-primary-foreground">
+                  Применить
+                </Button>
+
+                {hasActiveFilters && (
                   <Button
                     variant="ghost"
-                    className="w-full text-primary"
-                    onClick={() => {
-                      setSelectedBrands([]);
-                      setSelectedTypes([]);
-                      setSelectedVolumes([]);
-                    }}
+                    className="w-full text-primary mt-2"
+                    onClick={resetFilters}
                   >
                     Сбросить фильтры
                   </Button>
@@ -313,11 +396,7 @@ const Catalog = () => {
                   <Button
                     variant="link"
                     className="text-primary mt-2"
-                    onClick={() => {
-                      setSelectedBrands([]);
-                      setSelectedTypes([]);
-                      setSelectedVolumes([]);
-                    }}
+                    onClick={resetFilters}
                   >
                     Сбросить фильтры
                   </Button>
