@@ -36,7 +36,7 @@ const ProductCard = ({
   const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
 
   return (
-    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl transition-all duration-300">
       {/* Clickable area for product page */}
       <Link to={`/product/${id}`} className="block">
         {/* Image container */}
@@ -51,7 +51,7 @@ const ProductCard = ({
           
           {/* Discount badge */}
           {discountPercent && discountPercent > 0 && (
-            <span className="absolute left-2 bottom-2 rounded-md bg-gradient-to-r from-primary to-accent px-2 py-1 text-xs font-bold text-primary-foreground shadow-md">
+            <span className="absolute left-2 bottom-2 rounded-md bg-gradient-to-r from-primary to-accent px-2 py-1 text-xs font-bold text-primary-foreground">
               -{discountPercent}%
             </span>
           )}
