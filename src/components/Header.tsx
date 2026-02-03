@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-card">
       {/* Top navigation */}
-      <div className="border-b border-border">
+      <div>
         <div className="container">
           <nav className="flex items-center gap-6 py-2 text-sm">
             {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
