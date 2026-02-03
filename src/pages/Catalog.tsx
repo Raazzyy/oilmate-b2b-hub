@@ -214,7 +214,7 @@ const Catalog = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="py-6">
+      <main className="pt-28 py-6">
         <div className="container">
           {/* Breadcrumbs */}
           <nav className="mb-4 text-sm text-muted-foreground">
