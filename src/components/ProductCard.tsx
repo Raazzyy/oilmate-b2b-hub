@@ -30,7 +30,7 @@ const ProductCard = ({
   const oldKopecks = oldPrice ? Math.round((oldPrice - Math.floor(oldPrice)) * 100) || 99 : null;
 
   return (
-    <div className="group relative flex flex-col p-3">
+    <div className="group relative flex flex-col h-full p-3 bg-card rounded-2xl">
       {/* Image container */}
       <div className="relative mb-3">
         <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
@@ -42,41 +42,44 @@ const ProductCard = ({
         </div>
       </div>
 
-      {/* Name */}
-      <h3 className="line-clamp-3 text-sm text-foreground leading-snug mb-2 min-h-[3.75rem]">
+      {/* Name - fixed height for alignment */}
+      <h3 className="line-clamp-2 text-sm text-foreground leading-snug mb-2 h-10">
         {name}
       </h3>
       
-      {/* Volume and parameters inline */}
-      <p className="text-xs text-muted-foreground mb-3">
+      {/* Volume and parameters inline - fixed height */}
+      <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
         {volume} · {oilType} · {brand}{isUniversal && " · Универсальное"}
       </p>
 
-      {/* Price */}
-      <div className="mb-3 flex items-baseline gap-2">
-        {oldPrice && (
-          <span className="text-sm text-muted-foreground line-through">
-            {oldRubles}<sup className="text-[10px]">{oldKopecks}</sup>₽
-          </span>
-        )}
-        <div className="flex items-baseline">
-          <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
-            {rubles.toLocaleString("ru-RU")}
-          </span>
-          <sup className={`text-xs font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
-            {kopecks.toString().padStart(2, '0')}
-          </sup>
-          <span className={`text-lg font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
+      {/* Spacer to push price and button to bottom */}
+      <div className="mt-auto">
+        {/* Price */}
+        <div className="mb-3 flex items-baseline gap-2">
+          {oldPrice && (
+            <span className="text-sm text-muted-foreground line-through">
+              {oldRubles}<sup className="text-[10px]">{oldKopecks}</sup>₽
+            </span>
+          )}
+          <div className="flex items-baseline">
+            <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+              {rubles.toLocaleString("ru-RU")}
+            </span>
+            <sup className={`text-xs font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+              {kopecks.toString().padStart(2, '0')}
+            </sup>
+            <span className={`text-lg font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
+          </div>
         </div>
-      </div>
 
-      {/* Add to cart */}
-      <Button 
-        variant="outline" 
-        className="w-full rounded-full border border-border hover:bg-muted font-medium h-10"
-      >
-        В корзину
-      </Button>
+        {/* Add to cart */}
+        <Button 
+          variant="outline" 
+          className="w-full rounded-full border border-border hover:bg-muted font-medium h-10"
+        >
+          В корзину
+        </Button>
+      </div>
     </div>
   );
 };
