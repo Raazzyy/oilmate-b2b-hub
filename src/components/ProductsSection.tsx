@@ -2,6 +2,13 @@ import ProductCard from "./ProductCard";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import oilProductImage from "@/assets/oil-product.png";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { useState, useEffect } from "react";
 
 const products = [
   {
@@ -64,6 +71,28 @@ const products = [
 ];
 
 const ProductsSection = () => {
+  const [api, setApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  useEffect(() => {
+    if (!api) return;
+
+    const updateScrollState = () => {
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+
+    updateScrollState();
+    api.on("select", updateScrollState);
+    api.on("reInit", updateScrollState);
+
+    return () => {
+      api.off("select", updateScrollState);
+      api.off("reInit", updateScrollState);
+    };
+  }, [api]);
+
   return (
     <section className="py-8 bg-card">
       <div className="container">
@@ -72,20 +101,46 @@ const ProductsSection = () => {
             Популярные товары
           </h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
+              onClick={() => api?.scrollPrev()}
+              disabled={!canScrollPrev}
+            >
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
+              onClick={() => api?.scrollNext()}
+              disabled={!canScrollNext}
+            >
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
-        </div>
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "start",
+            slidesToScroll: 1,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-4">
+            {products.map((product) => (
+              <CarouselItem 
+                key={product.id} 
+                className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+              >
+                <ProductCard {...product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
     </section>
   );
