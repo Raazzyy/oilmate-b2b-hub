@@ -262,10 +262,10 @@ const ChipFilter = ({
           <button
             key={item}
             onClick={() => onToggle(item)}
-            className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-sm transition-all ${
               selected.includes(item)
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background border-border text-foreground hover:border-primary/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-foreground hover:bg-muted-foreground/20"
             }`}
           >
             {item}
@@ -444,10 +444,10 @@ const Catalog = () => {
                       <button
                         key={cat.id}
                         onClick={() => selectCategory(cat.id)}
-                        className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                           selectedCategory === cat.id
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background border-border text-foreground hover:border-primary/50"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground hover:bg-muted-foreground/20"
                         }`}
                       >
                         {cat.name}
