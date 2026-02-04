@@ -207,6 +207,20 @@ export const allProducts: ProductData[] = [
     category: "lubricants",
     application: "Универсальная",
   },
+  {
+    id: 14,
+    name: "Shell Argina S3 40",
+    brand: "Shell",
+    volume: "20 л",
+    price: 12500,
+    image: oilProductImage,
+    inStock: true,
+    oilType: "Минеральное",
+    isUniversal: false,
+    category: "marine",
+    viscosity: "SAE 40",
+    application: "Судовые дизели",
+  },
 ];
 
 export const categoryNames: Record<string, string> = {
@@ -216,6 +230,7 @@ export const categoryNames: Record<string, string> = {
   industrial: "Индустриальные масла",
   lubricants: "Смазки",
   antifreeze: "Антифризы",
+  marine: "Судовые масла",
   all: "Все товары",
   promo: "Все акции",
   new: "Новинки",

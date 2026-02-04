@@ -13,6 +13,7 @@ const catalogCategories = [
   { id: "industrial", name: "Индустриальные масла", icon: Factory },
   { id: "lubricants", name: "Смазки", icon: Wrench },
   { id: "antifreeze", name: "Антифризы", icon: Snowflake },
+  { id: "marine", name: "Судовые масла", icon: Droplet },
 ];
 
 const Header = () => {
