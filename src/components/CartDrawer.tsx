@@ -291,7 +291,7 @@ const CartDrawer = () => {
                 onClick={handleSubmitOrder}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Оформляем..." : "Подтвердить заказ"}
+                {isSubmitting ? "Отправляем..." : "Запросить счёт на оплату"}
               </Button>
             </div>
           </>
