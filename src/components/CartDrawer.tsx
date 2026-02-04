@@ -8,6 +8,7 @@ import { useState } from "react";
 import { categoryNames } from "@/data/products";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { sendTelegramNotification } from "@/lib/telegram";
 
 const orderSchema = z.object({
   name: z.string().trim().min(2, "Имя должно содержать минимум 2 символа").max(100),
@@ -79,25 +80,51 @@ const CartDrawer = () => {
     
     setIsSubmitting(true);
     
-    // Simulate order submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const orderData = {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      inn: formData.inn || undefined,
+      city: formData.city || undefined,
+      address: formData.address || undefined,
+      deliveryType: formData.deliveryType,
+      comment: formData.comment || undefined,
+      items: items.map((item) => ({
+        name: item.product.name,
+        volume: item.product.volume,
+        quantity: item.quantity,
+        price: item.product.price,
+      })),
+      totalPrice: getTotalPrice(),
+    };
+
+    const success = await sendTelegramNotification(orderData);
     
     setIsSubmitting(false);
-    setOrderComplete(true);
     
-    toast({
-      title: "Заказ оформлен!",
-      description: "Мы свяжемся с вами в ближайшее время для подтверждения",
-    });
-    
-    // Reset after showing success
-    setTimeout(() => {
-      clearCart();
-      setOrderComplete(false);
-      setIsOrderMode(false);
-      setIsCartOpen(false);
-      setFormData({ name: "", phone: "", email: "", inn: "", city: "", address: "", deliveryType: undefined, comment: "" });
-    }, 2000);
+    if (success) {
+      setOrderComplete(true);
+      
+      toast({
+        title: "Заказ оформлен!",
+        description: "Мы свяжемся с вами в ближайшее время для подтверждения",
+      });
+      
+      // Reset after showing success
+      setTimeout(() => {
+        clearCart();
+        setOrderComplete(false);
+        setIsOrderMode(false);
+        setIsCartOpen(false);
+        setFormData({ name: "", phone: "", email: "", inn: "", city: "", address: "", deliveryType: undefined, comment: "" });
+      }, 2000);
+    } else {
+      toast({
+        title: "Ошибка отправки",
+        description: "Не удалось отправить заказ. Попробуйте позже.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleClose = () => {
