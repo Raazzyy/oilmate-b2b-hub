@@ -474,14 +474,14 @@ const Catalog = () => {
                   </li>
                   <li className="text-muted-foreground/40">/</li>
                   <li>
-                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-primary text-primary-foreground font-medium">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-foreground/10 text-foreground font-medium">
                       {categoryNames[activeCategory]}
                     </span>
                   </li>
                 </>
               ) : (
                 <li>
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-primary text-primary-foreground font-medium">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-foreground/10 text-foreground font-medium">
                     {categoryTitle}
                   </span>
                 </li>

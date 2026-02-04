@@ -192,7 +192,7 @@ const Product = () => {
               </li>
               <li className="text-muted-foreground/40">/</li>
               <li>
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary text-primary-foreground font-medium line-clamp-1">
+                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-foreground/10 text-foreground font-medium line-clamp-1">
                   {product.name.length > 25 ? product.name.slice(0, 25) + '...' : product.name}
                 </span>
               </li>
