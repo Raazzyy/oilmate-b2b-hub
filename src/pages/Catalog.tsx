@@ -451,28 +451,50 @@ const Catalog = () => {
       <main className="py-4 md:py-6" itemScope itemType="https://schema.org/ItemList">
         <div className="container">
           {/* Breadcrumbs */}
-          <nav className="mb-3 md:mb-4 text-sm text-muted-foreground">
-            <Link to="/" className="hover:text-primary">Главная</Link>
-            <span className="mx-2">/</span>
-            {activeCategory ? (
-              <>
-                <Link to="/catalog" className="hover:text-primary">Каталог</Link>
-                <span className="mx-2">/</span>
-                <span className="text-foreground">{categoryNames[activeCategory]}</span>
-              </>
-            ) : (
-              <span className="text-foreground">{categoryTitle}</span>
-            )}
+          <nav className="mb-3 md:mb-4 text-sm">
+            <ol className="flex items-center flex-wrap gap-1">
+              <li>
+                <Link 
+                  to="/" 
+                  className="text-muted-foreground hover:text-accent transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-accent hover:after:w-full after:transition-all after:duration-300"
+                >
+                  Главная
+                </Link>
+              </li>
+              <li className="text-muted-foreground/50 mx-1.5">/</li>
+              {activeCategory ? (
+                <>
+                  <li>
+                    <Link 
+                      to="/catalog" 
+                      className="text-muted-foreground hover:text-accent transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-accent hover:after:w-full after:transition-all after:duration-300"
+                    >
+                      Каталог
+                    </Link>
+                  </li>
+                  <li className="text-muted-foreground/50 mx-1.5">/</li>
+                  <li>
+                    <span className="text-foreground font-medium">{categoryNames[activeCategory]}</span>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <span className="text-foreground font-medium">{categoryTitle}</span>
+                </li>
+              )}
+            </ol>
           </nav>
 
           {/* Back button for category pages */}
           {activeCategory && (
             <button
               onClick={() => navigate("/catalog")}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
+              className="group flex items-center gap-1.5 text-sm text-muted-foreground hover:text-accent mb-4 transition-all duration-200"
             >
-              <ChevronLeft className="h-4 w-4" />
-              Все категории
+              <ChevronLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
+              <span className="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-accent group-hover:after:w-full after:transition-all after:duration-300">
+                Все категории
+              </span>
             </button>
           )}
 
