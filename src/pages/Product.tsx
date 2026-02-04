@@ -171,20 +171,40 @@ const Product = () => {
       <main className="py-4 md:py-6" itemScope itemType="https://schema.org/Product">
         <div className="container">
           {/* Breadcrumbs */}
-          <nav className="mb-4 md:mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/" className="hover:text-primary">Главная</Link>
-            <span>/</span>
-            <Link to="/catalog/all" className="hover:text-primary">Каталог</Link>
-            <span>/</span>
-            <span className="text-foreground line-clamp-1">{product.name}</span>
+          <nav className="mb-4 md:mb-5">
+            <ol className="flex items-center flex-wrap gap-2 text-sm">
+              <li>
+                <Link 
+                  to="/" 
+                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-95"
+                >
+                  Главная
+                </Link>
+              </li>
+              <li className="text-muted-foreground/40">/</li>
+              <li>
+                <Link 
+                  to="/catalog" 
+                  className="inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-95"
+                >
+                  Каталог
+                </Link>
+              </li>
+              <li className="text-muted-foreground/40">/</li>
+              <li>
+                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-primary text-primary-foreground font-medium line-clamp-1">
+                  {product.name.length > 25 ? product.name.slice(0, 25) + '...' : product.name}
+                </span>
+              </li>
+            </ol>
           </nav>
 
           {/* Back button */}
           <Link 
-            to="/catalog/all" 
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4 md:mb-6"
+            to="/catalog" 
+            className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm gradient-primary text-primary-foreground font-medium mb-4 md:mb-6 transition-all duration-200 hover:opacity-90 active:scale-95"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
             Назад в каталог
           </Link>
 
