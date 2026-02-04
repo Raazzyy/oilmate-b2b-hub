@@ -75,6 +75,16 @@ const getAvailableFilters = (products: ProductData[], category: string | null) =
     if (colors.length > 0) specificFilters.push({ label: "Цвет", key: "color", options: colors as string[] });
   }
 
+  if (category === "marine") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
+    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
+    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
+    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
+  }
+
   return { brands, volumes, specificFilters };
 };
 
@@ -410,6 +420,7 @@ const Catalog = () => {
     { id: "industrial", name: "Индустриальные масла" },
     { id: "lubricants", name: "Смазки" },
     { id: "antifreeze", name: "Антифризы" },
+    { id: "marine", name: "Судовые масла" },
   ];
 
   return (
