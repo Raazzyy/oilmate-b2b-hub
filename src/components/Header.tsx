@@ -110,10 +110,10 @@ const Header = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden h-10 w-10 shrink-0"
+              className="md:hidden h-12 w-12 shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-7 w-7" />
             </Button>
 
             {/* Catalog button with dropdown - desktop only */}
@@ -256,10 +256,10 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative h-10 w-10 md:h-12 md:w-12 shrink-0"
+              className="relative h-12 w-12 shrink-0"
               onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
+              <ShoppingCart className="h-6 w-6 md:h-7 md:w-7" />
               {cartCount > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                   {cartCount > 99 ? "99+" : cartCount}
