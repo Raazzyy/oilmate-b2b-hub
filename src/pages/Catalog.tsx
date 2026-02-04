@@ -3,9 +3,10 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SlidersHorizontal, X, ChevronLeft } from "lucide-react";
+import { SlidersHorizontal, X, ChevronLeft, ShoppingCart } from "lucide-react";
 import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useCart } from "@/contexts/CartContext";
 import { allProducts, categoryNames, type ProductData } from "@/data/products";
 import { categories } from "@/data/categories";
 import SEO from "@/components/SEO";
@@ -148,6 +149,7 @@ const Catalog = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
+  const { getTotalItems, setIsCartOpen } = useCart();
   
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<Record<string, string[]>>({});
@@ -155,6 +157,18 @@ const Catalog = () => {
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [showFloatingWidgets, setShowFloatingWidgets] = useState(false);
+
+  const cartCount = getTotalItems();
+
+  // Show floating widgets after scrolling
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFloatingWidgets(window.scrollY > 200);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Reset filters when category changes
   useEffect(() => {
@@ -592,6 +606,37 @@ const Catalog = () => {
               <FiltersContent />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating Widgets - Mobile Only */}
+      {showFloatingWidgets && (
+        <div className="fixed bottom-6 right-4 z-40 flex flex-col gap-3 md:hidden">
+          {/* Filter button - only show when category is active */}
+          {activeCategory && (
+            <button
+              onClick={() => setShowFilters(true)}
+              className="w-11 h-11 rounded-full bg-card shadow-lg flex items-center justify-center border border-border transition-transform hover:scale-105 active:scale-95"
+            >
+              <SlidersHorizontal className="h-5 w-5 text-foreground" />
+              {hasActiveFilters && (
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full" />
+              )}
+            </button>
+          )}
+          
+          {/* Cart button */}
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="w-11 h-11 rounded-full gradient-primary shadow-lg flex items-center justify-center relative transition-transform hover:scale-105 active:scale-95"
+          >
+            <ShoppingCart className="h-5 w-5 text-primary-foreground" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-card text-foreground text-xs font-bold rounded-full flex items-center justify-center border border-border">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </button>
         </div>
       )}
     </div>
