@@ -1,8 +1,9 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/contexts/CartContext";
-import { Minus, Plus, Trash2, ShoppingBag, CheckCircle } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, CheckCircle, Truck, MapPin } from "lucide-react";
 import { useState } from "react";
 import { categoryNames } from "@/data/products";
 import { z } from "zod";
@@ -11,8 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 const orderSchema = z.object({
   name: z.string().trim().min(2, "Имя должно содержать минимум 2 символа").max(100),
   phone: z.string().trim().min(10, "Введите корректный номер телефона").max(20),
-  email: z.string().trim().email("Введите корректный email").max(255).optional().or(z.literal("")),
-  comment: z.string().max(500).optional(),
+  email: z.string().trim().email("Введите корректный email").max(255),
+  inn: z.string().max(12).optional().or(z.literal("")),
+  city: z.string().max(100).optional().or(z.literal("")),
+  address: z.string().max(300).optional().or(z.literal("")),
+  deliveryType: z.enum(["pickup", "delivery"]).optional(),
+  comment: z.string().max(500).optional().or(z.literal("")),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -28,6 +33,10 @@ const CartDrawer = () => {
     name: "",
     phone: "",
     email: "",
+    inn: "",
+    city: "",
+    address: "",
+    deliveryType: undefined,
     comment: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof OrderFormData, string>>>({});
@@ -37,6 +46,13 @@ const CartDrawer = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const setDeliveryType = (type: "pickup" | "delivery") => {
+    setFormData((prev) => ({ 
+      ...prev, 
+      deliveryType: prev.deliveryType === type ? undefined : type 
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -80,7 +96,7 @@ const CartDrawer = () => {
       setOrderComplete(false);
       setIsOrderMode(false);
       setIsCartOpen(false);
-      setFormData({ name: "", phone: "", email: "", comment: "" });
+      setFormData({ name: "", phone: "", email: "", inn: "", city: "", address: "", deliveryType: undefined, comment: "" });
     }, 2000);
   };
 
@@ -147,6 +163,7 @@ const CartDrawer = () => {
 
               {/* Contact Form */}
               <div className="space-y-4">
+                {/* Required fields */}
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">
                     Имя <span className="text-destructive">*</span>
@@ -179,7 +196,9 @@ const CartDrawer = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Email</label>
+                  <label className="text-sm font-medium mb-1.5 block">
+                    Email <span className="text-destructive">*</span>
+                  </label>
                   <Input
                     type="email"
                     placeholder="email@example.com"
@@ -192,12 +211,74 @@ const CartDrawer = () => {
                   )}
                 </div>
 
+                {/* Optional fields */}
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Комментарий</label>
+                  <label className="text-sm font-medium mb-1.5 block">ИНН</label>
                   <Input
-                    placeholder="Дополнительная информация к заказу"
+                    placeholder="1234567890"
+                    value={formData.inn}
+                    onChange={(e) => handleInputChange("inn", e.target.value)}
+                    maxLength={12}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Город</label>
+                  <Input
+                    placeholder="Москва"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange("city", e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Адрес доставки</label>
+                  <Input
+                    placeholder="ул. Примерная, д. 1"
+                    value={formData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                  />
+                </div>
+
+                {/* Delivery type */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Способ получения</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryType("pickup")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                        formData.deliveryType === "pickup"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted-foreground/20"
+                      }`}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Самовывоз
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryType("delivery")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                        formData.deliveryType === "delivery"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted-foreground/20"
+                      }`}
+                    >
+                      <Truck className="h-4 w-4" />
+                      Доставка
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Комментарий к заказу</label>
+                  <Textarea
+                    placeholder="Дополнительная информация к заказу..."
                     value={formData.comment}
                     onChange={(e) => handleInputChange("comment", e.target.value)}
+                    className="resize-none"
+                    rows={3}
                   />
                 </div>
               </div>
