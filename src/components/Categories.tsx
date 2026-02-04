@@ -49,7 +49,7 @@ const categories = [
     title: "Все товары",
     color: "text-foreground",
     bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/all",
+    href: "/catalog",
   },
 ];
 
