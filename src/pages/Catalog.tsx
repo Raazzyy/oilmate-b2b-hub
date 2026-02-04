@@ -493,30 +493,28 @@ const Catalog = () => {
 
           {/* Category selection view (when no specific category selected) */}
           {!activeCategory && !searchQuery && (
-            <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
+            <div className="grid gap-3 md:gap-4 grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-8">
               {categories.map((cat) => {
                 const productCount = allProducts.filter(p => p.category === cat.id).length;
                 return (
                   <Link
                     key={cat.id}
                     to={`/catalog/${cat.id}`}
-                    className="bg-card rounded-2xl overflow-hidden hover:shadow-lg transition-all group"
+                    className="group"
                   >
-                    <div className="aspect-square overflow-hidden bg-muted">
+                    <div className="aspect-square overflow-hidden bg-muted rounded-2xl mb-2">
                       <img 
                         src={cat.image} 
                         alt={cat.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-medium text-foreground group-hover:text-primary transition-colors text-sm md:text-base">
-                        {cat.name}
-                      </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground mt-1">
-                        {productCount} товаров
-                      </p>
-                    </div>
+                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors text-xs md:text-sm text-center leading-tight">
+                      {cat.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground text-center">
+                      {productCount} товаров
+                    </p>
                   </Link>
                 );
               })}
