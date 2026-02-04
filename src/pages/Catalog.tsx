@@ -3,55 +3,79 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SlidersHorizontal, X } from "lucide-react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { SlidersHorizontal, X, ChevronLeft } from "lucide-react";
+import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { allProducts, categoryNames, type ProductData } from "@/data/products";
 import SEO from "@/components/SEO";
 
-// Filters configuration is now local, products data is imported from @/data/products
+// Get available filter options from actual products
+const getAvailableFilters = (products: ProductData[], category: string | null) => {
+  const categoryProducts = category && category !== "all" 
+    ? products.filter(p => p.category === category)
+    : products;
 
-const filterCategories = [
-  { id: "motor", name: "Моторные" },
-  { id: "transmission", name: "Трансмиссионные" },
-  { id: "hydraulic", name: "Гидравлические" },
-  { id: "industrial", name: "Индустриальные" },
-  { id: "lubricants", name: "Смазки" },
-  { id: "antifreeze", name: "Антифризы" },
-];
+  const brands = [...new Set(categoryProducts.map(p => p.brand))].sort();
+  const volumes = [...new Set(categoryProducts.map(p => p.volume))].sort();
+  
+  // Category-specific filters based on actual product data
+  const specificFilters: { label: string; key: keyof ProductData; options: string[] }[] = [];
 
-const brands = ["Shell", "Mobil", "Castrol", "Лукойл", "Total", "Mannol", "Liqui Moly", "Felix", "Sintec", "Fuchs"];
-const volumes = ["1 л", "4 л", "5 л", "20 л"];
+  if (category === "motor") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
+    const approvals = [...new Set(categoryProducts.map(p => p.approvals).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
+    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
+    if (approvals.length > 0) specificFilters.push({ label: "Допуски", key: "approvals", options: approvals as string[] });
+  }
 
-// Специфичные фильтры для каждой категории
-const categorySpecificFilters: Record<string, { label: string; options: string[] }[]> = {
-  motor: [
-    { label: "Тип масла", options: ["Синтетическое", "Полусинтетика", "Минеральное"] },
-    { label: "Вязкость", options: ["0W-20", "0W-30", "5W-30", "5W-40", "10W-40", "15W-40"] },
-    { label: "Допуски", options: ["API SN", "API SP", "ACEA C3", "MB 229.5", "VW 502/505", "BMW LL-04"] },
-  ],
-  transmission: [
-    { label: "Тип масла", options: ["Синтетическое", "Полусинтетика", "Минеральное"] },
-    { label: "Вязкость", options: ["75W-80", "75W-90", "80W-90"] },
-    { label: "Спецификация", options: ["GL-4", "GL-5", "ATF"] },
-  ],
-  hydraulic: [
-    { label: "Тип масла", options: ["Синтетическое", "Минеральное"] },
-    { label: "Класс вязкости", options: ["HLP 32", "HLP 46", "HLP 68", "HVLP 46"] },
-  ],
-  industrial: [
-    { label: "Тип масла", options: ["Синтетическое", "Минеральное"] },
-    { label: "Применение", options: ["Компрессорное", "Редукторное", "Турбинное", "Цепное"] },
-  ],
-  lubricants: [
-    { label: "Тип смазки", options: ["Пластичная", "Литиевая", "Молибденовая", "Силиконовая"] },
-    { label: "Вес", options: ["100 г", "400 г", "800 г", "1 кг", "5 кг"] },
-  ],
-  antifreeze: [
-    { label: "Тип", options: ["Готовый", "Концентрат"] },
-    { label: "Стандарт", options: ["G11", "G12", "G12+", "G12++", "G13"] },
-    { label: "Цвет", options: ["Красный", "Зеленый", "Синий", "Желтый"] },
-  ],
+  if (category === "transmission") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
+    const specs = [...new Set(categoryProducts.map(p => p.specification).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
+    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
+    if (specs.length > 0) specificFilters.push({ label: "Спецификация", key: "specification", options: specs as string[] });
+  }
+
+  if (category === "hydraulic") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const viscosityClasses = [...new Set(categoryProducts.map(p => p.viscosityClass).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
+    if (viscosityClasses.length > 0) specificFilters.push({ label: "Класс вязкости", key: "viscosityClass", options: viscosityClasses as string[] });
+  }
+
+  if (category === "industrial") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
+    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
+  }
+
+  if (category === "lubricants") {
+    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
+    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
+    
+    if (oilTypes.length > 0) specificFilters.push({ label: "Тип смазки", key: "oilType", options: oilTypes as string[] });
+    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
+  }
+
+  if (category === "antifreeze") {
+    const types = [...new Set(categoryProducts.map(p => p.type).filter(Boolean))];
+    const standards = [...new Set(categoryProducts.map(p => p.standard).filter(Boolean))];
+    const colors = [...new Set(categoryProducts.map(p => p.color).filter(Boolean))];
+    
+    if (types.length > 0) specificFilters.push({ label: "Тип", key: "type", options: types as string[] });
+    if (standards.length > 0) specificFilters.push({ label: "Стандарт", key: "standard", options: standards as string[] });
+    if (colors.length > 0) specificFilters.push({ label: "Цвет", key: "color", options: colors as string[] });
+  }
+
+  return { brands, volumes, specificFilters };
 };
 
 const ChipFilter = ({ 
@@ -68,6 +92,8 @@ const ChipFilter = ({
   const [showAll, setShowAll] = useState(false);
   const visibleItems = showAll ? items : items.slice(0, visibleCount);
   const hiddenCount = items.length - visibleCount;
+
+  if (items.length === 0) return null;
 
   return (
     <div>
@@ -108,16 +134,25 @@ const ChipFilter = ({
 
 const Catalog = () => {
   const { category } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
   
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categoryFilters, setCategoryFilters] = useState<Record<string, string[]>>({});
   const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Reset filters when category changes
+  useEffect(() => {
+    setSelectedBrands([]);
+    setCategoryFilters({});
+    setSelectedVolumes([]);
+    setPriceFrom("");
+    setPriceTo("");
+  }, [category]);
 
   // Lock body scroll when mobile filters are open
   useEffect(() => {
@@ -135,6 +170,17 @@ const Catalog = () => {
     searchParams.delete("search");
     setSearchParams(searchParams);
   };
+
+  // Determine active category
+  const activeCategory = category && category !== "all" && category !== "promo" && category !== "new" 
+    ? category 
+    : null;
+
+  // Get available filters based on current category
+  const availableFilters = useMemo(() => 
+    getAvailableFilters(allProducts, activeCategory), 
+    [activeCategory]
+  );
 
   const categoryTitle = searchQuery 
     ? `Результаты поиска: «${searchQuery}»`
@@ -162,73 +208,69 @@ const Catalog = () => {
     }
   };
 
-  const selectCategory = (catId: string) => {
-    if (selectedCategory === catId) {
-      setSelectedCategory(null);
-      setCategoryFilters({});
-    } else {
-      setSelectedCategory(catId);
-      setCategoryFilters({});
-    }
-  };
-
-  const toggleCategoryFilter = (filterLabel: string, value: string) => {
+  const toggleCategoryFilter = (filterKey: string, value: string) => {
     setCategoryFilters(prev => {
-      const current = prev[filterLabel] || [];
+      const current = prev[filterKey] || [];
       if (current.includes(value)) {
-        return { ...prev, [filterLabel]: current.filter(v => v !== value) };
+        return { ...prev, [filterKey]: current.filter(v => v !== value) };
       } else {
-        return { ...prev, [filterLabel]: [...current, value] };
+        return { ...prev, [filterKey]: [...current, value] };
       }
     });
   };
 
-  // Определяем активную категорию для показа специфичных фильтров
-  const activeCategory = selectedCategory 
-    || (category && category !== "all" && category !== "promo" && category !== "new" ? category : null);
-
-  const filteredProducts = allProducts.filter((product) => {
-    // Фильтр по поисковому запросу
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      const matchesSearch = 
-        product.name.toLowerCase().includes(lowerQuery) ||
-        product.brand.toLowerCase().includes(lowerQuery) ||
-        product.oilType.toLowerCase().includes(lowerQuery) ||
-        (product.viscosity && product.viscosity.toLowerCase().includes(lowerQuery)) ||
-        (product.approvals && product.approvals.toLowerCase().includes(lowerQuery));
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      // Filter by search query
+      if (searchQuery) {
+        const lowerQuery = searchQuery.toLowerCase();
+        const matchesSearch = 
+          product.name.toLowerCase().includes(lowerQuery) ||
+          product.brand.toLowerCase().includes(lowerQuery) ||
+          product.oilType.toLowerCase().includes(lowerQuery) ||
+          (product.viscosity && product.viscosity.toLowerCase().includes(lowerQuery)) ||
+          (product.approvals && product.approvals.toLowerCase().includes(lowerQuery));
+        
+        if (!matchesSearch) return false;
+      }
       
-      if (!matchesSearch) return false;
-    }
-    
-    // Фильтр по URL категории (если не выбрана категория в фильтрах и нет поиска)
-    if (!searchQuery && category && category !== "all" && category !== "promo" && category !== "new") {
-      if (!selectedCategory && product.category !== category) return false;
-    }
-    
-    // Фильтр по выбранной категории
-    if (selectedCategory && product.category !== selectedCategory) {
-      return false;
-    }
-    
-    if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
-      return false;
-    }
-    
-    if (selectedVolumes.length > 0 && !selectedVolumes.includes(product.volume)) {
-      return false;
-    }
+      // Filter by URL category
+      if (activeCategory && product.category !== activeCategory) {
+        return false;
+      }
+      
+      // Filter by brand
+      if (selectedBrands.length > 0 && !selectedBrands.includes(product.brand)) {
+        return false;
+      }
+      
+      // Filter by volume
+      if (selectedVolumes.length > 0 && !selectedVolumes.includes(product.volume)) {
+        return false;
+      }
 
-    if (priceFrom && product.price < parseInt(priceFrom)) {
-      return false;
-    }
+      // Filter by price
+      if (priceFrom && product.price < parseInt(priceFrom)) {
+        return false;
+      }
+      if (priceTo && product.price > parseInt(priceTo)) {
+        return false;
+      }
 
-    if (priceTo && product.price > parseInt(priceTo)) {
-      return false;
-    }
-    
-    return true;
-  });
+      // Filter by category-specific filters
+      for (const filter of availableFilters.specificFilters) {
+        const selectedValues = categoryFilters[filter.key] || [];
+        if (selectedValues.length > 0) {
+          const productValue = product[filter.key];
+          if (!productValue || !selectedValues.includes(productValue as string)) {
+            return false;
+          }
+        }
+      }
+      
+      return true;
+    });
+  }, [searchQuery, activeCategory, selectedBrands, selectedVolumes, priceFrom, priceTo, categoryFilters, availableFilters]);
 
   const structuredData = useMemo(() => ({
     "@context": "https://schema.org",
@@ -260,14 +302,17 @@ const Catalog = () => {
 
   const resetFilters = () => {
     setSelectedBrands([]);
-    setSelectedCategory(null);
     setCategoryFilters({});
     setSelectedVolumes([]);
     setPriceFrom("");
     setPriceTo("");
   };
 
-  const hasActiveFilters = selectedBrands.length > 0 || selectedCategory || Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || selectedVolumes.length > 0 || priceFrom || priceTo;
+  const hasActiveFilters = selectedBrands.length > 0 || 
+    Object.keys(categoryFilters).some(k => categoryFilters[k].length > 0) || 
+    selectedVolumes.length > 0 || 
+    priceFrom || 
+    priceTo;
 
   const FiltersContent = () => (
     <>
@@ -298,43 +343,25 @@ const Catalog = () => {
         </div>
       </div>
 
-      {/* Category filter */}
-      <div className="mb-6">
-        <span className="text-sm text-muted-foreground mb-3 block">Категория</span>
-        <div className="flex flex-wrap gap-2">
-          {filterCategories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => selectCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                selectedCategory === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground hover:bg-muted-foreground/20"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Brand filter */}
-      <div className="mb-6">
-        <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
-        <ChipFilter
-          items={brands}
-          selected={selectedBrands}
-          onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
-          visibleCount={5}
-        />
-      </div>
+      {availableFilters.brands.length > 0 && (
+        <div className="mb-6">
+          <span className="text-sm text-muted-foreground mb-3 block">Бренд</span>
+          <ChipFilter
+            items={availableFilters.brands}
+            selected={selectedBrands}
+            onToggle={(item) => toggleFilter(item, selectedBrands, setSelectedBrands)}
+            visibleCount={5}
+          />
+        </div>
+      )}
       
-      {/* Volume filter - hide for lubricants */}
-      {activeCategory !== 'lubricants' && (
+      {/* Volume filter - show only if volumes exist for category */}
+      {availableFilters.volumes.length > 0 && activeCategory !== 'lubricants' && (
         <div className="mb-6">
           <span className="text-sm text-muted-foreground mb-3 block">Объем</span>
           <ChipFilter
-            items={volumes}
+            items={availableFilters.volumes}
             selected={selectedVolumes}
             onToggle={(item) => toggleFilter(item, selectedVolumes, setSelectedVolumes)}
             visibleCount={4}
@@ -343,24 +370,17 @@ const Catalog = () => {
       )}
 
       {/* Category-specific filters */}
-      {activeCategory && categorySpecificFilters[activeCategory] && (
-        <div className="mb-4">
-          <div className="text-xs text-primary font-medium mb-3 uppercase tracking-wide">
-            {categoryNames[activeCategory]}
-          </div>
-          {categorySpecificFilters[activeCategory].map(filter => (
-            <div key={filter.label} className="mb-4">
-              <span className="text-sm text-muted-foreground mb-2 block">{filter.label}</span>
-              <ChipFilter
-                items={filter.options}
-                selected={categoryFilters[`${activeCategory}_${filter.label}`] || []}
-                onToggle={(item) => toggleCategoryFilter(`${activeCategory}_${filter.label}`, item)}
-                visibleCount={4}
-              />
-            </div>
-          ))}
+      {availableFilters.specificFilters.map(filter => (
+        <div key={filter.key} className="mb-6">
+          <span className="text-sm text-muted-foreground mb-3 block">{filter.label}</span>
+          <ChipFilter
+            items={filter.options}
+            selected={categoryFilters[filter.key] || []}
+            onToggle={(item) => toggleCategoryFilter(filter.key, item)}
+            visibleCount={4}
+          />
         </div>
-      )}
+      ))}
 
       {/* Apply button */}
       <Button 
@@ -382,6 +402,16 @@ const Catalog = () => {
     </>
   );
 
+  // Category navigation for "all" view
+  const categoryLinks = [
+    { id: "motor", name: "Моторные масла" },
+    { id: "transmission", name: "Трансмиссионные масла" },
+    { id: "hydraulic", name: "Гидравлические масла" },
+    { id: "industrial", name: "Индустриальные масла" },
+    { id: "lubricants", name: "Смазки" },
+    { id: "antifreeze", name: "Антифризы" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -396,10 +426,29 @@ const Catalog = () => {
         <div className="container">
           {/* Breadcrumbs */}
           <nav className="mb-3 md:mb-4 text-sm text-muted-foreground">
-            <a href="/" className="hover:text-primary">Главная</a>
+            <Link to="/" className="hover:text-primary">Главная</Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground">{categoryTitle}</span>
+            {activeCategory ? (
+              <>
+                <Link to="/catalog" className="hover:text-primary">Каталог</Link>
+                <span className="mx-2">/</span>
+                <span className="text-foreground">{categoryNames[activeCategory]}</span>
+              </>
+            ) : (
+              <span className="text-foreground">{categoryTitle}</span>
+            )}
           </nav>
+
+          {/* Back button for category pages */}
+          {activeCategory && (
+            <button
+              onClick={() => navigate("/catalog")}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Все категории
+            </button>
+          )}
 
           {/* Title and filter toggle */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -415,33 +464,62 @@ const Catalog = () => {
                 </button>
               )}
             </div>
-            <Button
-              variant="outline"
-              className="md:hidden gap-2 shrink-0"
-              onClick={() => setShowFilters(true)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Фильтры
-              {hasActiveFilters && (
-                <span className="w-2 h-2 bg-primary rounded-full" />
-              )}
-            </Button>
+            {activeCategory && (
+              <Button
+                variant="outline"
+                className="md:hidden gap-2 shrink-0"
+                onClick={() => setShowFilters(true)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Фильтры
+                {hasActiveFilters && (
+                  <span className="w-2 h-2 bg-primary rounded-full" />
+                )}
+              </Button>
+            )}
           </div>
 
+          {/* Category selection view (when no specific category selected) */}
+          {!activeCategory && !searchQuery && (
+            <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-8">
+              {categoryLinks.map((cat) => {
+                const productCount = allProducts.filter(p => p.category === cat.id).length;
+                return (
+                  <Link
+                    key={cat.id}
+                    to={`/catalog/${cat.id}`}
+                    className="bg-card rounded-2xl p-4 md:p-6 text-center hover:bg-muted transition-colors group"
+                  >
+                    <h3 className="font-medium text-foreground group-hover:text-primary transition-colors text-sm md:text-base">
+                      {cat.name}
+                    </h3>
+                    <p className="text-xs md:text-sm text-muted-foreground mt-1">
+                      {productCount} товаров
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
           <div className="flex gap-8">
-            {/* Filters sidebar - desktop */}
-            <aside className="hidden md:block w-64 shrink-0">
-              <div className="sticky top-24 bg-card rounded-2xl p-5">
-                <h3 className="font-medium text-foreground mb-5">Фильтры</h3>
-                <FiltersContent />
-              </div>
-            </aside>
+            {/* Filters sidebar - desktop, only show when category is selected */}
+            {activeCategory && (
+              <aside className="hidden md:block w-64 shrink-0">
+                <div className="sticky top-24 bg-card rounded-2xl p-5">
+                  <h3 className="font-medium text-foreground mb-5">Фильтры</h3>
+                  <FiltersContent />
+                </div>
+              </aside>
+            )}
 
             {/* Products grid */}
             <div className="flex-1">
-              <div className="mb-4 text-sm text-muted-foreground">
-                Найдено: {filteredProducts.length} товаров
-              </div>
+              {(activeCategory || searchQuery) && (
+                <div className="mb-4 text-sm text-muted-foreground">
+                  Найдено: {filteredProducts.length} товаров
+                </div>
+              )}
               
               {filteredProducts.length > 0 ? (
                 <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -449,7 +527,7 @@ const Catalog = () => {
                     <ProductCard key={index} {...product} />
                   ))}
                 </div>
-              ) : (
+              ) : (activeCategory || searchQuery) ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">Товары не найдены</p>
                   <Button
@@ -460,7 +538,7 @@ const Catalog = () => {
                     Сбросить фильтры
                   </Button>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
