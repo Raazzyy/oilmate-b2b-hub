@@ -1,51 +1,52 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
-import { Check } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import AddToCartButton from "./AddToCartButton";
+import { StaticImageData } from "next/image";
 
 interface ProductCardProps {
-  id?: string | number;
-  name: string;
-  brand: string;
-  volume: string;
-  price: number;
-  oldPrice?: number;
-  image: string;
-  inStock: boolean;
-  oilType: string;
-  isUniversal?: boolean;
-  category?: string;
-  viscosity?: string;
-  approvals?: string;
-  specification?: string;
-  viscosityClass?: string;
-  application?: string;
-  standard?: string;
-  color?: string;
-  type?: string;
+  product: {
+    id?: string | number;
+    name: string;
+    brand: string;
+    volume: string;
+    price: number;
+    oldPrice?: number;
+    image: string | StaticImageData;
+    inStock: boolean;
+    oilType: string;
+    isUniversal?: boolean;
+    category?: string;
+    viscosity?: string;
+    approvals?: string;
+    specification?: string;
+    viscosityClass?: string;
+    application?: string;
+    standard?: string;
+    color?: string;
+    type?: string;
+    rating?: number;
+    isNew?: boolean;
+    isHit?: boolean;
+  };
 }
 
-const ProductCard = ({
-  id = 1,
-  name,
-  brand,
-  volume,
-  price,
-  oldPrice,
-  image,
-  inStock,
-  oilType,
-  isUniversal = true,
-  category,
-  viscosity,
-  approvals,
-  specification,
-  viscosityClass,
-  application,
-  standard,
-  color,
-}: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
+  const {
+    id = 1,
+    name,
+    brand,
+    volume,
+    price,
+    oldPrice,
+    image,
+    inStock,
+    oilType,
+    isUniversal = true,
+    category,
+  } = product;
+
   // Формируем строку характеристик
   const getSpecsLine = () => {
     // Для смазок показываем вес вместо объема
@@ -54,6 +55,7 @@ const ProductCard = ({
     }
     return `${oilType} · ${volume}`;
   };
+  
   // Разделяем цену на рубли и копейки
   const rubles = Math.floor(price);
   const kopecks = Math.round((price - rubles) * 100) || 99;
@@ -64,15 +66,18 @@ const ProductCard = ({
   // Рассчитываем процент скидки
   const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
 
+  // Handle image source
+  const imageSrc = typeof image === 'string' ? image : image.src;
+
   return (
     <div className="group relative flex flex-col h-full p-3 transition-all duration-300">
       {/* Clickable area for product page */}
-      <Link to={`/product/${id}`} className="block">
+      <Link href={`/product/${id}`} className="block">
         {/* Image container */}
         <div className="relative mb-3">
           <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-muted to-muted/50">
             <img
-              src={image}
+              src={imageSrc}
               alt={name}
               className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
             />
@@ -117,53 +122,10 @@ const ProductCard = ({
           </div>
         </div>
 
-        {/* Add to cart - implemented in wrapper component */}
-        <AddToCartButton product={{ id: Number(id), name, brand, volume, price, oldPrice, image, inStock, oilType, isUniversal, category: category || '' }} />
+        {/* Add to cart */}
+        <AddToCartButton product={product} />
       </div>
     </div>
-  );
-};
-
-// Separate component for add to cart button to use hooks
-const AddToCartButton = ({ product }: { product: any }) => {
-  const { addToCart, setIsCartOpen } = useCart();
-  const [added, setAdded] = useState(false);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    addToCart(product);
-    setAdded(true);
-    
-    setTimeout(() => setAdded(false), 1500);
-  };
-
-  const handleOpenCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsCartOpen(true);
-  };
-
-  return (
-    <Button 
-      variant="ghost" 
-      className={`w-full rounded-full font-medium h-10 transition-all ${
-        added 
-          ? "bg-green-100 text-green-700 hover:bg-green-100" 
-          : "bg-muted hover:bg-primary hover:text-primary-foreground"
-      }`}
-      onClick={added ? handleOpenCart : handleAddToCart}
-    >
-      {added ? (
-        <>
-          <Check className="h-4 w-4 mr-1" />
-          Добавлено
-        </>
-      ) : (
-        "В корзину"
-      )}
-    </Button>
   );
 };
 

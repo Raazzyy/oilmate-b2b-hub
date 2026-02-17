@@ -1,5 +1,7 @@
+"use client";
+
 import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const categories = [
   {
@@ -58,18 +60,19 @@ const Categories = () => {
     <section className="py-4 md:py-6">
       <div className="container">
         {/* Mobile: horizontal scroll, Desktop: even grid */}
-        <div className="flex md:grid md:grid-cols-7 gap-6 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex md:grid md:grid-cols-7 gap-4 md:gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
           {categories.map((category, index) => (
             <Link
               key={index}
-              to={category.href}
+              href={category.href}
               className="group flex flex-col items-center text-center shrink-0"
               style={{ minWidth: '80px' }}
             >
+              {/* Rectangular container */}
               <div
-                className={`mb-2 md:mb-3 flex h-16 w-16 md:h-[72px] md:w-[72px] items-center justify-center rounded-2xl ${category.bgColor} transition-all group-hover:scale-105`}
+                className={`mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-[180px] items-center justify-center rounded-xl ${category.bgColor} transition-all group-hover:scale-105`}
               >
-                <category.icon className={`h-7 w-7 md:h-8 md:w-8 ${category.color}`} strokeWidth={1.5} />
+                <category.icon className={`h-8 w-8 md:h-12 md:w-12 ${category.color}`} strokeWidth={1.5} />
               </div>
               <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center whitespace-nowrap">
                 {category.title}

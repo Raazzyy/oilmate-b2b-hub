@@ -1,10 +1,13 @@
+"use client";
+
 import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { searchProducts, categoryNames } from "@/data/products";
-import { useCart } from "@/contexts/CartContext";
+import { useCartStore } from "@/store/cart";
 
 const catalogCategories = [
   { id: "motor", name: "Моторные масла", icon: Droplet },
@@ -17,16 +20,20 @@ const catalogCategories = [
 ];
 
 const Header = () => {
-  const { getTotalItems, setIsCartOpen } = useCart();
+  const { getTotalItems, setIsCartOpen, isClient, setClient } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const catalogRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
-  const cartCount = getTotalItems();
+  useEffect(() => {
+    setClient();
+  }, [setClient]);
+
+  const cartCount = isClient ? getTotalItems() : 0;
   const searchResults = searchProducts(searchQuery);
   const showResults = isSearchFocused && searchQuery.trim().length > 0;
 
@@ -57,11 +64,11 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const handleProductClick = (productId: number) => {
+  const handleProductClick = (productId: number | string) => {
     setSearchQuery("");
     setIsSearchFocused(false);
     setIsMobileMenuOpen(false);
-    navigate(`/product/${productId}`);
+    router.push(`/product/${productId}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -69,7 +76,7 @@ const Header = () => {
     if (searchQuery.trim()) {
       setIsSearchFocused(false);
       setIsMobileMenuOpen(false);
-      navigate(`/catalog?search=${encodeURIComponent(searchQuery)}`);
+      router.push(`/catalog?search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -80,24 +87,24 @@ const Header = () => {
   const handleCategoryClick = (categoryId: string) => {
     setIsCatalogOpen(false);
     setIsMobileMenuOpen(false);
-    navigate(`/catalog/${categoryId}`);
+    router.push(`/catalog/${categoryId}`);
   };
 
   return (
     <>
-      <header className="w-full bg-card">
+      <header className="w-full bg-card sticky top-0 z-40 border-b border-border/50 backdrop-blur-md bg-card/80">
         {/* Top navigation - hidden on mobile */}
-        <div className="hidden md:block">
+        <div className="hidden md:block border-b border-border/50">
           <div className="container">
             <nav className="flex items-center gap-6 py-2 text-sm">
               {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-                <a
+                <Link
                   key={item}
                   href="#"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   {item}
-                </a>
+                </Link>
               ))}
             </nav>
           </div>
@@ -115,6 +122,7 @@ const Header = () => {
             >
               <Menu className="h-7 w-7" />
             </Button>
+            
 
             {/* Catalog button with dropdown - desktop only */}
             <div className="relative hidden md:block" ref={catalogRef}>
@@ -128,14 +136,14 @@ const Header = () => {
 
               {/* Catalog Dropdown */}
               {isCatalogOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50 shadow-lg">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50 shadow-lg border border-border">
                   <div className="p-2">
                     {catalogCategories.map((category) => {
                       const IconComponent = category.icon;
                       return (
                         <button
                           key={category.id}
-                          className="w-full flex items-center gap-4 p-4 hover:bg-muted rounded-xl transition-colors text-left group"
+                          className="w-full flex items-center gap-4 p-3 hover:bg-muted rounded-xl transition-colors text-left group"
                           onClick={() => handleCategoryClick(category.id)}
                         >
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -153,7 +161,7 @@ const Header = () => {
                       className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
                       onClick={() => {
                         setIsCatalogOpen(false);
-                        navigate("/catalog");
+                        router.push("/catalog");
                       }}
                     >
                       Смотреть все товары
@@ -198,7 +206,7 @@ const Header = () => {
 
               {/* Search Results Dropdown */}
               {showResults && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-2xl overflow-hidden z-50 shadow-lg max-h-[70vh] overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-2xl overflow-hidden z-50 shadow-lg border border-border max-h-[70vh] overflow-y-auto">
                   {searchResults.length > 0 ? (
                     <>
                       <div className="p-2">
@@ -209,7 +217,7 @@ const Header = () => {
                             onClick={() => handleProductClick(product.id)}
                           >
                             <img 
-                              src={product.image} 
+                              src={typeof product.image === 'string' ? product.image : product.image.src} 
                               alt={product.name}
                               className="w-10 h-10 md:w-12 md:h-12 object-contain bg-muted rounded-lg"
                             />
@@ -236,7 +244,7 @@ const Header = () => {
                           className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
                           onClick={() => {
                             setIsSearchFocused(false);
-                            navigate(`/catalog?search=${encodeURIComponent(searchQuery)}`);
+                            router.push(`/catalog?search=${encodeURIComponent(searchQuery)}`);
                           }}
                         >
                           Показать все результаты
@@ -275,12 +283,12 @@ const Header = () => {
         <div className="fixed inset-0 z-50 md:hidden">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
           {/* Menu Panel */}
-          <div className="absolute left-0 top-0 bottom-0 w-[85%] max-w-sm bg-card overflow-y-auto">
+          <div className="absolute left-0 top-0 bottom-0 w-[85%] max-w-sm bg-card overflow-y-auto shadow-2xl">
             {/* Menu Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <span className="font-semibold text-lg">Меню</span>
@@ -316,7 +324,7 @@ const Header = () => {
                   className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left text-primary"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    navigate("/catalog");
+                    router.push("/catalog");
                   }}
                 >
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -332,14 +340,14 @@ const Header = () => {
               <p className="text-sm text-muted-foreground mb-3">Информация</p>
               <div className="space-y-1">
                 {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-                  <a
+                  <Link
                     key={item}
                     href="#"
                     className="block p-3 text-foreground hover:bg-muted rounded-xl transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
