@@ -18,21 +18,21 @@ const promotions = [
     id: 1,
     title: "Скидка 15% на моторные масла Lukoil",
     description: "Только до конца месяца при заказе от 50 000 ₽",
-    image: "/lovable-uploads/27170845-f9be-449e-ba21-0a442e947ac0.png", // Using the placeholder we have access to
+    image: "/oil-product.png",
     color: "bg-blue-600",
   },
   {
     id: 2,
     title: "Бесплатная доставка",
     description: "При заказе бочки любого масла объемом 200л",
-    image: "/lovable-uploads/27170845-f9be-449e-ba21-0a442e947ac0.png",
+    image: "/oil-product.png",
     color: "bg-orange-500",
   },
   {
     id: 3,
     title: "Оптовые цены для СТО",
     description: "Специальные условия для автосервисов и магазинов",
-    image: "/lovable-uploads/27170845-f9be-449e-ba21-0a442e947ac0.png",
+    image: "/oil-product.png",
     color: "bg-green-600",
   },
 ];
