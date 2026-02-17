@@ -3,33 +3,10 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
-import { StaticImageData } from "next/image";
+import { ProductData } from "@/data/products";
 
 interface ProductCardProps {
-  product: {
-    id?: string | number;
-    name: string;
-    brand: string;
-    volume: string;
-    price: number;
-    oldPrice?: number;
-    image: string | StaticImageData;
-    inStock: boolean;
-    oilType: string;
-    isUniversal?: boolean;
-    category?: string;
-    viscosity?: string;
-    approvals?: string;
-    specification?: string;
-    viscosityClass?: string;
-    application?: string;
-    standard?: string;
-    color?: string;
-    type?: string;
-    rating?: number;
-    isNew?: boolean;
-    isHit?: boolean;
-  };
+  product: ProductData;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
