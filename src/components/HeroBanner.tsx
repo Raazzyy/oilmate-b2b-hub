@@ -1,7 +1,10 @@
+
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 
 const slides = [
@@ -85,7 +88,7 @@ const HeroBanner = () => {
                 {slides.map((slide) => (
                   <Link
                     key={slide.id}
-                    to={slide.href}
+                    href={slide.href}
                     className={`flex-[0_0_100%] min-w-0 h-full bg-gradient-to-br ${slide.gradient} relative`}
                   >
                     {/* Animated shimmer overlay */}
@@ -147,7 +150,7 @@ const HeroBanner = () => {
 
           {/* Fixed side banner */}
           <Link 
-            to="/catalog/motor"
+            href="/catalog/motor"
             className="h-[200px] md:h-[380px] rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br from-accent via-accent to-primary/80 p-5 md:p-6 flex flex-col justify-between relative group"
           >
             {/* Decorative circles */}

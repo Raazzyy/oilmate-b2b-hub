@@ -6,10 +6,12 @@ import lubricantsImage from "@/assets/categories/lubricants.jpg";
 import antifreezeImage from "@/assets/categories/antifreeze.jpg";
 import marineOilImage from "@/assets/categories/marine-oil.jpg";
 
+import { StaticImageData } from 'next/image';
+
 export interface CategoryData {
   id: string;
   name: string;
-  image: string;
+  image: string | StaticImageData;
 }
 
 export const categories: CategoryData[] = [
@@ -22,7 +24,7 @@ export const categories: CategoryData[] = [
   { id: "marine", name: "Судовые масла", image: marineOilImage },
 ];
 
-export const getCategoryImage = (categoryId: string): string | undefined => {
+export const getCategoryImage = (categoryId: string): string | StaticImageData | undefined => {
   const category = categories.find(c => c.id === categoryId);
   return category?.image;
 };

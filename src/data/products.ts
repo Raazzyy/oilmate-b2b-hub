@@ -1,13 +1,15 @@
-import oilProductImage from "@/assets/oil-product.png";
+import { StaticImageData } from 'next/image';
+
+const oilProductImage = "/oil-product.png";
 
 export interface ProductData {
-  id: number;
+  id: number | string;
   name: string;
   brand: string;
   volume: string;
   price: number;
   oldPrice?: number;
-  image: string;
+  image: string | StaticImageData;
   inStock: boolean;
   oilType: string;
   isUniversal?: boolean;
@@ -20,6 +22,9 @@ export interface ProductData {
   standard?: string;
   color?: string;
   type?: string;
+  rating?: number;
+  isNew?: boolean;
+  isHit?: boolean;
 }
 
 export const allProducts: ProductData[] = [
@@ -238,10 +243,10 @@ export const categoryNames: Record<string, string> = {
 
 export function searchProducts(query: string): ProductData[] {
   if (!query.trim()) return [];
-  
+
   const lowerQuery = query.toLowerCase();
-  
-  return allProducts.filter(product => 
+
+  return allProducts.filter(product =>
     product.name.toLowerCase().includes(lowerQuery) ||
     product.brand.toLowerCase().includes(lowerQuery) ||
     product.category.toLowerCase().includes(lowerQuery) ||

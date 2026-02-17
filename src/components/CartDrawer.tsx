@@ -1,14 +1,16 @@
+"use client";
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCart } from "@/contexts/CartContext";
+import { useCartStore } from "@/store/cart";
 import { Minus, Plus, Trash2, ShoppingBag, CheckCircle, Truck, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { categoryNames } from "@/data/products";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { sendTelegramNotification } from "@/lib/telegram";
+// import { sendTelegramNotification } from "@/lib/telegram"; // Deprecated, using API route
 
 const orderSchema = z.object({
   name: z.string().trim().min(2, "Имя должно содержать минимум 2 символа").max(100),
@@ -24,7 +26,18 @@ const orderSchema = z.object({
 type OrderFormData = z.infer<typeof orderSchema>;
 
 const CartDrawer = () => {
-  const { items, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart();
+  const { 
+    items, 
+    isCartOpen, 
+    setIsCartOpen, 
+    updateQuantity, 
+    removeFromCart, 
+    getTotalPrice, 
+    clearCart,
+    isClient,
+    setClient
+  } = useCartStore();
+  
   const { toast } = useToast();
   
   const [isOrderMode, setIsOrderMode] = useState(false);
@@ -41,6 +54,13 @@ const CartDrawer = () => {
     comment: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof OrderFormData, string>>>({});
+
+  // Hydration fix
+  useEffect(() => {
+    setClient();
+  }, [setClient]);
+
+  if (!isClient) return null;
 
   const handleInputChange = (field: keyof OrderFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -98,30 +118,48 @@ const CartDrawer = () => {
       totalPrice: getTotalPrice(),
     };
 
-    const success = await sendTelegramNotification(orderData);
-    
-    setIsSubmitting(false);
-    
-    if (success) {
-      setOrderComplete(true);
-      
-      toast({
-        title: "Заказ оформлен!",
-        description: "Мы свяжемся с вами в ближайшее время для подтверждения",
+    try {
+      const response = await fetch('/api/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ order: orderData }),
       });
+
+      const success = response.ok;
       
-      // Reset after showing success
-      setTimeout(() => {
-        clearCart();
-        setOrderComplete(false);
-        setIsOrderMode(false);
-        setIsCartOpen(false);
-        setFormData({ name: "", phone: "", email: "", inn: "", city: "", address: "", deliveryType: undefined, comment: "" });
-      }, 2000);
-    } else {
+      setIsSubmitting(false);
+      
+      if (success) {
+        setOrderComplete(true);
+        
+        toast({
+          title: "Заказ оформлен!",
+          description: "Мы свяжемся с вами в ближайшее время для подтверждения",
+        });
+        
+        // Reset after showing success
+        setTimeout(() => {
+          clearCart();
+          setOrderComplete(false);
+          setIsOrderMode(false);
+          setIsCartOpen(false);
+          setFormData({ name: "", phone: "", email: "", inn: "", city: "", address: "", deliveryType: undefined, comment: "" });
+        }, 2000);
+      } else {
+        toast({
+          title: "Ошибка отправки",
+          description: "Не удалось отправить заказ. Попробуйте позже.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setIsSubmitting(false);
       toast({
-        title: "Ошибка отправки",
-        description: "Не удалось отправить заказ. Попробуйте позже.",
+        title: "Ошибка",
+        description: "Что-то пошло не так.",
         variant: "destructive",
       });
     }
@@ -136,7 +174,7 @@ const CartDrawer = () => {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={handleClose}>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 bg-card">
         <SheetHeader className="p-6 pb-0">
           <SheetTitle className="text-xl">
             {orderComplete ? "Заказ оформлен" : isOrderMode ? "Оформление заказа" : "Корзина"}
@@ -168,7 +206,7 @@ const CartDrawer = () => {
           </div>
         ) : isOrderMode ? (
           <>
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
               {/* Order Summary */}
               <div className="bg-muted rounded-xl p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
@@ -325,18 +363,20 @@ const CartDrawer = () => {
         ) : (
           <>
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
               <div className="space-y-4">
                 {items.map((item) => (
                   <div
                     key={item.product.id}
                     className="flex gap-4 p-4 bg-muted rounded-xl"
                   >
-                    <img
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="w-20 h-20 object-contain bg-background rounded-lg"
-                    />
+                    <div className="w-20 h-20 bg-background rounded-lg flex items-center justify-center shrink-0">
+                      <img
+                        src={typeof item.product.image === 'string' ? item.product.image : item.product.image.src}
+                        alt={item.product.name}
+                        className="w-full h-full object-contain p-2"
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-2 mb-1">
                         {item.product.name}
@@ -408,3 +448,4 @@ const CartDrawer = () => {
 };
 
 export default CartDrawer;
+

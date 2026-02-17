@@ -1,74 +1,18 @@
+"use client";
+
 import ProductCard from "./ProductCard";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import oilProductImage from "@/assets/oil-product.png";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { allProducts } from "@/data/products";
 import { useState, useEffect } from "react";
 
-const products = [
-  {
-    id: "1",
-    name: "Shell Helix Ultra 5W-40 синтетическое",
-    brand: "Shell",
-    volume: "4 л",
-    price: 3299,
-    oldPrice: 3899,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-  },
-  {
-    id: "2",
-    name: "Mobil 1 ESP Formula 5W-30 синтетическое",
-    brand: "Mobil",
-    volume: "4 л",
-    price: 4150,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: true,
-  },
-  {
-    id: "3",
-    name: "Castrol EDGE 5W-30 LL синтетическое",
-    brand: "Castrol",
-    volume: "4 л",
-    price: 3850,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Синтетическое",
-    isUniversal: false,
-  },
-  {
-    id: "4",
-    name: "Лукойл Genesis Armortech 5W-40",
-    brand: "Лукойл",
-    volume: "4 л",
-    price: 1890,
-    image: oilProductImage,
-    inStock: true,
-    oilType: "Полусинтетика",
-    isUniversal: true,
-  },
-  {
-    id: "5",
-    name: "Total Quartz INEO ECS 5W-30",
-    brand: "Total",
-    volume: "5 л",
-    price: 4299,
-    oldPrice: 4799,
-    image: oilProductImage,
-    inStock: false,
-    oilType: "Синтетическое",
-    isUniversal: true,
-  },
-];
+const products = allProducts.slice(0, 6);
 
 const ProductsSection = () => {
   const [api, setApi] = useState<CarouselApi>();
@@ -136,7 +80,7 @@ const ProductsSection = () => {
                 key={product.id} 
                 className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
               >
-                <ProductCard {...product} />
+                <ProductCard product={product} />
               </CarouselItem>
             ))}
           </CarouselContent>
