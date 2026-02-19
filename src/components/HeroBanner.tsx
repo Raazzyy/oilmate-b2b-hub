@@ -7,37 +7,13 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 
-const slides = [
-  {
-    id: 1,
-    title: "ЦЕНТР\nНИЗКИХ\nЦЕН",
-    subtitle: "Ищите товары со\nспециальным ценником",
-    badge: "Выгодно",
-    buttonText: "Подробнее",
-    href: "/catalog/promo",
-    gradient: "from-primary via-primary to-accent",
-  },
-  {
-    id: 2,
-    title: "НОВИНКИ\nСЕЗОНА",
-    subtitle: "Свежие поступления\nот ведущих брендов",
-    badge: "New",
-    buttonText: "Смотреть",
-    href: "/catalog/new",
-    gradient: "from-accent via-accent to-primary",
-  },
-  {
-    id: 3,
-    title: "СКИДКИ\nДО 30%",
-    subtitle: "На трансмиссионные\nмасла и антифризы",
-    badge: "Sale",
-    buttonText: "К акциям",
-    href: "/catalog/promo",
-    gradient: "from-primary via-accent to-primary",
-  },
-];
+import { HeroSlide } from "@/types";
 
-const HeroBanner = () => {
+interface HeroBannerProps {
+  slides: HeroSlide[];
+}
+
+const HeroBanner = ({ slides }: HeroBannerProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -88,9 +64,19 @@ const HeroBanner = () => {
                 {slides.map((slide) => (
                   <Link
                     key={slide.id}
-                    href={slide.href}
+                    href={slide.href || "/"}
                     className={`flex-[0_0_100%] min-w-0 h-full bg-gradient-to-br ${slide.gradient} relative`}
+                    style={slide.backgroundImage ? { 
+                      backgroundImage: `url(${slide.backgroundImage})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    } : undefined}
                   >
+                    {/* Dark overlay if image is present */}
+                    {slide.backgroundImage && (
+                      <div className="absolute inset-0 bg-black/40" />
+                    )}
+
                     {/* Animated shimmer overlay */}
                     <div className="absolute inset-0 opacity-30">
                       <div 
@@ -120,12 +106,12 @@ const HeroBanner = () => {
                           {slide.buttonText}
                         </Button>
 
-                        <div className="text-right text-primary-foreground hidden sm:block">
+                        {/* <div className="text-right text-primary-foreground hidden sm:block">
                           <p className="text-sm md:text-lg mb-2 whitespace-pre-line">{slide.subtitle}</p>
                           <div className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-sm rounded-lg px-3 md:px-4 py-1.5 md:py-2 border border-white/20">
                             <span className="text-sm md:text-lg font-semibold">{slide.badge}</span>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </Link>
