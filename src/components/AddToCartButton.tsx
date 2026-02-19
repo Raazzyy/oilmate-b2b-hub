@@ -9,9 +9,10 @@ import { useEffect, useState } from "react";
 interface AddToCartButtonProps {
   product: ProductData;
   className?: string;
+  quantity?: number;
 }
 
-const AddToCartButton = ({ product, className }: AddToCartButtonProps) => {
+const AddToCartButton = ({ product, className, quantity = 1 }: AddToCartButtonProps) => {
   const { addToCart, isClient, setClient } = useCartStore();
   const [added, setAdded] = useState(false);
 
@@ -23,7 +24,7 @@ const AddToCartButton = ({ product, className }: AddToCartButtonProps) => {
     e.preventDefault();
     e.stopPropagation();
     
-    addToCart(product);
+    addToCart(product, quantity);
     setAdded(true);
     
     setTimeout(() => setAdded(false), 1500);

@@ -164,7 +164,7 @@ const Header = () => {
                         router.push("/catalog");
                       }}
                     >
-                      Смотреть все товары
+                      Все товары
                     </Button>
                   </div>
                 </div>
