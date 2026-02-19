@@ -57,7 +57,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
       <div className="container">
         <div className="grid gap-3 md:gap-4 lg:grid-cols-3">
           {/* Carousel banner */}
-          <div className="relative lg:col-span-2 h-[280px] md:h-[380px] rounded-2xl md:rounded-3xl overflow-hidden">
+          <div className="relative lg:col-span-2 h-[280px] md:h-[380px] rounded-2xl overflow-hidden">
             {/* Carousel */}
             <div className="overflow-hidden h-full" ref={emblaRef}>
               <div className="flex h-full">
@@ -122,13 +122,13 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
             {/* Navigation arrows */}
             <button 
               onClick={(e) => { e.preventDefault(); scrollPrev(); }}
-              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-full bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm"
+              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-lg bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm shadow-md"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button 
               onClick={(e) => { e.preventDefault(); scrollNext(); }}
-              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-full bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm"
+              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-lg bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm shadow-md"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -137,7 +137,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
           {/* Fixed side banner */}
           <Link 
             href="/catalog/motor"
-            className="h-[200px] md:h-[380px] rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br from-accent via-accent to-primary/80 p-5 md:p-6 flex flex-col justify-between relative group"
+            className="h-[200px] md:h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br from-accent via-accent to-primary/80 p-5 md:p-6 flex flex-col justify-between relative group"
           >
             {/* Decorative circles */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
@@ -166,7 +166,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
             <button
               key={index}
               onClick={() => scrollTo(index)}
-              className={`h-2 rounded-full transition-all ${
+              className={`h-2 rounded-sm transition-all ${
                 selectedIndex === index ? "bg-primary w-6" : "bg-border hover:bg-primary/50 w-2"
               }`}
             />
