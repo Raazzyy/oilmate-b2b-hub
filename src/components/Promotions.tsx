@@ -11,33 +11,23 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import ImageWithSkeleton from "./ImageWithSkeleton";
+import { getStrapiMedia } from "@/lib/strapi";
 
-// Mock data for promotions
-const promotions = [
-  {
-    id: 1,
-    title: "Скидка 15% на моторные масла Lukoil",
-    description: "Только до конца месяца при заказе от 50 000 ₽",
-    image: "/oil-product.png",
-    color: "bg-blue-600",
-  },
-  {
-    id: 2,
-    title: "Бесплатная доставка",
-    description: "При заказе бочки любого масла объемом 200л",
-    image: "/oil-product.png",
-    color: "bg-orange-500",
-  },
-  {
-    id: 3,
-    title: "Оптовые цены для СТО",
-    description: "Специальные условия для автосервисов и магазинов",
-    image: "/oil-product.png",
-    color: "bg-green-600",
-  },
-];
+interface Promotion {
+  id: number;
+  title?: string;
+  image: any;
+  href: string;
+}
 
-const Promotions = () => {
+interface PromotionsProps {
+  promotions: Promotion[];
+}
+
+const Promotions = ({ promotions }: PromotionsProps) => {
+  if (!promotions || promotions.length === 0) return null;
+
   return (
     <section className="py-6 md:py-10 bg-muted/30">
       <div className="container">
@@ -62,32 +52,25 @@ const Promotions = () => {
         >
           <CarouselContent className="-ml-4">
             {promotions.map((promo) => (
-              <CarouselItem key={promo.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                <div className="group relative overflow-hidden rounded-2xl bg-card border border-border h-full flex flex-col">
-                  {/* Image/Background Area */}
-                  <div className={`h-40 md:h-48 w-full ${promo.color} relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                    {/* Abstract shapes or image */}
-                    <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-                    
-                    <div className="absolute inset-0 p-6 flex flex-col justify-center text-white">
-                      <h3 className="text-xl font-bold leading-tight mb-2 drop-shadow-sm">
-                        {promo.title}
-                      </h3>
-                    </div>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="p-5 flex-1 flex flex-col">
-                    <p className="text-muted-foreground text-sm mb-4 flex-1">
-                      {promo.description}
-                    </p>
-                    <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                      Подробнее
-                    </Button>
-                  </div>
-                </div>
-              </CarouselItem>
+                <CarouselItem key={promo.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                    <Link href={promo.href} className="block group">
+                        <div className="relative overflow-hidden rounded-3xl bg-card border border-border h-full flex flex-col aspect-video">
+                            <ImageWithSkeleton 
+                                src={getStrapiMedia(promo.image?.url) || "/oil-product.png"} 
+                                alt={promo.title || "Promotion"} 
+                                aspectRatio="video"
+                                className="group-hover:scale-105 transition-transform duration-500"
+                            />
+                            {promo.title && (
+                                <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent text-white">
+                                    <h3 className="text-xl font-bold leading-tight mb-2 drop-shadow-sm">
+                                        {promo.title}
+                                    </h3>
+                                </div>
+                            )}
+                        </div>
+                    </Link>
+                </CarouselItem>
             ))}
           </CarouselContent>
           <div className="hidden md:block">

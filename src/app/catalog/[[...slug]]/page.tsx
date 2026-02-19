@@ -1,30 +1,52 @@
 
-import { ProductData, allProducts, categoryNames } from "@/data/products";
+import { ProductData, categoryNames } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
-import { Button } from "@/components/ui/button"; // Assuming we might need buttons
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { getProducts as fetchStrapiProducts, getCategories, getStrapiMedia } from "@/lib/strapi";
 
 // Mock function to simulate fetching data (replace with Strapi later)
-async function getProducts(category?: string, searchQuery?: string): Promise<ProductData[]> {
-  // Simulate network delay
-  // await new Promise(resolve => setTimeout(resolve, 500)); 
-
-  let filtered = allProducts;
-
-  if (category && category !== 'all') {
-     filtered = filtered.filter(p => p.category === category);
+// Data fetching from Strapi
+async function getProducts(categorySlug?: string, searchQuery?: string): Promise<ProductData[]> {
+  const filters: any = {};
+  
+  if (categorySlug && categorySlug !== 'all') {
+    filters.category = {
+      slug: { $eq: categorySlug }
+    };
   }
 
   if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    filtered = filtered.filter(product => 
-      product.name.toLowerCase().includes(lowerQuery) ||
-      product.brand.toLowerCase().includes(lowerQuery)
-    );
+    filters.name = { $containsi: searchQuery };
   }
 
-  return filtered;
+  const response = await fetchStrapiProducts({ filters });
+  
+  return response.data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    brand: item.brand,
+    volume: item.volume,
+    price: item.price,
+    oldPrice: item.oldPrice,
+    image: getStrapiMedia(item.image?.url) || "/oil-product.png",
+    inStock: item.inStock,
+    oilType: item.oilType,
+    isUniversal: item.isUniversal,
+    category: item.category?.slug || "all",
+    viscosity: item.viscosity,
+    approvals: item.approvals,
+    specification: item.specification,
+    viscosityClass: item.viscosityClass,
+    application: item.application,
+    standard: item.standard,
+    color: item.color,
+    type: item.type,
+    rating: item.rating,
+    isNew: item.isNew,
+    isHit: item.isHit,
+  }));
 }
 
 interface CatalogPageProps {

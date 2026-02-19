@@ -9,12 +9,14 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { allProducts } from "@/data/products";
 import { useState, useEffect } from "react";
+import { ProductData } from "@/data/products";
 
-const products = allProducts.slice(0, 6);
+interface ProductsSectionProps {
+  products: ProductData[];
+}
 
-const ProductsSection = () => {
+const ProductsSection = ({ products }: ProductsSectionProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
