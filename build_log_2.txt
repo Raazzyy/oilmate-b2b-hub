@@ -1,0 +1,57 @@
+
+> oilmate-b2b-hub-next@0.1.0 build
+> next build
+
+   ▲ Next.js 15.3.9
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 16.0s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+./src/app/layout.tsx
+16:14  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/app/product/[id]/page.tsx
+22:23  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/badge.tsx
+29:17  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/button.tsx
+47:18  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/form.tsx
+129:10  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/navigation-menu.tsx
+111:3  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/sidebar.tsx
+636:3  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/sonner.tsx
+27:19  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/toggle.tsx
+37:18  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+Failed to compile.
+
+./src/app/catalog/[[...slug]]/page.tsx:26:3
+Type error: Type '{ id: number; name: string; brand: string; volume: string; price: number; oldPrice: number; image: string; inStock: boolean; oilType: string; isUniversal: boolean; category: string; viscosity: unknown; approvals: unknown; ... 8 more ...; isHit: unknown; }[]' is not assignable to type 'ProductData[]'.
+  Type '{ id: number; name: string; brand: string; volume: string; price: number; oldPrice: number; image: string; inStock: boolean; oilType: string; isUniversal: boolean; category: string; viscosity: unknown; approvals: unknown; ... 8 more ...; isHit: unknown; }' is not assignable to type 'ProductData'.
+    Types of property 'viscosity' are incompatible.
+      Type 'unknown' is not assignable to type 'string'.
+
+[0m [90m 24 |[39m   [36mconst[39m response [33m=[39m [36mawait[39m fetchStrapiProducts({ filters })[33m;[39m[0m
+[0m [90m 25 |[39m   [0m
+[0m[31m[1m>[22m[39m[90m 26 |[39m   [36mreturn[39m (response[33m.[39mdata [36mas[39m [33mStrapiProduct[39m[])[33m.[39mmap((item) [33m=>[39m ({[0m
+[0m [90m    |[39m   [31m[1m^[22m[39m[0m
+[0m [90m 27 |[39m     id[33m:[39m item[33m.[39mid[33m,[39m[0m
+[0m [90m 28 |[39m     name[33m:[39m item[33m.[39mname[33m,[39m[0m
+[0m [90m 29 |[39m     brand[33m:[39m item[33m.[39mbrand[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null

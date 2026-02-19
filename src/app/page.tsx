@@ -4,7 +4,7 @@ import Categories from "@/components/Categories";
 import Promotions from "@/components/Promotions";
 import ProductsSection from "@/components/ProductsSection";
 
-import { getHeroSlides, getProducts as fetchStrapiProducts, getStrapiMedia, getPromotions } from "@/lib/strapi";
+import { getHeroSlides, getProducts as fetchStrapiProducts, getStrapiMedia, getPromotions, StrapiProduct } from "@/lib/strapi";
 import { ProductData } from "@/data/products";
 
 export default async function Home() {
@@ -25,7 +25,7 @@ export default async function Home() {
     });
   }
 
-  const popularProducts: ProductData[] = (productsResponse?.data || []).map((item: any) => ({
+  const popularProducts: ProductData[] = (productsResponse.data as StrapiProduct[]).map((item) => ({
     id: item.id,
     name: item.name,
     brand: item.brand,
@@ -37,17 +37,17 @@ export default async function Home() {
     oilType: item.oilType,
     isUniversal: item.isUniversal,
     category: item.category?.slug || "all",
-    viscosity: item.viscosity,
-    approvals: item.approvals,
-    specification: item.specification,
-    viscosityClass: item.viscosityClass,
-    application: item.application,
-    standard: item.standard,
-    color: item.color,
-    type: item.type,
-    rating: item.rating,
-    isNew: item.isNew,
-    isHit: item.isHit,
+    viscosity: item.viscosity as string,
+    approvals: item.approvals as string,
+    specification: item.specification as string,
+    viscosityClass: item.viscosityClass as string,
+    application: item.application as string,
+    standard: item.standard as string,
+    color: item.color as string,
+    type: item.type as string,
+    rating: item.rating as number,
+    isNew: item.isNew as boolean,
+    isHit: item.isHit as boolean,
   }));
 
   return (

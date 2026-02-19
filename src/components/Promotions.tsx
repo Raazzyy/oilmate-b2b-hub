@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ImageWithSkeleton from "./ImageWithSkeleton";
-import { getStrapiMedia } from "@/lib/strapi";
+import { getStrapiMedia, StrapiImage } from "@/lib/strapi";
 
 interface Promotion {
   id: number;
   title?: string;
-  image: any;
+  image?: StrapiImage;
   href: string;
 }
 

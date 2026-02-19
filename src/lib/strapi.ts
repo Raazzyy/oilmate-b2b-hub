@@ -39,20 +39,20 @@ export async function fetchAPI(
         };
 
         // Build request URL
-        const stringifyParams = (params: any, prefix = ""): string => {
+        const stringifyParams = (params: Record<string, unknown>, prefix = ""): string => {
             return Object.keys(params)
                 .map((key) => {
                     const value = params[key];
                     const fullKey = prefix ? `${prefix}[${key}]` : key;
 
                     if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-                        return stringifyParams(value, fullKey);
+                        return stringifyParams(value as Record<string, unknown>, fullKey);
                     } else if (Array.isArray(value)) {
-                        return value
-                            .map((item, index) => `${fullKey}[${index}]=${encodeURIComponent(item)}`)
+                        return (value as unknown[])
+                            .map((item, index) => `${fullKey}[${index}]=${encodeURIComponent(String(item))}`)
                             .join("&");
                     } else {
-                        return `${fullKey}=${encodeURIComponent(value)}`;
+                        return `${fullKey}=${encodeURIComponent(String(value))}`;
                     }
                 })
                 .join("&");
@@ -91,6 +91,31 @@ export interface StrapiData<T> {
     id: number;
     documentId: string;
     attributes: T;
+}
+
+export interface StrapiImage {
+    url: string;
+    alternativeText?: string;
+    formats?: Record<string, unknown>;
+}
+
+export interface StrapiProduct {
+    id: number;
+    documentId: string;
+    name: string;
+    brand?: string;
+    volume?: string;
+    price: number;
+    oldPrice?: number;
+    image?: StrapiImage;
+    inStock?: boolean;
+    oilType?: string;
+    isUniversal?: boolean;
+    category?: {
+        slug: string;
+        name: string;
+    };
+    [key: string]: unknown; // Allow other dynamic fields for mapping convenience
 }
 
 import { HeroSlide } from "@/types";
@@ -135,9 +160,9 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
             return DEFAULT_SLIDES;
         }
 
-        return data.data.map((item: any) => ({
+        return data.data.map((item: { id: number; name?: string; title?: string; subtitle?: string; badge?: string; buttonText?: string; href?: string; gradient?: string; image?: StrapiImage }) => ({
             id: item.id,
-            title: item.name || item.title,
+            title: item.name || item.title || "",
             subtitle: item.subtitle,
             badge: item.badge,
             buttonText: item.buttonText,
@@ -153,7 +178,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     }
 }
 
-export async function getCategories(): Promise<any[]> {
+export async function getCategories(): Promise<Record<string, unknown>[]> {
     try {
         const data = await fetchAPI("/categories", { sort: "name:asc" });
         return data?.data || [];
@@ -163,7 +188,7 @@ export async function getCategories(): Promise<any[]> {
     }
 }
 
-export async function getProducts(params: any = {}): Promise<StrapiResponse<any[]>> {
+export async function getProducts(params: Record<string, unknown> = {}): Promise<StrapiResponse<StrapiProduct[]>> {
     try {
         const data = await fetchAPI("/products", {
             populate: "*",
@@ -181,13 +206,13 @@ export async function getProducts(params: any = {}): Promise<StrapiResponse<any[
     }
 }
 
-export async function getPromotions(): Promise<any[]> {
+export async function getPromotions(): Promise<{ id: number; documentId: string; title?: string; href: string; image?: StrapiImage }[]> {
     try {
         const data = await fetchAPI("/promotions", { populate: "*" });
 
         if (!data?.data) return [];
 
-        return data.data.map((item: any) => ({
+        return data.data.map((item: { id: number; documentId: string; title?: string; href: string; image?: StrapiImage }) => ({
             id: item.id,
             documentId: item.documentId,
             title: item.title,
