@@ -1,12 +1,10 @@
-import { categoryNames } from "@/data/products";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus, ChevronLeft, Star, ChevronRight } from "lucide-react";
+import { categoryNames, allProducts, ProductData } from "@/data/products";
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ProductImageGallery from "@/components/ProductImageGallery"; 
-import AddToCartButton from "@/components/AddToCartButton"; 
+import ProductImageGallery from "@/components/ProductImageGallery";
+import ProductDetailControls from "@/components/ProductDetailControls";
 import { getProductById, getStrapiMedia, getProducts as fetchStrapiProducts, StrapiProduct } from "@/lib/strapi";
-import { ProductData } from "@/data/products";
 import ProductsSection from "@/components/ProductsSection";
 
 interface ProductPageProps {
@@ -16,35 +14,48 @@ interface ProductPageProps {
 }
 
 async function getProduct(id: string): Promise<ProductData | null> {
-  const item = await getProductById(id);
-  if (!item) return null;
+  // Try Strapi first
+  try {
+    const item = await getProductById(id);
+    if (item) {
+      return {
+        id: item.id,
+        documentId: item.documentId,
+        name: item.name,
+        brand: item.brand || "",
+        volume: item.volume || "",
+        price: item.price,
+        oldPrice: item.oldPrice,
+        image: getStrapiMedia(item.image?.url) || "/oil-product.png",
+        inStock: item.inStock || false,
+        oilType: item.oilType || "",
+        isUniversal: item.isUniversal,
+        category: item.category?.slug || "all",
+        viscosity: item.viscosity as string,
+        approvals: item.approvals as string,
+        specification: item.specification as string,
+        viscosityClass: item.viscosityClass as string,
+        application: item.application as string,
+        standard: item.standard as string,
+        color: item.color as string,
+        type: item.type as string,
+        rating: item.rating as number,
+        isNew: item.isNew as boolean,
+        isHit: item.isHit as boolean,
+      };
+    }
+  } catch {
+    // Strapi unavailable, fall through to local data
+  }
 
-  return {
-    id: item.id,
-    documentId: item.documentId,
-    name: item.name,
-    brand: item.brand || "",
-    volume: item.volume || "",
-    price: item.price,
-    oldPrice: item.oldPrice,
-    image: getStrapiMedia(item.image?.url) || "/oil-product.png",
-    inStock: item.inStock || false,
-    oilType: item.oilType || "",
-    isUniversal: item.isUniversal,
-    category: item.category?.slug || "all",
-    viscosity: item.viscosity as string,
-    approvals: item.approvals as string,
-    specification: item.specification as string,
-    viscosityClass: item.viscosityClass as string,
-    application: item.application as string,
-    standard: item.standard as string,
-    color: item.color as string,
-    type: item.type as string,
-    rating: item.rating as number,
-    isNew: item.isNew as boolean,
-    isHit: item.isHit as boolean,
-  };
+  // Fallback: look up in local static data by id or documentId
+  const parsed = parseInt(id, 10);
+  const localProduct = allProducts.find(
+    (p) => p.id === parsed || p.id === id || p.documentId === id
+  );
+  return localProduct || null;
 }
+
 
 export async function generateMetadata(props: ProductPageProps) {
   const params = await props.params;
@@ -132,7 +143,7 @@ export default async function ProductPage(props: ProductPageProps) {
                   {oldRubles}<sup className="text-[10px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
                 </span>
               )}
-              <div className="inline-flex items-baseline w-fit bg-gradient-to-r from-primary/10 to-accent/10 px-6 py-2 rounded-xl dark:bg-muted/30 border border-primary/5">
+              <div className={`inline-flex items-baseline w-fit px-6 py-2 rounded-xl dark:bg-muted/30 border border-transparent ${product.oldPrice ? 'bg-gradient-to-r from-primary/10 to-accent/10 border-primary/5' : 'bg-[#f2f4f7]'}`}>
                 <span className="text-4xl font-black text-foreground tracking-tighter">
                   {rubles.toLocaleString("ru-RU")}
                 </span>
@@ -146,22 +157,8 @@ export default async function ProductPage(props: ProductPageProps) {
               </p>
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-4 mb-10">
-              <div className="flex items-center border rounded-xl bg-muted/20 px-2 h-12 shadow-sm">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted">
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-10 text-center font-bold">1</span>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted font-bold">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex-1 max-w-[300px]">
-                <AddToCartButton product={product} className="h-12 text-base font-bold rounded-lg bg-blue-600 hover:bg-blue-700 border-none text-white shadow-md transition-all" />
-              </div>
-            </div>
+            {/* Controls — quantity + cart */}
+            <ProductDetailControls product={product} />
 
             {/* Characteristics */}
             <div className="space-y-4">
@@ -199,7 +196,7 @@ export default async function ProductPage(props: ProductPageProps) {
 
         {/* Similar Products */}
         <div className="mt-20">
-           <ProductsSection products={relatedProducts} />
+           <ProductsSection title="Смотрите также" products={relatedProducts} />
         </div>
       </div>
     </div>

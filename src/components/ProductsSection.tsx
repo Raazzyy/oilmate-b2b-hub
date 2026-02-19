@@ -14,9 +14,10 @@ import { ProductData } from "@/data/products";
 
 interface ProductsSectionProps {
   products: ProductData[];
+  title?: string;
 }
 
-const ProductsSection = ({ products }: ProductsSectionProps) => {
+const ProductsSection = ({ products, title = "Популярные товары" }: ProductsSectionProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -44,7 +45,7 @@ const ProductsSection = ({ products }: ProductsSectionProps) => {
       <div className="container">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">
-            Популярные товары
+            {title}
           </h2>
           <div className="flex items-center gap-2">
             <Button 
