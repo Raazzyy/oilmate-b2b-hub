@@ -32,7 +32,7 @@ const AddToCartButton = ({ product, className }: AddToCartButtonProps) => {
   return (
     <Button 
       variant="ghost" 
-      className={`w-full rounded-full font-medium h-10 transition-all ${
+      className={`w-full rounded-xl font-medium h-10 transition-all ${
         added 
           ? "bg-green-100 text-green-700 hover:bg-green-100" 
           : "bg-muted hover:bg-primary hover:text-primary-foreground"

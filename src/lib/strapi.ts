@@ -206,6 +206,16 @@ export async function getProducts(params: Record<string, unknown> = {}): Promise
     }
 }
 
+export async function getProductById(id: string): Promise<StrapiProduct | null> {
+    try {
+        const data = await fetchAPI(`/products/${id}`, { populate: "*" });
+        return data?.data || null;
+    } catch (error) {
+        console.error(`Failed to fetch product with id ${id}:`, error);
+        return null;
+    }
+}
+
 export async function getPromotions(): Promise<{ id: number; documentId: string; title?: string; href: string; image?: StrapiImage }[]> {
     try {
         const data = await fetchAPI("/promotions", { populate: "*" });

@@ -27,6 +27,7 @@ export default async function Home() {
 
   const popularProducts: ProductData[] = (productsResponse.data as StrapiProduct[]).map((item) => ({
     id: item.id,
+    documentId: item.documentId,
     name: item.name,
     brand: item.brand,
     volume: item.volume,

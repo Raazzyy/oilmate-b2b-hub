@@ -50,7 +50,7 @@ const ProductsSection = ({ products }: ProductsSectionProps) => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
+              className="rounded-lg bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
               onClick={() => api?.scrollPrev()}
               disabled={!canScrollPrev}
             >
@@ -59,7 +59,7 @@ const ProductsSection = ({ products }: ProductsSectionProps) => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
+              className="rounded-lg bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
               onClick={() => api?.scrollNext()}
               disabled={!canScrollNext}
             >

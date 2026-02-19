@@ -12,6 +12,7 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   const {
     id = 1,
+    documentId,
     name,
     brand,
     volume,
@@ -49,10 +50,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="group relative flex flex-col h-full p-3 transition-all duration-300">
       {/* Clickable area for product page */}
-      <Link href={`/product/${id}`} className="block">
+      <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container */}
         <div className="relative mb-3">
-          <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-muted to-muted/50">
+          <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50">
             <img
               src={imageSrc}
               alt={name}
@@ -60,11 +61,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
             />
           </div>
           
-          {/* Discount badge */}
+          {/* Discount badge - Split style with original gradient */}
           {discountPercent && discountPercent > 0 && (
-            <span className="absolute left-2 bottom-2 rounded-md bg-gradient-to-r from-primary to-accent px-2 py-1 text-xs font-bold text-primary-foreground">
-              -{discountPercent}%
-            </span>
+            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-black/10 backdrop-blur-md border border-white/10 text-[10px] font-bold shadow-sm">
+              <div className="bg-gradient-to-r from-primary to-accent px-2 py-1 text-white">
+                -{discountPercent}%
+              </div>
+              <div className="px-2 py-1 text-foreground dark:text-white opacity-90">
+                Распродажа
+              </div>
+            </div>
           )}
         </div>
 
@@ -81,14 +87,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       {/* Spacer to push price and button to bottom */}
       <div className="mt-auto">
-        {/* Price */}
-        <div className="mb-3 flex flex-col">
-          {oldPrice && (
-            <span className="text-xs text-muted-foreground line-through mb-1">
-              {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
-            </span>
-          )}
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-1.5 py-0.5 rounded' : ''}`}>
+        {/* Price Row (Single line) */}
+        <div className="mb-4 flex items-center gap-3">
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
             <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")}
             </span>
@@ -97,6 +98,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </sup>
             <span className={`text-base font-bold ml-0.5 ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
           </div>
+          
+          {oldPrice && (
+            <span className="text-sm text-muted-foreground line-through decoration-muted-foreground/50">
+              {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
+            </span>
+          )}
         </div>
 
         {/* Add to cart */}

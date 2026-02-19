@@ -127,7 +127,7 @@ const Header = () => {
             {/* Catalog button with dropdown - desktop only */}
             <div className="relative hidden md:block" ref={catalogRef}>
               <Button 
-                className="flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0 transition-all"
+                className="flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-xl shrink-0 transition-all font-bold"
                 onClick={() => setIsCatalogOpen(!isCatalogOpen)}
               >
                 {isCatalogOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -177,7 +177,7 @@ const Header = () => {
                 <div className="relative">
                   <Input
                     placeholder="Поиск..."
-                    className="h-10 md:h-12 pl-4 pr-10 md:pr-12 rounded-full border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full text-sm md:text-base"
+                    className="h-10 md:h-12 pl-4 pr-10 md:pr-12 rounded-xl border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full text-sm md:text-base"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
@@ -187,7 +187,7 @@ const Header = () => {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="absolute right-9 md:right-11 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
+                      className="absolute right-9 md:right-11 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-lg hover:bg-muted"
                       onClick={clearSearch}
                     >
                       <X className="h-4 w-4 text-muted-foreground" />
@@ -197,7 +197,7 @@ const Header = () => {
                     type="submit"
                     size="icon"
                     variant="ghost"
-                    className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
+                    className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-lg hover:bg-muted"
                   >
                     <Search className="h-5 w-5 text-muted-foreground" />
                   </Button>
