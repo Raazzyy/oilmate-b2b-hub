@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: '/private/',
+            disallow: ['/private/', '/admin/', '/my-account/'],
         },
-        sitemap: 'https://oilmate-b2b-hub.vercel.app/sitemap.xml', // Replace with actual domain when known
+        sitemap: 'https://oilmate-b2b-hub.vercel.app/sitemap.xml',
     };
 }

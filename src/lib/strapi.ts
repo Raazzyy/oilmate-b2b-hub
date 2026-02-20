@@ -178,7 +178,15 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     }
 }
 
-export async function getCategories(): Promise<Record<string, unknown>[]> {
+export interface StrapiCategory {
+    id: number;
+    documentId: string;
+    name: string;
+    slug: string;
+    description?: string;
+}
+
+export async function getCategories(): Promise<StrapiCategory[]> {
     try {
         const data = await fetchAPI("/categories", { sort: "name:asc" });
         return data?.data || [];
@@ -208,7 +216,15 @@ export async function getProducts(params: Record<string, unknown> = {}): Promise
 
 export async function getProductById(id: string): Promise<StrapiProduct | null> {
     try {
-        const data = await fetchAPI(`/products/${id}`, { populate: "*" });
+        const data = await fetchAPI(`/products/${id}`, {
+            populate: {
+                image: true,
+                category: true,
+                seo: {
+                    populate: "*" // Populate metaImage inside seo
+                }
+            }
+        });
         return data?.data || null;
     } catch (error) {
         console.error(`Failed to fetch product with id ${id}:`, error);
