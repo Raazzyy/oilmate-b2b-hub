@@ -63,13 +63,67 @@ export async function generateMetadata(props: ProductPageProps) {
   
   if (!product) {
     return {
-      title: "Товар не найден",
+      title: "Товар не найден | OilMate",
     };
   }
 
+  // Get SEO data or fallbacks
+  // Note: We need to cast product to any to access the 'seo' field we just added to StrapiProduct
+  // but passed through getProduct which returns ProductData. 
+  // Let's rely on getProduct returning the raw strapi data mixed in or fetch fresh for metadata?
+  // Ideally getProduct should return the SEO info. 
+  // For now, let's fetch strictly for metadata to be safe and clean, or update ProductData interface.
+  // Actually, updating getProduct/ProductData is better.
+  // But for speed, let's re-fetch or assume getProduct was updated?
+  // Let's update getProduct to return seo data as well.
+  
+  // WAIT: getProduct transforms StrapiProduct -> ProductData.
+  // ProductData doesn't have 'seo'.
+  // We should fetch the raw Strapi Product here for full SEO context.
+  const strapiProduct = await getProductById(params.id);
+  
+  if (!strapiProduct) return { title: "Товар не найден" };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const seo = strapiProduct.seo || ({} as any);
+  
+  const title = (seo.metaTitle as string) || `${product.name} | OilMate`;
+  const description = (seo.metaDescription as string) || `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}. Выгодные цены для бизнеса.`;
+  const images = [];
+
+  if (seo.metaImage?.url) {
+    const media = getStrapiMedia(seo.metaImage.url);
+    if (media) images.push(media);
+  } else if (product.image) {
+     images.push(product.image); // This is already a full URL from getProduct
+  }
+
+  const canonical = (seo.canonicalURL as string) || `https://oilmate-b2b-hub.vercel.app/product/${product.documentId}`;
+  const keywords = seo.keywords as string | undefined;
+  
+  const ogImages = images.filter(Boolean).map(url => ({
+    url: url as string,
+    width: 800,
+    height: 600,
+    alt: title,
+  }));
+
   return {
-    title: `${product.name} | OilMate`,
-    description: `Купить ${product.name} оптом. ${product.brand} - ${product.volume}. Выгодные цены для бизнеса.`,
+    title,
+    description,
+    keywords: seo.keywords,
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: 'OilMate B2B',
+      images: ogImages,
+      locale: 'ru_RU',
+      type: 'website',
+    },
+    alternates: {
+      canonical: canonical,
+    },
   };
 }
 
@@ -119,6 +173,36 @@ export default async function ProductPage(props: ProductPageProps) {
           <ChevronLeft className="h-4 w-4" />
           Назад в каталог
         </Link>
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: product.name,
+              image: product.image,
+              description: `Моторное масло ${product.name} ${product.volume} ${product.brand}`,
+              brand: {
+                "@type": "Brand",
+                name: product.brand
+              },
+              offers: {
+                "@type": "AggregateOffer",
+                priceCurrency: "RUB",
+                lowPrice: product.price, // B2B often has ranges, for now efficient low/high logic or just single price
+                highPrice: product.oldPrice || product.price, 
+                offerCount: 1,
+                availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                audience: {
+                  "@type": "BusinessAudience",
+                  audienceType: "B2B"
+                }
+              }
+            })
+          }}
+        />
 
         <div className="grid md:grid-cols-12 gap-8 lg:gap-16">
           {/* Left: Images */}

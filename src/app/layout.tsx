@@ -14,9 +14,19 @@ import CookieConsent from "@/components/CookieConsent";
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
-  title: "OilMate — Масла и автохимия оптом | B2B интернет-магазин",
+  title: {
+    template: "%s | OilMate",
+    default: "OilMate — Масла и автохимия оптом | B2B интернет-магазин",
+  },
   description: "OilMate — оптовый интернет-магазин моторных масел, автохимии и смазочных материалов.",
   metadataBase: new URL("https://oilmate-b2b-hub.vercel.app"),
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    url: "https://oilmate-b2b-hub.vercel.app",
+    siteName: "OilMate B2B",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
