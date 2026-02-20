@@ -90,12 +90,20 @@ export async function generateMetadata(props: ProductPageProps) {
   const images = [];
 
   if (seo.metaImage?.url) {
-    images.push(getStrapiMedia(seo.metaImage.url));
+    const media = getStrapiMedia(seo.metaImage.url);
+    if (media) images.push(media);
   } else if (product.image) {
      images.push(product.image); // This is already a full URL from getProduct
   }
 
   const canonical = seo.canonicalURL || `https://oilmate-b2b-hub.vercel.app/product/${product.documentId}`;
+  
+  const ogImages = images.filter(Boolean).map(url => ({
+    url: url as string,
+    width: 800,
+    height: 600,
+    alt: title,
+  }));
 
   return {
     title,
@@ -106,12 +114,7 @@ export async function generateMetadata(props: ProductPageProps) {
       description,
       url: canonical,
       siteName: 'OilMate B2B',
-      images: images.map(url => ({
-        url: url!,
-        width: 800,
-        height: 600,
-        alt: title,
-      })),
+      images: ogImages,
       locale: 'ru_RU',
       type: 'website',
     },

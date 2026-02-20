@@ -22,13 +22,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Note: We might need to handle pagination if there are thousands of products.
     // For now, let's assume we fetch a reasonable amount or use a loop.
     // Strapi fetch with limit -1 or loop.
-    const productsResponse = await getProducts({ pagination: { limit: 1000 } });
-    const products = productsResponse.data.map((product) => ({
-        url: `${baseUrl}/product/${product.documentId}`,
-        lastModified: new Date(), // Ideally createAt/updatedAt from product
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-    }));
+    // Fetch products safely
+    let products = [];
+    try {
+        const productsResponse = await getProducts({ pagination: { limit: 1000 } });
+        products = productsResponse.data.map((product) => ({
+            url: `${baseUrl}/product/${product.documentId}`,
+            lastModified: new Date(), // Ideally createAt/updatedAt from product
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        }));
+    } catch (error) {
+        console.warn("Sitemap: Failed to fetch products", error);
+    }
+
 
     // Categories are a bit trickier because we need to map them to /catalog/[slug]
     // We need to fetch categories.
@@ -38,7 +45,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // For now let's skip dynamic categories in sitemap or rely on static catalog page.
     // Better to include them if possible.
 
-    // Categories
     const categories = await getCategories();
     const categoryRoutes = categories.map((category) => ({
         url: `${baseUrl}/catalog/${category.slug}`,
