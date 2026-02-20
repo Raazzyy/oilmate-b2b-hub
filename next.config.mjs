@@ -9,6 +9,12 @@ const nextConfig = {
         port: '1337',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
       // Add production Strapi URL here when available
     ],
   },
