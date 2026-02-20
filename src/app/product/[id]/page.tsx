@@ -84,9 +84,11 @@ export async function generateMetadata(props: ProductPageProps) {
   
   if (!strapiProduct) return { title: "Товар не найден" };
 
-  const seo = strapiProduct.seo || {};
-  const title = seo.metaTitle || `${product.name} | OilMate`;
-  const description = seo.metaDescription || `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}. Выгодные цены для бизнеса.`;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const seo = strapiProduct.seo || ({} as any);
+  
+  const title = (seo.metaTitle as string) || `${product.name} | OilMate`;
+  const description = (seo.metaDescription as string) || `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}. Выгодные цены для бизнеса.`;
   const images = [];
 
   if (seo.metaImage?.url) {
@@ -96,7 +98,8 @@ export async function generateMetadata(props: ProductPageProps) {
      images.push(product.image); // This is already a full URL from getProduct
   }
 
-  const canonical = seo.canonicalURL || `https://oilmate-b2b-hub.vercel.app/product/${product.documentId}`;
+  const canonical = (seo.canonicalURL as string) || `https://oilmate-b2b-hub.vercel.app/product/${product.documentId}`;
+  const keywords = seo.keywords as string | undefined;
   
   const ogImages = images.filter(Boolean).map(url => ({
     url: url as string,
