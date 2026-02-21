@@ -60,8 +60,7 @@ export async function generateMetadata(props: ProductPageProps) {
   
   if (!strapiProduct) return { title: "Товар не найден" };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const seo = strapiProduct.seo || ({} as any);
+  const seo = strapiProduct.seo || {};
   
   const title = (seo.metaTitle as string) || `${product.name} | OilMate`;
   const description = (seo.metaDescription as string) || `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}. Выгодные цены для бизнеса.`;
@@ -216,7 +215,7 @@ export default async function ProductPage(props: ProductPageProps) {
                   { label: "Тип", value: product.oilType },
                   { label: "Объем", value: product.volume },
                   { label: "Производитель", value: product.brand },
-                  { label: "Страна", value: "Германия" }, // Placeholder as per design
+                  { label: "Страна", value: product.country },
                   { label: "Допуски", value: product.approvals },
                   { label: "Применение", value: product.application || "Бензиновые и дизельные двигатели" }
                 ].filter(s => s.value).map((spec, i) => (
