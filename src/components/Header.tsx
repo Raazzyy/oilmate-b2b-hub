@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { categoryNames, ProductData } from "@/data/products";
 import { useCartStore } from "@/store/cart";
 import { getProducts, mapStrapiProduct } from "@/lib/strapi";
@@ -264,7 +264,7 @@ const Header = () => {
                           >
                             <div className="relative w-10 h-10 md:w-12 md:h-12 bg-muted rounded-lg overflow-hidden shrink-0">
                                 <Image 
-                                  src={typeof product.image === 'string' ? product.image : (product.image as any).src} 
+                                  src={typeof product.image === 'string' ? product.image : (product.image as StaticImageData).src} 
                                   alt={product.name}
                                   fill
                                   className="object-contain p-1"
