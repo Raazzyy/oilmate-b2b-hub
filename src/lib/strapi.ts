@@ -34,7 +34,7 @@ export async function fetchAPI(
             headers: {
                 "Content-Type": "application/json",
             },
-            next: { revalidate: 3600 }, // Default 1 hour revalidation
+            next: { revalidate: 60 }, // Default 1 minute revalidation
             ...options,
         };
 
