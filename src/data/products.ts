@@ -26,6 +26,7 @@ export interface ProductData {
   rating?: number;
   isNew?: boolean;
   isHit?: boolean;
+  country?: string;
 }
 
 export const allProducts: ProductData[] = [

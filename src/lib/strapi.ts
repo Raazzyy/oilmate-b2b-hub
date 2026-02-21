@@ -114,6 +114,14 @@ export interface StrapiProduct {
         slug: string;
         name: string;
     };
+    country?: string;
+    seo?: {
+        metaTitle?: string;
+        metaDescription?: string;
+        metaImage?: StrapiImage;
+        canonicalURL?: string;
+        keywords?: string;
+    };
     [key: string]: unknown;
 }
 
@@ -148,6 +156,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         rating: item.rating as number,
         isNew: item.isNew as boolean,
         isHit: item.isHit as boolean,
+        country: item.country as string,
     };
 }
 
