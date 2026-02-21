@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductDetailControls from "@/components/ProductDetailControls";
-import { getProductById, getStrapiMedia, getProducts as fetchStrapiProducts, StrapiProduct } from "@/lib/strapi";
+import { getProductById, getStrapiMedia, getProducts as fetchStrapiProducts, mapStrapiProduct, StrapiProduct } from "@/lib/strapi";
 import ProductsSection from "@/components/ProductsSection";
 
 interface ProductPageProps {
@@ -18,31 +18,7 @@ async function getProduct(id: string): Promise<ProductData | null> {
   try {
     const item = await getProductById(id);
     if (item) {
-      return {
-        id: item.id,
-        documentId: item.documentId,
-        name: item.name,
-        brand: item.brand || "",
-        volume: item.volume || "",
-        price: item.price,
-        oldPrice: item.oldPrice,
-        image: getStrapiMedia(item.image?.url) || "/oil-product.png",
-        inStock: item.inStock || false,
-        oilType: item.oilType || "",
-        isUniversal: item.isUniversal,
-        category: item.category?.slug || "all",
-        viscosity: item.viscosity as string,
-        approvals: item.approvals as string,
-        specification: item.specification as string,
-        viscosityClass: item.viscosityClass as string,
-        application: item.application as string,
-        standard: item.standard as string,
-        color: item.color as string,
-        type: item.type as string,
-        rating: item.rating as number,
-        isNew: item.isNew as boolean,
-        isHit: item.isHit as boolean,
-      };
+      return mapStrapiProduct(item);
     }
   } catch {
     // Strapi unavailable, fall through to local data
@@ -144,20 +120,7 @@ export default async function ProductPage(props: ProductPageProps) {
     pagination: { limit: 10 }
   });
 
-  const relatedProducts: ProductData[] = (relatedResponse.data as StrapiProduct[]).map((item) => ({
-    id: item.id,
-    documentId: item.documentId,
-    name: item.name,
-    brand: item.brand,
-    volume: item.volume,
-    price: item.price,
-    oldPrice: item.oldPrice,
-    image: getStrapiMedia(item.image?.url) || "/oil-product.png",
-    inStock: item.inStock,
-    oilType: item.oilType,
-    isUniversal: item.isUniversal,
-    category: item.category?.slug || "all",
-  }));
+  const relatedProducts: ProductData[] = (relatedResponse.data as StrapiProduct[]).map(mapStrapiProduct);
 
   const rubles = Math.floor(product.price);
   const kopecks = Math.round((product.price - rubles) * 100) || 0;

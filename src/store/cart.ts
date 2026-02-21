@@ -1,26 +1,10 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { StaticImageData } from 'next/image';
-
-export interface Product {
-    id: number | string;
-    documentId?: string;
-    name: string;
-    brand: string;
-    volume: string;
-    price: number;
-    oldPrice?: number;
-    image: string | StaticImageData;
-    inStock: boolean;
-    oilType: string;
-    isUniversal?: boolean;
-    category: string;
-    slug?: string;
-}
+import { ProductData } from '@/data/products';
 
 export interface CartItem {
-    product: Product;
+    product: ProductData;
     quantity: number;
 }
 
@@ -29,7 +13,7 @@ interface CartState {
     isCartOpen: boolean;
     isClient: boolean;
     setIsCartOpen: (isOpen: boolean) => void;
-    addToCart: (product: Product, quantity?: number) => void;
+    addToCart: (product: ProductData, quantity?: number) => void;
     removeFromCart: (productId: number | string) => void;
     updateQuantity: (productId: number | string, quantity: number) => void;
     clearCart: () => void;

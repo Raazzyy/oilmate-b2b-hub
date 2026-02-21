@@ -1,0 +1,44 @@
+
+> oilmate-b2b-hub-next@0.1.0 build
+> next build
+
+   ▲ Next.js 15.3.9
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 16.0s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+Failed to compile.
+
+./src/app/layout.tsx
+16:14  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/app/product/[id]/page.tsx
+36:23  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+123:67  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/ui/badge.tsx
+29:17  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/button.tsx
+47:18  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/form.tsx
+129:10  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/navigation-menu.tsx
+111:3  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/sidebar.tsx
+636:3  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/sonner.tsx
+27:19  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+./src/components/ui/toggle.tsx
+37:18  Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.  react-refresh/only-export-components
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
