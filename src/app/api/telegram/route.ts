@@ -21,20 +21,20 @@ export async function POST(request: Request) {
         let message = '';
 
         if (type === 'fast') {
-            message = `
-⚡️ *БЫСТРЫЙ ЗАКАЗ (В 1 КЛИК)*
-
-👤 *Клиент:*
-• Имя: ${order.name}
-• Телефон: ${order.phone}
-
-📦 *Товар:*
-• ${order.productName}
-• Объем: ${order.volume}
-• Цена: ${order.price.toLocaleString()} ₽
-
-💰 *Итого: ${order.price.toLocaleString()} ₽*
-`.trim();
+            message = [
+                `<b>⚡️ БЫСТРЫЙ ЗАКАЗ (В 1 КЛИК)</b>`,
+                ``,
+                `<b>👤 Клиент:</b>`,
+                `• Имя: ${order.name}`,
+                `• Телефон: ${order.phone}`,
+                ``,
+                `<b>📦 Товар:</b>`,
+                `• ${order.productName}`,
+                `• Объем: ${order.volume}`,
+                `• Цена: ${order.price.toLocaleString()} ₽`,
+                ``,
+                `<b>💰 Итого: ${order.price.toLocaleString()} ₽</b>`
+            ].join('\n');
         } else {
             const deliveryText = order.deliveryType === "pickup"
                 ? "🏪 Самовывоз"
@@ -48,27 +48,27 @@ export async function POST(request: Request) {
                 )
                 .join("\n");
 
-            message = `
-🛒 *НОВЫЙ ЗАКАЗ ИЗ КОРЗИНЫ*
-
-👤 *Контактные данные:*
-• Имя: ${order.name}
-• Телефон: ${order.phone}
-• Email: ${order.email || 'Не указан'}
-${order.inn ? `• ИНН: ${order.inn}` : ""}
-
-📍 *Доставка:*
-• Способ: ${deliveryText}
-${order.city ? `• Город: ${order.city}` : ""}
-${order.address ? `• Адрес: ${order.address}` : ""}
-
-📦 *Товары:*
-${itemsList}
-
-💰 *Итого: ${order.totalPrice.toLocaleString()} ₽*
-
-${order.comment ? `💬 *Комментарий:*\n${order.comment}` : ""}
-`.trim();
+            message = [
+                `<b>🛒 НОВЫЙ ЗАКАЗ ИЗ КОРЗИНЫ</b>`,
+                ``,
+                `<b>👤 Контактные данные:</b>`,
+                `• Имя: ${order.name}`,
+                `• Телефон: ${order.phone}`,
+                `• Email: ${order.email || 'Не указан'}`,
+                order.inn ? `• ИНН: ${order.inn}` : "",
+                ``,
+                `<b>📍 Доставка:</b>`,
+                `• Способ: ${deliveryText}`,
+                order.city ? `• Город: ${order.city}` : "",
+                order.address ? `• Адрес: ${order.address}` : "",
+                ``,
+                `<b>📦 Товары:</b>`,
+                itemsList,
+                ``,
+                `<b>💰 Итого: ${order.totalPrice.toLocaleString()} ₽</b>`,
+                ``,
+                order.comment ? `<b>💬 Комментарий:</b>\n${order.comment}` : ""
+            ].filter(Boolean).join('\n');
         }
 
         const response = await fetch(
@@ -81,7 +81,7 @@ ${order.comment ? `💬 *Комментарий:*\n${order.comment}` : ""}
                 body: JSON.stringify({
                     chat_id: TELEGRAM_CHAT_ID,
                     text: message,
-                    parse_mode: "Markdown",
+                    parse_mode: "HTML",
                 }),
             }
         );
