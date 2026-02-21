@@ -34,7 +34,7 @@ export async function fetchAPI(
             headers: {
                 "Content-Type": "application/json",
             },
-            cache: "no-store", // Disable caching for instant updates in development
+            next: { revalidate: 3600 }, // Default 1 hour revalidation
             ...options,
         };
 
@@ -63,12 +63,17 @@ export async function fetchAPI(
 
         // Trigger API call
         const response = await fetch(requestUrl, mergedOptions);
-        const data = await response.json();
 
+        if (!response.ok) {
+            console.error(response.statusText);
+            throw new Error(`An error occurred please try again`);
+        }
+
+        const data = await response.json();
         return data;
     } catch (error) {
         console.error(error);
-        throw new Error(`Please check if your server is running and you set all the required tokens.`);
+        throw new Error(`Failed to fetch from Strapi: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
 
@@ -85,12 +90,6 @@ export interface StrapiResponse<T> {
             total: number;
         };
     };
-}
-
-export interface StrapiData<T> {
-    id: number;
-    documentId: string;
-    attributes: T;
 }
 
 export interface StrapiImage {
@@ -115,10 +114,42 @@ export interface StrapiProduct {
         slug: string;
         name: string;
     };
-    [key: string]: unknown; // Allow other dynamic fields for mapping convenience
+    [key: string]: unknown;
 }
 
 import { HeroSlide } from "@/types";
+import { ProductData } from "@/data/products";
+
+/**
+ * Map Strapi product to UI ProductData
+ */
+export function mapStrapiProduct(item: StrapiProduct): ProductData {
+    return {
+        id: item.id,
+        documentId: item.documentId,
+        name: item.name,
+        brand: item.brand || "",
+        volume: item.volume || "",
+        price: item.price,
+        oldPrice: item.oldPrice,
+        image: getStrapiMedia(item.image?.url) || "/oil-product.png",
+        inStock: item.inStock ?? true,
+        oilType: item.oilType || "",
+        isUniversal: item.isUniversal,
+        category: item.category?.slug || "all",
+        viscosity: item.viscosity as string,
+        approvals: item.approvals as string,
+        specification: item.specification as string,
+        viscosityClass: item.viscosityClass as string,
+        application: item.application as string,
+        standard: item.standard as string,
+        color: item.color as string,
+        type: item.type as string,
+        rating: item.rating as number,
+        isNew: item.isNew as boolean,
+        isHit: item.isHit as boolean,
+    };
+}
 
 const DEFAULT_SLIDES: HeroSlide[] = [
     {
@@ -152,8 +183,6 @@ const DEFAULT_SLIDES: HeroSlide[] = [
 
 export async function getHeroSlides(): Promise<HeroSlide[]> {
     try {
-        // Note: This endpoint (/hero-slides) needs to be created in Strapi
-        // Fields: title (Text), subtitle (Text), badge (Text), buttonText (Text), href (Text), gradient (Text), image (Media)
         const data = await fetchAPI("/hero-slides", { populate: "*" });
 
         if (!data?.data || data.data.length === 0) {
@@ -167,7 +196,7 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
             badge: item.badge,
             buttonText: item.buttonText,
             href: item.href || "/",
-            gradient: item.gradient || "from-primary via-primary to-accent", // Fallback gradient
+            gradient: item.gradient || "from-primary via-primary to-accent",
             backgroundImage: item.image?.url
                 ? getStrapiMedia(item.image.url)
                 : undefined
@@ -221,7 +250,7 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
                 image: true,
                 category: true,
                 seo: {
-                    populate: "*" // Populate metaImage inside seo
+                    populate: "*"
                 }
             }
         });
@@ -243,7 +272,7 @@ export async function getPromotions(): Promise<{ id: number; documentId: string;
             documentId: item.documentId,
             title: item.title,
             href: item.href || "/",
-            image: item.image // Strapi 5 flat format
+            image: item.image
         }));
     } catch (error) {
         console.error("Failed to fetch promotions:", error);

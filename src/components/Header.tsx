@@ -1,13 +1,15 @@
 "use client";
 
-import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake, Wrench } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake, Wrench, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { searchProducts, categoryNames } from "@/data/products";
+import Image from "next/image";
+import { categoryNames, ProductData } from "@/data/products";
 import { useCartStore } from "@/store/cart";
+import { getProducts, mapStrapiProduct } from "@/lib/strapi";
 
 const catalogCategories = [
   { id: "motor", name: "Моторные масла", icon: Droplet },
@@ -22,6 +24,8 @@ const catalogCategories = [
 const Header = () => {
   const { getTotalItems, setIsCartOpen, isClient, setClient } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<ProductData[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,8 +38,49 @@ const Header = () => {
   }, [setClient]);
 
   const cartCount = isClient ? getTotalItems() : 0;
-  const searchResults = searchProducts(searchQuery);
   const showResults = isSearchFocused && searchQuery.trim().length > 0;
+
+  // Search logic with Strapi
+  const fetchSearchResults = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await getProducts({
+        filters: {
+          $or: [
+            { name: { $containsi: query } },
+            { brand: { $containsi: query } }
+          ]
+        },
+        pagination: { limit: 6 }
+      });
+
+      const mappedProducts = response.data.map(mapStrapiProduct);
+      setSearchResults(mappedProducts);
+    } catch (error) {
+      console.error("Search failed:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery) {
+        fetchSearchResults(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, fetchSearchResults]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -82,6 +127,7 @@ const Header = () => {
 
   const clearSearch = () => {
     setSearchQuery("");
+    setSearchResults([]);
   };
 
   const handleCategoryClick = (categoryId: string) => {
@@ -199,7 +245,7 @@ const Header = () => {
                     variant="ghost"
                     className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-lg hover:bg-muted"
                   >
-                    <Search className="h-5 w-5 text-muted-foreground" />
+                    {isSearching ? <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" /> : <Search className="h-5 w-5 text-muted-foreground" />}
                   </Button>
                 </div>
               </form>
@@ -216,11 +262,14 @@ const Header = () => {
                             className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
                             onClick={() => handleProductClick(product.id)}
                           >
-                            <img 
-                              src={typeof product.image === 'string' ? product.image : product.image.src} 
-                              alt={product.name}
-                              className="w-10 h-10 md:w-12 md:h-12 object-contain bg-muted rounded-lg"
-                            />
+                            <div className="relative w-10 h-10 md:w-12 md:h-12 bg-muted rounded-lg overflow-hidden shrink-0">
+                                <Image 
+                                  src={typeof product.image === 'string' ? product.image : (product.image as any).src} 
+                                  alt={product.name}
+                                  fill
+                                  className="object-contain p-1"
+                                />
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{product.name}</p>
                               <p className="text-xs text-muted-foreground">
@@ -251,9 +300,14 @@ const Header = () => {
                         </Button>
                       </div>
                     </>
-                  ) : (
+                  ) : !isSearching ? (
                     <div className="p-6 text-center text-muted-foreground">
                       По запросу «{searchQuery}» ничего не найдено
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center text-muted-foreground flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Поиск...
                     </div>
                   )}
                 </div>

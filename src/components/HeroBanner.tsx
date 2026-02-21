@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
+import Image from "next/image";
 
 import { HeroSlide } from "@/types";
 
@@ -61,17 +62,22 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
             {/* Carousel */}
             <div className="overflow-hidden h-full" ref={emblaRef}>
               <div className="flex h-full">
-                {slides.map((slide) => (
+                {slides.map((slide, index) => (
                   <Link
                     key={slide.id}
                     href={slide.href || "/"}
-                    className={`flex-[0_0_100%] min-w-0 h-full bg-gradient-to-br ${slide.gradient} relative`}
-                    style={slide.backgroundImage ? { 
-                      backgroundImage: `url(${slide.backgroundImage})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    } : undefined}
+                    className={`flex-[0_0_100%] min-w-0 h-full bg-gradient-to-br ${slide.gradient} relative overflow-hidden`}
                   >
+                    {slide.backgroundImage && (
+                      <Image 
+                        src={slide.backgroundImage} 
+                        alt={slide.title}
+                        fill
+                        priority={index === 0}
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 66vw"
+                      />
+                    )}
                     {/* Dark overlay if image is present */}
                     {slide.backgroundImage && (
                       <div className="absolute inset-0 bg-black/40" />

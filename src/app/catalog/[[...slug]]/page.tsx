@@ -4,7 +4,7 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { getProducts as fetchStrapiProducts, getCategories, getStrapiMedia, StrapiProduct } from "@/lib/strapi";
+import { getProducts as fetchStrapiProducts, getCategories, getStrapiMedia, StrapiProduct, mapStrapiProduct } from "@/lib/strapi";
 
 // Mock function to simulate fetching data (replace with Strapi later)
 // Data fetching from Strapi
@@ -23,30 +23,7 @@ async function getProducts(categorySlug?: string, searchQuery?: string): Promise
 
   const response = await fetchStrapiProducts({ filters });
   
-  return (response.data as StrapiProduct[]).map((item) => ({
-    id: item.id,
-    name: item.name,
-    brand: item.brand,
-    volume: item.volume,
-    price: item.price,
-    oldPrice: item.oldPrice,
-    image: getStrapiMedia(item.image?.url) || "/oil-product.png",
-    inStock: item.inStock,
-    oilType: item.oilType,
-    isUniversal: item.isUniversal,
-    category: item.category?.slug || "all",
-    viscosity: item.viscosity as string,
-    approvals: item.approvals as string,
-    specification: item.specification as string,
-    viscosityClass: item.viscosityClass as string,
-    application: item.application as string,
-    standard: item.standard as string,
-    color: item.color as string,
-    type: item.type as string,
-    rating: item.rating as number,
-    isNew: item.isNew as boolean,
-    isHit: item.isHit as boolean,
-  }));
+  return (response.data as StrapiProduct[]).map(mapStrapiProduct);
 }
 
 interface CatalogPageProps {

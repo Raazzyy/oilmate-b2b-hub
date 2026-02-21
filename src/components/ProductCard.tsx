@@ -5,6 +5,8 @@ import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
 import { ProductData } from "@/data/products";
 
+import Image from "next/image";
+
 interface ProductCardProps {
   product: ProductData;
 }
@@ -53,11 +55,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container */}
         <div className="relative mb-3">
-          <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50">
-            <img
+          <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
+            <Image
               src={imageSrc}
               alt={name}
-              className="h-full w-full object-contain p-5 transition-transform group-hover:scale-105"
+              fill
+              className="object-contain p-5 transition-transform group-hover:scale-105"
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
           
