@@ -7,34 +7,54 @@ const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { order } = body;
+        const { order, type = 'cart' } = body;
 
         if (!order) {
             return NextResponse.json({ error: 'Order data missing' }, { status: 400 });
         }
 
         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-            console.error('Telegram credentials invalid');
+            console.error('Telegram credentials missing');
             return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
         }
 
-        const deliveryText = order.deliveryType === "pickup"
-            ? "🏪 Самовывоз"
-            : order.deliveryType === "delivery"
-                ? "🚚 Доставка"
-                : "Не указан";
+        let message = '';
 
-        const itemsList = order.items
-            .map((item: { name: string; volume: string; quantity: number; price: number }, index: number) => `   ${index + 1}. ${item.name} (${item.volume}) × ${item.quantity} шт. = ${(item.price * item.quantity).toLocaleString()} ₽`)
-            .join("\n");
+        if (type === 'fast') {
+            message = `
+⚡️ *БЫСТРЫЙ ЗАКАЗ (В 1 КЛИК)*
 
-        const message = `
-🛒 *НОВЫЙ ЗАКАЗ (Next.js)*
+👤 *Клиент:*
+• Имя: ${order.name}
+• Телефон: ${order.phone}
+
+📦 *Товар:*
+• ${order.productName}
+• Объем: ${order.volume}
+• Цена: ${order.price.toLocaleString()} ₽
+
+💰 *Итого: ${order.price.toLocaleString()} ₽*
+`.trim();
+        } else {
+            const deliveryText = order.deliveryType === "pickup"
+                ? "🏪 Самовывоз"
+                : order.deliveryType === "delivery"
+                    ? "🚚 Доставка"
+                    : "Не указан";
+
+            const itemsList = order.items
+                .map((item: { name: string; volume: string; quantity: number; price: number }, index: number) =>
+                    `   ${index + 1}. ${item.name} (${item.volume}) × ${item.quantity} шт. = ${(item.price * item.quantity).toLocaleString()} ₽`
+                )
+                .join("\n");
+
+            message = `
+🛒 *НОВЫЙ ЗАКАЗ ИЗ КОРЗИНЫ*
 
 👤 *Контактные данные:*
 • Имя: ${order.name}
 • Телефон: ${order.phone}
-• Email: ${order.email}
+• Email: ${order.email || 'Не указан'}
 ${order.inn ? `• ИНН: ${order.inn}` : ""}
 
 📍 *Доставка:*
@@ -49,6 +69,7 @@ ${itemsList}
 
 ${order.comment ? `💬 *Комментарий:*\n${order.comment}` : ""}
 `.trim();
+        }
 
         const response = await fetch(
             `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
