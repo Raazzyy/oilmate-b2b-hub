@@ -222,11 +222,12 @@ export interface StrapiCategory {
     name: string;
     slug: string;
     description?: string;
+    image?: StrapiImage;
 }
 
 export async function getCategories(): Promise<StrapiCategory[]> {
     try {
-        const data = await fetchAPI("/categories", { sort: "name:asc" });
+        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true } });
         return data?.data || [];
     } catch (error) {
         console.error("Failed to fetch categories:", error);

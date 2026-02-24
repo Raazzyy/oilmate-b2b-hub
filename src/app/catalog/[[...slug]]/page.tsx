@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { getProducts as fetchStrapiProducts, getCategories, getStrapiMedia, StrapiProduct, mapStrapiProduct } from "@/lib/strapi";
+import CatalogFilters from "@/components/CatalogFilters";
 
 // Mock function to simulate fetching data (replace with Strapi later)
 // Data fetching from Strapi
@@ -64,33 +65,10 @@ export default async function CatalogPage(props: CatalogPageProps) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters (Placeholder for now) */}
+        {/* Sidebar Filters */}
         <div className="w-full md:w-64 shrink-0 hidden md:block">
-           <div className="sticky top-24 space-y-6">
-              <div>
-                <h3 className="font-semibold mb-4">Категории</h3>
-                <div className="space-y-2">
-                  {Object.entries(categoryNames).map(([slug, name]) => {
-                    if (slug === 'all' || slug === 'promo' || slug === 'new') return null;
-                    const isActive = categorySlug === slug;
-                    return (
-                      <Link 
-                        key={slug} 
-                        href={`/catalog/${slug}`}
-                        className={`block text-sm transition-colors ${isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}`}
-                      >
-                        {name}
-                      </Link>
-                    )
-                  })}
-                  <Link 
-                    href="/catalog"
-                    className={`block text-sm transition-colors pt-2 ${!categorySlug ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'}`}
-                  >
-                    Все товары
-                  </Link>
-                </div>
-              </div>
+           <div className="sticky top-6 space-y-6">
+              <CatalogFilters />
            </div>
         </div>
 

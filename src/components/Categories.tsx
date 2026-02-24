@@ -1,88 +1,81 @@
-"use client";
-
-import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid, HelpCircle } from "lucide-react";
+import { getCategories, getStrapiMedia } from "@/lib/strapi";
 
-const categories = [
-  {
-    icon: Car,
-    title: "Моторные масла",
-    color: "text-primary",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/motor",
-  },
-  {
-    icon: Cog,
-    title: "Трансмиссионные",
-    color: "text-primary",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/transmission",
-  },
-  {
-    icon: Droplets,
-    title: "Гидравлические",
-    color: "text-primary",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/hydraulic",
-  },
-  {
-    icon: Factory,
-    title: "Индустриальные",
-    color: "text-primary",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/industrial",
-  },
-  {
-    icon: Wrench,
-    title: "Смазки",
-    color: "text-primary",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog/lubricants",
-  },
-  {
-    icon: Snowflake,
-    title: "Антифризы",
-    color: "text-accent",
-    bgColor: "bg-muted hover:bg-accent/10",
-    href: "/catalog/antifreeze",
-  },
-  {
-    icon: LayoutGrid,
-    title: "Все товары",
-    color: "text-foreground",
-    bgColor: "bg-muted hover:bg-primary/10",
-    href: "/catalog",
-  },
-];
+const getCategoryIcon = (slug: string) => {
+  if (!slug) return HelpCircle;
+  if (slug.includes('motor')) return Car;
+  if (slug.includes('trans')) return Cog;
+  if (slug.includes('gidrav') || slug.includes('hydraul')) return Droplets;
+  if (slug.includes('indust')) return Factory;
+  if (slug.includes('smaz') || slug.includes('lubric')) return Wrench;
+  if (slug.includes('anti')) return Snowflake;
+  return HelpCircle;
+};
 
-const Categories = () => {
+const getCategoryColor = (slug: string) => {
+  if (!slug) return "text-foreground";
+  if (slug.includes('anti')) return "text-blue-500 dark:text-blue-400";
+  return "text-foreground";
+};
+
+export default async function Categories() {
+  const strapiCategories = await getCategories();
+
   return (
     <section className="py-4 md:py-6">
       <div className="container">
         {/* Mobile: horizontal scroll, Desktop: even grid */}
         <div className="flex md:grid md:grid-cols-7 gap-4 md:gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
-          {categories.map((category, index) => (
-            <Link
-              key={index}
-              href={category.href}
-              className="group flex flex-col items-center text-center shrink-0"
-              style={{ minWidth: '80px' }}
-            >
-              {/* Rectangular container */}
-              <div
-                className={`mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-[180px] items-center justify-center rounded-xl ${category.bgColor} transition-all group-hover:scale-105`}
+          {strapiCategories.map((category) => {
+            const IconComponent = getCategoryIcon(category.slug || '');
+            const iconColor = getCategoryColor(category.slug || '');
+            return (
+              <Link
+                key={category.id}
+                href={`/catalog/${category.slug}`}
+                className="group flex flex-col items-center text-center shrink-0"
+                style={{ minWidth: '80px' }}
               >
-                <category.icon className={`h-8 w-8 md:h-12 md:w-12 ${category.color}`} strokeWidth={1.5} />
-              </div>
-              <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center whitespace-nowrap">
-                {category.title}
-              </span>
-            </Link>
-          ))}
+                {/* Rectangular container */}
+                <div className="mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-full items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
+                  {category.image?.url ? (
+                    <div className="relative h-12 w-12 md:h-16 md:w-16">
+                      <Image
+                        src={getStrapiMedia(category.image.url) as string}
+                        alt={category.name}
+                        fill
+                        className="object-contain"
+                        sizes="64px"
+                      />
+                    </div>
+                  ) : (
+                    <IconComponent className={`h-8 w-8 md:h-12 md:w-12 ${iconColor}`} strokeWidth={1.5} />
+                  )}
+                </div>
+                <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
+                  {category.name}
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* All Products button */}
+          <Link
+            href="/catalog"
+            className="group flex flex-col items-center text-center shrink-0"
+            style={{ minWidth: '80px' }}
+          >
+            <div className="mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-full items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
+              <LayoutGrid className="h-8 w-8 md:h-12 md:w-12 text-foreground" strokeWidth={1.5} />
+            </div>
+            <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
+              Все товары
+            </span>
+          </Link>
         </div>
       </div>
     </section>
   );
-};
-
-export default Categories;
+}

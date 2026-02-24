@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Gauge, Factory, Snowflake, Wrench, Loader2 } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Droplets, Factory, Snowflake, Wrench, Loader2, LayoutGrid, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -9,19 +9,26 @@ import Link from "next/link";
 import Image, { StaticImageData } from "next/image";
 import { categoryNames, ProductData } from "@/data/products";
 import { useCartStore } from "@/store/cart";
-import { getProducts, mapStrapiProduct } from "@/lib/strapi";
+import { getProducts, mapStrapiProduct, getStrapiMedia, StrapiCategory } from "@/lib/strapi";
 
-const catalogCategories = [
-  { id: "motor", name: "Моторные масла", icon: Droplet },
-  { id: "transmission", name: "Трансмиссионные масла", icon: Cog },
-  { id: "hydraulic", name: "Гидравлические масла", icon: Gauge },
-  { id: "industrial", name: "Индустриальные масла", icon: Factory },
-  { id: "lubricants", name: "Смазки", icon: Wrench },
-  { id: "antifreeze", name: "Антифризы", icon: Snowflake },
-  { id: "marine", name: "Судовые масла", icon: Droplet },
-];
+const getCategoryIcon = (slug: string) => {
+  if (!slug) return HelpCircle;
+  if (slug.includes('motor')) return Droplet;
+  if (slug.includes('trans')) return Cog;
+  if (slug.includes('gidrav') || slug.includes('hydraul')) return Droplets;
+  if (slug.includes('indust')) return Factory;
+  if (slug.includes('smaz') || slug.includes('lubric')) return Wrench;
+  if (slug.includes('anti')) return Snowflake;
+  return Droplet;
+};
 
-const Header = () => {
+const getCategoryColor = (slug: string) => {
+  if (!slug) return "text-foreground";
+  if (slug.includes('anti')) return "text-blue-500 dark:text-blue-400";
+  return "text-foreground";
+};
+
+const Header = ({ categories = [] }: { categories?: StrapiCategory[] }) => {
   const { getTotalItems, setIsCartOpen, isClient, setClient } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProductData[]>([]);
@@ -138,9 +145,9 @@ const Header = () => {
 
   return (
     <>
-      <header className="w-full bg-card sticky top-0 z-40 border-b border-border/50 backdrop-blur-md bg-card/80">
+      <header className="w-full bg-card">
         {/* Top navigation - hidden on mobile */}
-        <div className="hidden md:block border-b border-border/50">
+        <div className="hidden md:block">
           <div className="container">
             <nav className="flex items-center gap-6 py-2 text-sm">
               {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
@@ -157,7 +164,7 @@ const Header = () => {
         </div>
 
         {/* Main header */}
-        <div className="container py-3 md:py-4">
+        <div className="container py-3 md:py-6">
           <div className="flex items-center gap-2 md:gap-4">
             {/* Mobile menu button */}
             <Button
@@ -173,48 +180,55 @@ const Header = () => {
             {/* Catalog button with dropdown - desktop only */}
             <div className="relative hidden md:block" ref={catalogRef}>
               <Button 
-                className="flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-xl shrink-0 transition-all font-bold"
+                className="flex gap-2 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold px-6 h-12 rounded-full shrink-0 transition-all font-bold"
                 onClick={() => setIsCatalogOpen(!isCatalogOpen)}
               >
                 {isCatalogOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 Каталог
               </Button>
 
-              {/* Catalog Dropdown */}
-              {isCatalogOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50 shadow-lg border border-border">
-                  <div className="p-2">
-                    {catalogCategories.map((category) => {
-                      const IconComponent = category.icon;
-                      return (
-                        <button
-                          key={category.id}
-                          className="w-full flex items-center gap-4 p-3 hover:bg-muted rounded-xl transition-colors text-left group"
-                          onClick={() => handleCategoryClick(category.id)}
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                            <IconComponent className="h-5 w-5 text-primary" />
-                          </div>
-                          <p className="font-medium text-foreground flex-1">{category.name}</p>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="p-2 border-t border-border">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
-                      onClick={() => {
-                        setIsCatalogOpen(false);
-                        router.push("/catalog");
-                      }}
-                    >
-                      Все товары
-                    </Button>
-                  </div>
-                </div>
-              )}
+                   {/* Catalog Dropdown */}
+               {isCatalogOpen && (
+                 <div className="absolute top-full left-0 mt-2 w-80 bg-card rounded-2xl overflow-hidden z-50 shadow-lg border border-border">
+                   <div className="p-2">
+                     {categories.map((category) => {
+                       const IconComponent = getCategoryIcon(category.slug || '');
+                       const iconColor = getCategoryColor(category.slug || '');
+                       return (
+                         <button
+                           key={category.id}
+                           className="w-full flex items-center gap-4 p-3 hover:bg-muted rounded-xl transition-colors text-left group"
+                           onClick={() => handleCategoryClick(category.slug)}
+                         >
+                           <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                             {category.image?.url ? (
+                               <div className="relative w-6 h-6">
+                                 <Image src={getStrapiMedia(category.image.url) as string} alt={category.name} fill className="object-contain" />
+                               </div>
+                             ) : (
+                               <IconComponent className={`h-5 w-5 ${iconColor}`} />
+                             )}
+                           </div>
+                           <p className="font-medium text-foreground flex-1">{category.name}</p>
+                           <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                         </button>
+                       );
+                     })}
+                   </div>
+                   <div className="p-2 border-t border-border">
+                     <Button
+                       variant="ghost"
+                       className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
+                       onClick={() => {
+                         setIsCatalogOpen(false);
+                         router.push("/catalog");
+                       }}
+                     >
+                       Все товары
+                     </Button>
+                   </div>
+                 </div>
+               )}
             </div>
 
             {/* Search - takes all available space */}
@@ -223,7 +237,7 @@ const Header = () => {
                 <div className="relative">
                   <Input
                     placeholder="Поиск..."
-                    className="h-10 md:h-12 pl-4 pr-10 md:pr-12 rounded-xl border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full text-sm md:text-base"
+                    className="h-10 md:h-12 pl-4 md:pl-6 pr-10 md:pr-12 rounded-full border-2 border-border focus:border-border focus-visible:ring-0 focus-visible:ring-offset-0 bg-background w-full text-sm md:text-base"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
@@ -233,7 +247,7 @@ const Header = () => {
                       type="button"
                       size="icon"
                       variant="ghost"
-                      className="absolute right-9 md:right-11 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-lg hover:bg-muted"
+                      className="absolute right-9 md:right-11 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
                       onClick={clearSearch}
                     >
                       <X className="h-4 w-4 text-muted-foreground" />
@@ -243,7 +257,7 @@ const Header = () => {
                     type="submit"
                     size="icon"
                     variant="ghost"
-                    className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-lg hover:bg-muted"
+                    className="absolute right-0.5 md:right-1 top-0.5 md:top-1 h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-muted"
                   >
                     {isSearching ? <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" /> : <Search className="h-5 w-5 text-muted-foreground" />}
                   </Button>
@@ -359,16 +373,21 @@ const Header = () => {
             <div className="p-4">
               <p className="text-sm text-muted-foreground mb-3">Каталог</p>
               <div className="space-y-1">
-                {catalogCategories.map((category) => {
-                  const IconComponent = category.icon;
+                {categories.map((category) => {
+                  const IconComponent = getCategoryIcon(category.slug || '');
+                  const iconColor = getCategoryColor(category.slug || '');
                   return (
                     <button
                       key={category.id}
                       className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
-                      onClick={() => handleCategoryClick(category.id)}
+                      onClick={() => handleCategoryClick(category.slug)}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <IconComponent className="h-5 w-5 text-primary" />
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden relative">
+                        {category.image?.url ? (
+                          <Image src={getStrapiMedia(category.image.url) as string} alt={category.name} fill className="object-cover" />
+                        ) : (
+                          <IconComponent className={`h-5 w-5 ${iconColor}`} />
+                        )}
                       </div>
                       <span className="font-medium">{category.name}</span>
                     </button>
@@ -381,8 +400,8 @@ const Header = () => {
                     router.push("/catalog");
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Menu className="h-5 w-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                    <LayoutGrid className="h-5 w-5 text-foreground" />
                   </div>
                   <span className="font-medium">Все товары</span>
                 </button>

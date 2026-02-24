@@ -29,18 +29,10 @@ const Promotions = ({ promotions }: PromotionsProps) => {
   if (!promotions || promotions.length === 0) return null;
 
   return (
-    <section className="py-6 md:py-10 bg-muted/30">
+    <section className="py-6 md:py-10 bg-background">
       <div className="container">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Акции и предложения</h2>
-          
-          <div className="hidden md:flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/promotions">
-                Все акции <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          <h2 className="text-2xl font-semibold text-foreground">Акции и предложения</h2>
         </div>
 
         <Carousel
@@ -59,7 +51,6 @@ const Promotions = ({ promotions }: PromotionsProps) => {
                                 src={getStrapiMedia(promo.image?.url) || "/oil-product.png"} 
                                 alt={promo.title || "Promotion"} 
                                 aspectRatio="video"
-                                className="group-hover:scale-105 transition-transform duration-500"
                             />
                             {promo.title && (
                                 <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent text-white">
@@ -73,19 +64,7 @@ const Promotions = ({ promotions }: PromotionsProps) => {
                 </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="hidden md:block">
-            <CarouselPrevious className="-left-4" />
-            <CarouselNext className="-right-4" />
-          </div>
         </Carousel>
-
-        <div className="mt-6 md:hidden">
-          <Button variant="outline" className="w-full" asChild>
-            <Link href="/promotions">
-              Смотреть все акции
-            </Link>
-          </Button>
-        </div>
       </div>
     </section>
   );
