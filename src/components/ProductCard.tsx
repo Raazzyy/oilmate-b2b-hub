@@ -60,18 +60,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
               src={imageSrc}
               alt={name}
               fill
-              className="object-contain p-5 transition-transform group-hover:scale-105"
+              className="object-contain p-5 transition-transform"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
           
           {/* Discount badge - Split style with original gradient */}
           {discountPercent && discountPercent > 0 && (
-            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-black/10 backdrop-blur-md border border-white/10 text-[10px] font-bold shadow-sm">
-              <div className="bg-gradient-to-r from-primary to-accent px-2 py-1 text-white">
-                -{discountPercent}%
-              </div>
-              <div className="px-2 py-1 text-foreground dark:text-white opacity-90">
+            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-card border border-border text-[10px] font-bold shadow-sm">
+              <div className="px-2 py-1 text-foreground">
                 Распродажа
               </div>
             </div>

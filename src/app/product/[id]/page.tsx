@@ -56,9 +56,21 @@ export async function generateMetadata(props: ProductPageProps) {
   // WAIT: getProduct transforms StrapiProduct -> ProductData.
   // ProductData doesn't have 'seo'.
   // We should fetch the raw Strapi Product here for full SEO context.
-  const strapiProduct = await getProductById(params.id);
-  
-  if (!strapiProduct) return { title: "Товар не найден" };
+  // Try to get Strapi SEO data, but gracefully fallback if Strapi is offline
+  let strapiProduct = null;
+  try {
+    strapiProduct = await getProductById(params.id);
+  } catch {
+    // Strapi unavailable — use basic metadata from local product data
+  }
+
+  // If no Strapi product, return basic metadata from local data
+  if (!strapiProduct) {
+    return {
+      title: `${product.name} | OilMate`,
+      description: `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}.`,
+    };
+  }
 
   const seo = strapiProduct.seo || {};
   
@@ -70,11 +82,10 @@ export async function generateMetadata(props: ProductPageProps) {
     const media = getStrapiMedia(seo.metaImage.url);
     if (media) images.push(media);
   } else if (product.image) {
-     images.push(product.image); // This is already a full URL from getProduct
+     images.push(product.image);
   }
 
   const canonical = (seo.canonicalURL as string) || `https://oilmate-b2b-hub.vercel.app/product/${product.documentId}`;
-  const keywords = seo.keywords as string | undefined;
   
   const ogImages = images.filter(Boolean).map(url => ({
     url: url as string,
@@ -230,8 +241,8 @@ export default async function ProductPage(props: ProductPageProps) {
         </div>
 
         {/* Description Section */}
-        <div className="mt-16">
-           <h2 className="text-2xl font-bold mb-6">Описание</h2>
+        <div className="mt-12 md:mt-16">
+           <h2 className="text-2xl font-semibold text-foreground mb-4">Описание</h2>
            <div className="text-muted-foreground leading-relaxed space-y-4 text-base">
              <p>
                {product.name} — полностью синтетическое моторное масло, разработанное для обеспечения максимальной защиты двигателя и его чистоты. 
@@ -240,11 +251,14 @@ export default async function ProductPage(props: ProductPageProps) {
            </div>
         </div>
 
-        {/* Similar Products */}
-        <div className="mt-20">
-           <ProductsSection title="Смотрите также" products={relatedProducts} />
-        </div>
       </div>
+
+      {/* Similar Products — outside inner container so it doesn't have double padding */}
+      {relatedProducts.length > 0 && (
+        <div className="border-t border-border/50">
+          <ProductsSection title="Смотрите также" products={relatedProducts} />
+        </div>
+      )}
     </div>
   );
 }

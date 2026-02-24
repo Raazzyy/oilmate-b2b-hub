@@ -1,15 +1,13 @@
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // Assuming Inter was used or can be used
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import Header from "@/components/Header"; // We will need to check if Header relies on specific Router hooks
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
-
-// Note: We might need to adjust Header/CartDrawer if they use 'react-router-dom'.
-// We will address that in the next steps.
+import { getCategories } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -29,16 +27,17 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = await getCategories();
   return (
     <html lang="ru">
       <body className={inter.className}>
         <Providers>
-          <Header />
+          <Header categories={categories} />
             {children}
           <Footer />
           <CartDrawer />
