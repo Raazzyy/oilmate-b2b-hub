@@ -6,11 +6,12 @@ import type { Metadata } from "next";
 export const revalidate = 60; // Revalidate every minute
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const page = await getPageBySlug(params.slug);
+  const { slug } = await params;
+  const page = await getPageBySlug(slug);
 
   if (!page) {
     return {
@@ -25,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DynamicPage({ params }: Props) {
-  const page = await getPageBySlug(params.slug);
+  const { slug } = await params;
+  const page = await getPageBySlug(slug);
 
   if (!page) {
     notFound();

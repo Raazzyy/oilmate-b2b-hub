@@ -297,7 +297,7 @@ export async function getPromotions(): Promise<{ id: number; documentId: string;
 export interface StrapiBlock {
     id: number;
     __component: string;
-    [key: string]: any; // Specific fields depend on the component
+    [key: string]: unknown; // Specific fields depend on the component
 }
 
 export interface StrapiRichTextBlock extends StrapiBlock {
@@ -315,12 +315,21 @@ export interface StrapiGalleryBlock extends StrapiBlock {
     images: StrapiImage[];
 }
 
+export interface StrapiSEO {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string;
+    canonicalURL?: string;
+    ogImage?: StrapiImage;
+    structuredData?: unknown;
+}
+
 export interface StrapiPage {
     id: number;
     documentId: string;
     title: string;
     slug: string;
-    seo?: any;
+    seo?: StrapiSEO;
     blocks: (StrapiRichTextBlock | StrapiImageBlock | StrapiGalleryBlock)[];
 }
 
