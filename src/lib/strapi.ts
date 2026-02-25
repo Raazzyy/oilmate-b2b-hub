@@ -93,6 +93,8 @@ export interface StrapiResponse<T> {
 }
 
 export interface StrapiImage {
+    id?: number;
+    documentId?: string;
     url: string;
     alternativeText?: string;
     formats?: Record<string, unknown>;
@@ -286,6 +288,81 @@ export async function getPromotions(): Promise<{ id: number; documentId: string;
         }));
     } catch (error) {
         console.error("Failed to fetch promotions:", error);
+        return [];
+    }
+}
+
+// --- Dynamic Pages (Strapi Dynamic Zones) ---
+
+export interface StrapiBlock {
+    id: number;
+    __component: string;
+    [key: string]: any; // Specific fields depend on the component
+}
+
+export interface StrapiRichTextBlock extends StrapiBlock {
+    __component: "blocks.rich-text";
+    content: string; // Markdown/HTML from Strapi
+}
+
+export interface StrapiImageBlock extends StrapiBlock {
+    __component: "blocks.image";
+    file: StrapiImage;
+}
+
+export interface StrapiGalleryBlock extends StrapiBlock {
+    __component: "blocks.gallery";
+    images: StrapiImage[];
+}
+
+export interface StrapiPage {
+    id: number;
+    documentId: string;
+    title: string;
+    slug: string;
+    seo?: any;
+    blocks: (StrapiRichTextBlock | StrapiImageBlock | StrapiGalleryBlock)[];
+}
+
+export async function getPageBySlug(slug: string): Promise<StrapiPage | null> {
+    try {
+        const data = await fetchAPI("/pages", {
+            filters: { slug: { $eq: slug } },
+            populate: {
+                seo: { populate: "*" },
+                blocks: {
+                    populate: "*" // Populates the media inside blocks
+                }
+            }
+        });
+
+        if (!data || !data.data || data.data.length === 0) {
+            return null;
+        }
+
+        return data.data[0];
+    } catch (error) {
+        console.error(`Failed to fetch page with slug ${slug}:`, error);
+        return null;
+    }
+}
+
+// --- Dynamic Navigation ---
+
+export interface StrapiNavigationItem {
+    id: number;
+    documentId: string;
+    label: string;
+    href: string;
+    order: number;
+}
+
+export async function getNavigationItems(): Promise<StrapiNavigationItem[]> {
+    try {
+        const data = await fetchAPI("/navigation-items", { sort: "order:asc" });
+        return data?.data || [];
+    } catch (error) {
+        console.error("Failed to fetch navigation items:", error);
         return [];
     }
 }
