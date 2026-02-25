@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image, { StaticImageData } from "next/image";
 import { categoryNames, ProductData } from "@/data/products";
 import { useCartStore } from "@/store/cart";
-import { getProducts, mapStrapiProduct, getStrapiMedia, StrapiCategory } from "@/lib/strapi";
+import { getProducts, mapStrapiProduct, getStrapiMedia, StrapiCategory, StrapiNavigationItem } from "@/lib/strapi";
 
 const getCategoryIcon = (slug: string) => {
   if (!slug) return HelpCircle;
@@ -28,7 +28,7 @@ const getCategoryColor = (slug: string) => {
   return "text-foreground";
 };
 
-const Header = ({ categories = [] }: { categories?: StrapiCategory[] }) => {
+const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCategory[], navigation?: StrapiNavigationItem[] }) => {
   const { getTotalItems, setIsCartOpen, isClient, setClient } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProductData[]>([]);
@@ -150,15 +150,27 @@ const Header = ({ categories = [] }: { categories?: StrapiCategory[] }) => {
         <div className="hidden md:block">
           <div className="container">
             <nav className="flex items-center gap-6 py-2 text-sm">
-              {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-                <Link
-                  key={item}
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {item}
-                </Link>
-              ))}
+              {navigation.length > 0 ? (
+                navigation.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))
+              ) : (
+                ["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
+                  <Link
+                    key={item}
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {item}
+                  </Link>
+                ))
+              )}
             </nav>
           </div>
         </div>
@@ -412,16 +424,29 @@ const Header = ({ categories = [] }: { categories?: StrapiCategory[] }) => {
             <div className="p-4 border-t border-border">
               <p className="text-sm text-muted-foreground mb-3">Информация</p>
               <div className="space-y-1">
-                {["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-                  <Link
-                    key={item}
-                    href="#"
-                    className="block p-3 text-foreground hover:bg-muted rounded-xl transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
+                {navigation.length > 0 ? (
+                  navigation.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="block p-3 text-foreground hover:bg-muted rounded-xl transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))
+                ) : (
+                  ["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
+                    <Link
+                      key={item}
+                      href="#"
+                      className="block p-3 text-foreground hover:bg-muted rounded-xl transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item}
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           </div>

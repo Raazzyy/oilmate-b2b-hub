@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
-import { getCategories } from "@/lib/strapi";
+import { getCategories, getNavigationItems } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -33,11 +33,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const categories = await getCategories();
+  const navigation = await getNavigationItems();
   return (
     <html lang="ru">
       <body className={inter.className}>
         <Providers>
-          <Header categories={categories} />
+          <Header categories={categories} navigation={navigation} />
             {children}
           <Footer />
           <CartDrawer />
