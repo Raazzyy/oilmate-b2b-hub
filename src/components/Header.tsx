@@ -149,7 +149,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
         {/* Top navigation - hidden on mobile */}
         <div className="hidden md:block">
           <div className="container">
-            <nav className="flex items-center gap-6 py-2 text-sm">
+            <nav className="flex items-center gap-6 pt-5 pb-0 text-sm">
               {navigation.length > 0 ? (
                 navigation.map((item) => (
                   <Link
@@ -176,7 +176,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
         </div>
 
         {/* Main header */}
-        <div className="container py-3 md:py-6">
+        <div className="container py-3 md:pb-6 md:pt-5">
           <div className="flex items-center gap-2 md:gap-4">
             {/* Mobile menu button */}
             <Button
