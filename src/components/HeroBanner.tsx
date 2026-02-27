@@ -2,29 +2,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 
 import { HeroSlide } from "@/types";
+import { StrapiSideBanner } from "@/lib/strapi";
 
 interface HeroBannerProps {
   slides: HeroSlide[];
+  sideBanner: StrapiSideBanner;
 }
 
-const HeroBanner = ({ slides }: HeroBannerProps) => {
+const HeroBanner = ({ slides, sideBanner }: HeroBannerProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
 
   const scrollTo = useCallback((index: number) => {
     if (emblaApi) emblaApi.scrollTo(index);
@@ -43,15 +36,6 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi, onSelect]);
-
-  // Auto-play
-  useEffect(() => {
-    if (!emblaApi) return;
-    const interval = setInterval(() => {
-      emblaApi.scrollNext();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [emblaApi]);
 
   return (
     <section className="py-4 md:py-6">
@@ -125,43 +109,31 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
               </div>
             </div>
 
-            {/* Navigation arrows */}
-            <button 
-              onClick={(e) => { e.preventDefault(); scrollPrev(); }}
-              className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-lg bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm shadow-md"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button 
-              onClick={(e) => { e.preventDefault(); scrollNext(); }}
-              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-lg bg-card/90 flex items-center justify-center hover:bg-card transition-colors backdrop-blur-sm shadow-md"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
           </div>
 
           {/* Fixed side banner */}
           <Link 
-            href="/catalog/motor"
-            className="h-[200px] md:h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br from-accent via-accent to-primary/80 p-5 md:p-6 flex flex-col justify-between relative group"
+            href={sideBanner.href}
+            className={`h-[200px] md:h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br ${sideBanner.gradient || "from-accent via-accent to-primary/80"} p-5 md:p-6 flex flex-col justify-between relative group`}
           >
             {/* Decorative circles */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
             <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
             
             <div className="relative z-10">
-              <h3 className="text-xl md:text-2xl font-bold text-primary-foreground leading-snug mb-2 md:mb-4">
-                Широкий ассортимент<br/>
-                моторных масел
+              <h3 className="text-xl md:text-2xl font-bold text-primary-foreground leading-snug mb-2 md:mb-4 whitespace-pre-line">
+                {sideBanner.title}
               </h3>
               
-              <p className="text-primary-foreground/90 text-xs md:text-sm">
-                Для легковых и грузовых<br/>автомобилей, спецтехники
-              </p>
+              {sideBanner.subtitle && (
+                <p className="text-primary-foreground/90 text-xs md:text-sm whitespace-pre-line">
+                  {sideBanner.subtitle}
+                </p>
+              )}
             </div>
 
             <Button className="relative z-10 bg-card text-foreground group-hover:bg-card/90 font-semibold w-fit px-5 md:px-8 h-10 md:h-11 rounded-xl text-sm pointer-events-none">
-              Смотреть каталог
+              {sideBanner.buttonText}
             </Button>
           </Link>
         </div>

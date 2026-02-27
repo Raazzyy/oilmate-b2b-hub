@@ -4,11 +4,12 @@ import Categories from "@/components/Categories";
 import Promotions from "@/components/Promotions";
 import ProductsSection from "@/components/ProductsSection";
 
-import { getHeroSlides, getProducts as fetchStrapiProducts, getStrapiMedia, getPromotions, StrapiProduct, mapStrapiProduct } from "@/lib/strapi";
+import { getHeroSlides, getSideBanner, getProducts as fetchStrapiProducts, getStrapiMedia, getPromotions, StrapiProduct, mapStrapiProduct } from "@/lib/strapi";
 import { ProductData } from "@/data/products";
 
 export default async function Home() {
   const slides = await getHeroSlides();
+  const sideBanner = await getSideBanner();
   const promotions = await getPromotions();
 
   // Fetch popular products for the carousel (hits)
@@ -29,7 +30,7 @@ export default async function Home() {
 
   return (
     <main>
-      <HeroBanner slides={slides} />
+      <HeroBanner slides={slides} sideBanner={sideBanner} />
       <Categories />
       <ProductsSection products={popularProducts} />
       <Promotions promotions={promotions} />

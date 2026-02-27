@@ -64,9 +64,14 @@ export async function fetchAPI(
         // Trigger API call
         const response = await fetch(requestUrl, mergedOptions);
 
+        if (response.status === 404) {
+            console.warn(`[Strapi API] 404 Not Found: ${requestUrl}`);
+            return { data: null };
+        }
+
         if (!response.ok) {
             console.error(response.statusText);
-            throw new Error(`An error occurred please try again`);
+            throw new Error(`An error occurred please try again: ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -233,7 +238,43 @@ export async function getCategories(): Promise<StrapiCategory[]> {
         return data?.data || [];
     } catch (error) {
         console.error("Failed to fetch categories:", error);
-        return [];
+    }
+}
+
+export interface StrapiSideBanner {
+    title: string;
+    subtitle?: string;
+    buttonText: string;
+    href: string;
+    gradient?: string;
+}
+
+const DEFAULT_SIDE_BANNER: StrapiSideBanner = {
+    title: "Широкий ассортимент\nмоторных масел",
+    subtitle: "Для легковых и грузовых\nавтомобилей, спецтехники",
+    buttonText: "Смотреть каталог",
+    href: "/catalog/motor",
+    gradient: "from-accent via-accent to-primary/80"
+};
+
+export async function getSideBanner(): Promise<StrapiSideBanner> {
+    try {
+        const data = await fetchAPI("/side-banner", {}, { next: { revalidate: 0 } });
+
+        if (!data?.data || !data.data.title) {
+            return DEFAULT_SIDE_BANNER;
+        }
+
+        return {
+            title: data.data.title || DEFAULT_SIDE_BANNER.title,
+            subtitle: data.data.subtitle || DEFAULT_SIDE_BANNER.subtitle,
+            buttonText: data.data.buttonText || DEFAULT_SIDE_BANNER.buttonText,
+            href: data.data.href || DEFAULT_SIDE_BANNER.href,
+            gradient: data.data.gradient || DEFAULT_SIDE_BANNER.gradient
+        };
+    } catch (error) {
+        console.warn("Failed to fetch side banner from Strapi:", error);
+        return DEFAULT_SIDE_BANNER;
     }
 }
 
