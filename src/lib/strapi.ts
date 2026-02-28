@@ -251,6 +251,32 @@ export async function getCategories(): Promise<StrapiCategory[]> {
     }
 }
 
+export async function getHomepageCategories(): Promise<StrapiCategory[]> {
+    try {
+        const data = await fetchAPI("/homepage", {
+            populate: {
+                featuredCategories: {
+                    populate: {
+                        image: true
+                    }
+                }
+            }
+        }, { next: { revalidate: 0 } });
+
+        const categories = data?.data?.featuredCategories;
+
+        if (!categories || categories.length === 0) {
+            console.log("No featured categories found on homepage, falling back to all categories.");
+            return getCategories();
+        }
+
+        return categories;
+    } catch (error) {
+        console.warn("Failed to fetch homepage categories, falling back to all categories:", error);
+        return getCategories();
+    }
+}
+
 export interface StrapiSideBanner {
     title: string;
     subtitle?: string;
