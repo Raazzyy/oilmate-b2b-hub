@@ -38,7 +38,7 @@ const HeroBanner = ({ slides, sideBanner }: HeroBannerProps) => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="py-4 md:py-6">
+    <section className="pt-2 pb-6 md:pt-4 md:pb-10">
       <div className="container">
         <div className="grid gap-3 md:gap-4 lg:grid-cols-3">
           {/* Carousel banner */}
