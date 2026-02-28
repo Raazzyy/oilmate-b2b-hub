@@ -1,15 +1,11 @@
 "use client";
 
 import ProductCard from "./ProductCard";
-import { ChevronRight, ChevronLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  type CarouselApi,
 } from "@/components/ui/carousel";
-import { useState, useEffect } from "react";
 import { ProductData } from "@/data/products";
 
 interface ProductsSectionProps {
@@ -18,59 +14,17 @@ interface ProductsSectionProps {
 }
 
 const ProductsSection = ({ products, title = "Популярные товары" }: ProductsSectionProps) => {
-  const [api, setApi] = useState<CarouselApi>();
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  useEffect(() => {
-    if (!api) return;
-
-    const updateScrollState = () => {
-      setCanScrollPrev(api.canScrollPrev());
-      setCanScrollNext(api.canScrollNext());
-    };
-
-    updateScrollState();
-    api.on("select", updateScrollState);
-    api.on("reInit", updateScrollState);
-
-    return () => {
-      api.off("select", updateScrollState);
-      api.off("reInit", updateScrollState);
-    };
-  }, [api]);
-
   return (
     <section className="py-8 bg-card">
       <div className="container">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6">
           <h2 className="text-2xl font-semibold text-foreground">
             {title}
           </h2>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-lg bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
-              onClick={() => api?.scrollPrev()}
-              disabled={!canScrollPrev}
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-lg bg-muted hover:bg-muted-foreground/20 h-10 w-10 disabled:opacity-50"
-              onClick={() => api?.scrollNext()}
-              disabled={!canScrollNext}
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
         </div>
 
+
         <Carousel
-          setApi={setApi}
           opts={{
             align: "start",
             slidesToScroll: 1,

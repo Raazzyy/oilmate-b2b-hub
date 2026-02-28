@@ -268,6 +268,41 @@ export async function getHomepageCategories(): Promise<StrapiCategory[]> {
     }
 }
 
+export async function getHomepageProducts(): Promise<ProductData[]> {
+    try {
+        const data = await fetchAPI("/homepage", {
+            populate: {
+                featuredProducts: {
+                    populate: {
+                        image: true,
+                        category: true
+                    }
+                }
+            }
+        }, { next: { revalidate: 0 } });
+
+        const products = data?.data?.featuredProducts;
+
+        if (!products || products.length === 0) {
+            console.log("No featured products found on homepage, falling back to hit products.");
+            const productsResponse = await getProducts({ 
+                pagination: { limit: 10 },
+                filters: { isHit: { $eq: true } }
+            });
+            return (productsResponse.data as StrapiProduct[]).map(mapStrapiProduct);
+        }
+
+        return (products as StrapiProduct[]).map(mapStrapiProduct);
+    } catch (error) {
+        console.warn("Failed to fetch homepage products, falling back to hits:", error);
+        const productsResponse = await getProducts({ 
+            pagination: { limit: 10 },
+            filters: { isHit: { $eq: true } }
+        });
+        return (productsResponse.data as StrapiProduct[]).map(mapStrapiProduct);
+    }
+}
+
 export interface StrapiSideBanner {
     title: string;
     subtitle?: string;
