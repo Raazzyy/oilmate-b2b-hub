@@ -1,11 +1,6 @@
 "use client";
 
 import ProductCard from "./ProductCard";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { ProductData } from "@/data/products";
 
 interface ProductsSectionProps {
@@ -23,25 +18,17 @@ const ProductsSection = ({ products, title = "Популярные товары"
           </h2>
         </div>
 
-
-        <Carousel
-          opts={{
-            align: "start",
-            slidesToScroll: 1,
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-4">
-            {products.map((product) => (
-              <CarouselItem 
-                key={product.id} 
-                className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
-              >
-                <ProductCard product={product} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        {/* Native horizontal scroll container */}
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -ml-4 pl-4">
+          {products.map((product) => (
+            <div 
+              key={product.id} 
+              className="shrink-0 basis-[70%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
