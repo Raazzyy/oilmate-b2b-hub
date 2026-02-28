@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid, HelpCircle } from "lucide-react";
-import { getCategories, getStrapiMedia } from "@/lib/strapi";
+import { getHomepageCategories, getStrapiMedia } from "@/lib/strapi";
 
 const getCategoryIcon = (slug: string) => {
   if (!slug) return HelpCircle;
@@ -21,7 +21,7 @@ const getCategoryColor = (slug: string) => {
 };
 
 export default async function Categories() {
-  const strapiCategories = await getCategories();
+  const strapiCategories = await getHomepageCategories();
 
   return (
     <section className="py-4 md:py-6">
