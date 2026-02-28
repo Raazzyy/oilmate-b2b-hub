@@ -24,7 +24,7 @@ export default async function Categories() {
   const strapiCategories = await getHomepageCategories();
 
   return (
-    <section className="py-4 md:py-6">
+    <section className="py-6 md:py-10">
       <div className="container">
         {/* Horizontal scroll on all screen sizes */}
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
