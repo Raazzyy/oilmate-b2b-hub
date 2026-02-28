@@ -234,10 +234,19 @@ export interface StrapiCategory {
 
 export async function getCategories(): Promise<StrapiCategory[]> {
     try {
-        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true } });
-        return data?.data || [];
+        const data = await fetchAPI("/categories", { sort: ["sortOrder:asc", "name:asc"], populate: { image: true } }, { next: { revalidate: 0 } });
+        const categories = data?.data || [];
+
+        // Manual sort as a safety measure for null values (nulls to the end)
+        return categories.sort((a: any, b: any) => {
+            const orderA = a.sortOrder ?? 999;
+            const orderB = b.sortOrder ?? 999;
+            if (orderA !== orderB) return orderA - orderB;
+            return (a.name || "").localeCompare(b.name || "");
+        });
     } catch (error) {
         console.error("Failed to fetch categories:", error);
+        return [];
     }
 }
 
