@@ -55,19 +55,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container */}
         <div className="relative mb-3">
-          <div className="aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
+          <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
             <Image
               src={imageSrc}
               alt={name}
               fill
-              className="object-contain p-5 transition-transform"
+              className="object-contain p-2 transition-transform"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
           
           {/* Discount badge - Split style with original gradient */}
           {discountPercent && discountPercent > 0 && (
-            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-card border border-border text-[10px] font-bold shadow-sm">
+            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-card border border-border text-[10px] font-bold shadow-sm z-10">
               <div className="px-2 py-1 text-foreground">
                 Распродажа
               </div>
@@ -76,12 +76,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         {/* Name - fixed height for alignment */}
-        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-2 h-10 group-hover:text-primary transition-colors">
+        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-1 h-10 group-hover:text-primary transition-colors">
           {name}
         </h3>
         
         {/* Volume and parameters inline - fixed height */}
-        <p className="text-xs text-muted-foreground mb-3 line-clamp-1">
+        <p className="text-xs text-muted-foreground mb-1 line-clamp-1">
           {getSpecsLine()}
         </p>
       </Link>
@@ -89,8 +89,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
       {/* Spacer to push price and button to bottom */}
       <div className="mt-auto">
         {/* Price Row (Single line) */}
-        <div className="mb-4 flex items-center gap-3">
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
+        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div className={`inline-flex items-baseline w-fit break-words ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
             <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")}
             </span>
@@ -101,7 +101,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
           
           {oldPrice && (
-            <span className="text-sm text-muted-foreground line-through decoration-muted-foreground/50">
+            <span className="text-sm text-muted-foreground line-through decoration-muted-foreground/50 whitespace-nowrap">
               {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
             </span>
           )}
