@@ -230,6 +230,7 @@ export interface StrapiCategory {
     slug: string;
     description?: string;
     image?: StrapiImage;
+    sortOrder?: number;
 }
 
 export async function getCategories(): Promise<StrapiCategory[]> {
@@ -238,7 +239,7 @@ export async function getCategories(): Promise<StrapiCategory[]> {
         const categories = data?.data || [];
 
         // Manual sort as a safety measure for null values (nulls to the end)
-        return categories.sort((a: any, b: any) => {
+        return categories.sort((a: StrapiCategory, b: StrapiCategory) => {
             const orderA = a.sortOrder ?? 999;
             const orderB = b.sortOrder ?? 999;
             if (orderA !== orderB) return orderA - orderB;
