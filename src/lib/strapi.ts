@@ -223,6 +223,14 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     }
 }
 
+export interface StrapiFilter {
+    id: number;
+    name: string;
+    slug: string;
+    type: 'chips' | 'range';
+    options?: string[];
+}
+
 export interface StrapiCategory {
     id: number;
     documentId: string;
@@ -230,17 +238,33 @@ export interface StrapiCategory {
     slug: string;
     description?: string;
     image?: StrapiImage;
+    filters?: StrapiFilter[];
 }
 
 export async function getCategories(): Promise<StrapiCategory[]> {
     try {
-        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true } }, { next: { revalidate: 60 } });
+        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true, filters: true } }, { next: { revalidate: 60 } });
         return data?.data || [];
     } catch (error) {
         console.error("Failed to fetch categories:", error);
         return [];
     }
 }
+
+export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | null> {
+    try {
+        const data = await fetchAPI("/categories", {
+            filters: { slug: { $eq: slug } },
+            populate: { filters: true, image: true }
+        });
+        if (!data?.data || data.data.length === 0) return null;
+        return data.data[0];
+    } catch (error) {
+        console.error(`Failed to fetch category ${slug}:`, error);
+        return null;
+    }
+}
+
 
 export async function getHomepageCategories(): Promise<StrapiCategory[]> {
     try {
@@ -285,7 +309,7 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
 
         if (!products || products.length === 0) {
             console.log("No featured products found on homepage, falling back to hit products.");
-            const productsResponse = await getProducts({ 
+            const productsResponse = await getProducts({
                 pagination: { limit: 10 },
                 filters: { isHit: { $eq: true } }
             });
@@ -295,7 +319,7 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
         return (products as StrapiProduct[]).map(mapStrapiProduct);
     } catch (error) {
         console.warn("Failed to fetch homepage products, falling back to hits:", error);
-        const productsResponse = await getProducts({ 
+        const productsResponse = await getProducts({
             pagination: { limit: 10 },
             filters: { isHit: { $eq: true } }
         });
