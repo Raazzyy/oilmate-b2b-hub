@@ -180,7 +180,7 @@ export default async function ProductPage(props: ProductPageProps) {
         <div className="grid md:grid-cols-12 gap-8 lg:gap-16">
           {/* Left: Images */}
           <div className="md:col-span-6 lg:col-span-5">
-            <ProductImageGallery image={product.image} name={product.name} />
+            <ProductImageGallery image={product.image} images={product.images} name={product.name} />
           </div>
 
           {/* Right: Info */}
@@ -240,16 +240,17 @@ export default async function ProductPage(props: ProductPageProps) {
           </div>
         </div>
 
-        {/* Description Section */}
-        <div className="mt-12 md:mt-16">
-           <h2 className="text-2xl font-semibold text-foreground mb-4">Описание</h2>
-           <div className="text-muted-foreground leading-relaxed space-y-4 text-base">
-             <p>
-               {product.name} — полностью синтетическое моторное масло, разработанное для обеспечения максимальной защиты двигателя и его чистоты. 
-               Создано с применением инновационных технологий, которые превращают базовые компоненты в высококачественный продукт для современных автомобилей.
-             </p>
-           </div>
-        </div>
+        {/* Description Section — only shown if set in Strapi */}
+        {product.description && (
+          <div className="mt-12 md:mt-16">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Описание</h2>
+            <div className="text-muted-foreground leading-relaxed space-y-4 text-base">
+              {product.description.split('\n').filter(Boolean).map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
 

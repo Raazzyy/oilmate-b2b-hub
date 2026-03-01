@@ -114,6 +114,8 @@ export interface StrapiProduct {
     price: number;
     oldPrice?: number;
     image?: StrapiImage;
+    images?: StrapiImage[];
+    description?: string;
     inStock?: boolean;
     oilType?: string;
     isUniversal?: boolean;
@@ -148,6 +150,8 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         price: item.price,
         oldPrice: item.oldPrice,
         image: getStrapiMedia(item.image?.url) || "/oil-product.png",
+        images: item.images?.map(img => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
+        description: item.description,
         inStock: item.inStock ?? true,
         oilType: item.oilType || "",
         isUniversal: item.isUniversal,
@@ -387,6 +391,7 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
         const data = await fetchAPI(`/products/${id}`, {
             populate: {
                 image: true,
+                images: true,
                 category: true,
                 seo: {
                     populate: "*"
