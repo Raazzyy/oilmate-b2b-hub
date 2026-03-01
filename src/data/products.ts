@@ -11,6 +11,8 @@ export interface ProductData {
   price: number;
   oldPrice?: number;
   image: string | StaticImageData;
+  images?: string[];
+  description?: string;
   inStock: boolean;
   oilType: string;
   isUniversal?: boolean;
