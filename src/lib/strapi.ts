@@ -19,6 +19,8 @@ export function getStrapiMedia(url: string | null) {
     return `${STRAPI_API_URL}${url}`;
 }
 
+import qs from "qs";
+
 /**
  * Generic fetcher for Strapi API
  */
@@ -38,27 +40,7 @@ export async function fetchAPI(
             ...options,
         };
 
-        // Build request URL
-        const stringifyParams = (params: Record<string, unknown>, prefix = ""): string => {
-            return Object.keys(params)
-                .map((key) => {
-                    const value = params[key];
-                    const fullKey = prefix ? `${prefix}[${key}]` : key;
-
-                    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-                        return stringifyParams(value as Record<string, unknown>, fullKey);
-                    } else if (Array.isArray(value)) {
-                        return (value as unknown[])
-                            .map((item, index) => `${fullKey}[${index}]=${encodeURIComponent(String(item))}`)
-                            .join("&");
-                    } else {
-                        return `${fullKey}=${encodeURIComponent(String(value))}`;
-                    }
-                })
-                .join("&");
-        };
-
-        const queryString = stringifyParams(urlParamsObject);
+        const queryString = qs.stringify(urlParamsObject, { encodeValuesOnly: true });
         const requestUrl = `${STRAPI_API_URL}/api${path}${queryString ? `?${queryString}` : ""}`;
 
         // Trigger API call

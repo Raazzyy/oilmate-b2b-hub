@@ -23,7 +23,17 @@ async function getProducts(
   }
 
   if (searchQuery) {
-    filters.name = { $containsi: searchQuery };
+    const lowerQuery = searchQuery.toLowerCase();
+    const capitalizedQuery = searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1).toLowerCase();
+    
+    filters.$or = [
+      { name: { $containsi: searchQuery } },
+      { name: { $containsi: lowerQuery } },
+      { name: { $containsi: capitalizedQuery } },
+      { brand: { $containsi: searchQuery } },
+      { brand: { $containsi: lowerQuery } },
+      { brand: { $containsi: capitalizedQuery } },
+    ];
   }
 
   const response = await fetchStrapiProducts({ filters });

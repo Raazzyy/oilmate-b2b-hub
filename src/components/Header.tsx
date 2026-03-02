@@ -56,11 +56,18 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
 
     setIsSearching(true);
     try {
+      const lowerQuery = query.toLowerCase();
+      const capitalizedQuery = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
+      
       const response = await getProducts({
         filters: {
           $or: [
             { name: { $containsi: query } },
-            { brand: { $containsi: query } }
+            { name: { $containsi: lowerQuery } },
+            { name: { $containsi: capitalizedQuery } },
+            { brand: { $containsi: query } },
+            { brand: { $containsi: lowerQuery } },
+            { brand: { $containsi: capitalizedQuery } }
           ]
         },
         pagination: { limit: 6 }
