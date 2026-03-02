@@ -14,27 +14,47 @@ import CatalogFilters from "@/components/CatalogFilters";
 // Data fetching from Strapi
 async function getProducts(
   categorySlug?: string,
-  searchQuery?: string
+  searchParams: Record<string, string | string[] | undefined> = {}
 ): Promise<ProductData[]> {
   const filters: Record<string, unknown> = {};
+  const { search, minPrice, maxPrice, ...otherFilters } = searchParams;
 
   if (categorySlug && categorySlug !== "all") {
     filters.category = { slug: { $eq: categorySlug } };
   }
 
-  if (searchQuery) {
-    const lowerQuery = searchQuery.toLowerCase();
-    const capitalizedQuery = searchQuery.charAt(0).toUpperCase() + searchQuery.slice(1).toLowerCase();
+  // Price filtering
+  if (minPrice || maxPrice) {
+    const priceFilter: Record<string, unknown> = {};
+    if (minPrice) priceFilter.$gte = minPrice;
+    if (maxPrice) priceFilter.$lte = maxPrice;
+    filters.price = priceFilter;
+  }
+
+  // Search filtering
+  if (search && typeof search === 'string') {
+    const lowerQuery = search.toLowerCase();
+    const capitalizedQuery = search.charAt(0).toUpperCase() + search.slice(1).toLowerCase();
     
     filters.$or = [
-      { name: { $containsi: searchQuery } },
+      { name: { $containsi: search } },
       { name: { $containsi: lowerQuery } },
       { name: { $containsi: capitalizedQuery } },
-      { brand: { $containsi: searchQuery } },
+      { brand: { $containsi: search } },
       { brand: { $containsi: lowerQuery } },
       { brand: { $containsi: capitalizedQuery } },
     ];
   }
+
+  // Dynamic filters from chips
+  Object.entries(otherFilters).forEach(([key, value]) => {
+    if (value && typeof value === 'string') {
+      const options = value.split(',');
+      if (options.length > 0) {
+        filters[key] = { $in: options };
+      }
+    }
+  });
 
   const response = await fetchStrapiProducts({ filters });
   return (response.data as StrapiProduct[]).map(mapStrapiProduct);
@@ -42,7 +62,7 @@ async function getProducts(
 
 interface CatalogPageProps {
   params: Promise<{ slug?: string[] }>;
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export const dynamic = "force-dynamic";
@@ -52,14 +72,14 @@ export default async function CatalogPage(props: CatalogPageProps) {
   const searchParams = await props.searchParams;
 
   const categorySlug = params.slug?.[0];
-  const searchQuery = searchParams.search;
+  const searchQuery = typeof searchParams.search === 'string' ? searchParams.search : undefined;
 
   const categoryName = categorySlug
     ? categoryNames[categorySlug] || "Каталог"
     : "Все товары";
 
   const [products, category] = await Promise.all([
-    getProducts(categorySlug, searchQuery),
+    getProducts(categorySlug, searchParams),
     categorySlug && categorySlug !== "all"
       ? getCategoryBySlug(categorySlug)
       : Promise.resolve(null),
