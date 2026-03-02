@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid } from "lucide-react";
 import { StrapiCategory, StrapiFilter } from "@/lib/strapi";
 
@@ -85,27 +85,67 @@ const ChipButton = ({
 
 const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const currentCatSlug = categorySlugProp || pathname?.split("/").filter(Boolean).pop() || "";
 
-  const [activeChips, setActiveChips] = useState<Record<string, string[]>>({});
-  const [priceMin, setPriceMin] = useState("");
-  const [priceMax, setPriceMax] = useState("");
+  // Helper to update URL params
+  const updateFilters = (newFilters: Record<string, string[]>, min?: string, max?: string) => {
+    const params = new URLSearchParams(searchParams?.toString());
+    
+    // Clear existing dynamic filters (exclude 'search' and 'sort')
+    const currentKeys = Array.from(params.keys());
+    currentKeys.forEach(key => {
+      if (key !== 'search' && key !== 'sort') {
+        params.delete(key);
+      }
+    });
+
+    // Add active chips
+    Object.entries(newFilters).forEach(([key, values]) => {
+      if (values.length > 0) {
+        params.set(key, values.join(','));
+      }
+    });
+
+    // Add price range
+    if (min) params.set('minPrice', min);
+    else params.delete('minPrice');
+    
+    if (max) params.set('maxPrice', max);
+    else params.delete('maxPrice');
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const toggleChip = (filterSlug: string, option: string) => {
-    setActiveChips((prev) => {
-      const cur = prev[filterSlug] || [];
-      if (cur.includes(option)) {
-        return { ...prev, [filterSlug]: cur.filter((c) => c !== option) };
+    const currentValues = searchParams?.get(filterSlug)?.split(',') || [];
+    let newValues: string[];
+    
+    if (currentValues.includes(option)) {
+      newValues = currentValues.filter((v) => v !== option);
+    } else {
+      newValues = [...currentValues, option];
+    }
+
+    const allFilters: Record<string, string[]> = {};
+    // Collect all current filters from searchParams
+    searchParams?.forEach((value, key) => {
+      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
+        allFilters[key] = value.split(',');
       }
-      return { ...prev, [filterSlug]: [...cur, option] };
     });
+    
+    allFilters[filterSlug] = newValues;
+    updateFilters(allFilters, searchParams?.get('minPrice') || "", searchParams?.get('maxPrice') || "");
   };
 
   const handleReset = () => {
-    setActiveChips({});
-    setPriceMin("");
-    setPriceMax("");
+    router.push(pathname || "/catalog", { scroll: false });
   };
+
+  const priceMin = searchParams?.get('minPrice') || "";
+  const priceMax = searchParams?.get('maxPrice') || "";
 
   // Determine which filters to show:
   // 1. If Strapi returned filters for this category → use them
@@ -178,7 +218,15 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
                 <Input
                   type="number"
                   value={priceMin}
-                  onChange={(e) => setPriceMin(e.target.value)}
+                  onChange={(e) => {
+                    const allFilters: Record<string, string[]> = {};
+                    searchParams?.forEach((value, key) => {
+                      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
+                        allFilters[key] = value.split(',');
+                      }
+                    });
+                    updateFilters(allFilters, e.target.value, priceMax);
+                  }}
                   className="pl-7 pr-6 h-9 rounded-lg bg-muted/50 border-transparent text-sm"
                 />
                 <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
@@ -192,7 +240,15 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
                 <Input
                   type="number"
                   value={priceMax}
-                  onChange={(e) => setPriceMax(e.target.value)}
+                  onChange={(e) => {
+                    const allFilters: Record<string, string[]> = {};
+                    searchParams?.forEach((value, key) => {
+                      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
+                        allFilters[key] = value.split(',');
+                      }
+                    });
+                    updateFilters(allFilters, priceMin, e.target.value);
+                  }}
                   className="pl-7 pr-6 h-9 rounded-lg bg-muted/50 border-transparent text-sm"
                 />
                 <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">
@@ -220,7 +276,7 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
                     <ChipButton
                       key={opt}
                       label={opt}
-                      active={!!activeChips[filter.slug]?.includes(opt)}
+                      active={searchParams?.get(filter.slug)?.split(',').filter(Boolean).includes(opt) || false}
                       onClick={() => toggleChip(filter.slug, opt)}
                     />
                   ))}
@@ -233,7 +289,11 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
 
       {/* ── Actions (sticky to bottom of sidebar) ── */}
       <div className="pt-4 pb-2 bg-background/80 backdrop-blur-sm flex flex-col gap-2 sticky bottom-0">
-        <Button className="w-full h-10 rounded-xl" variant="default">
+        <Button className="w-full h-10 rounded-xl" variant="default" onClick={() => {
+           // This button can now just close mobile menu or similar if needed, 
+           // but since we are pushing to URL on every click, it's already active.
+           // Let's keep it for visual consistency but maybe it's not strictly needed for logic anymore.
+        }}>
           Применить
         </Button>
         <Button className="w-full h-10 rounded-xl" variant="ghost" onClick={handleReset}>

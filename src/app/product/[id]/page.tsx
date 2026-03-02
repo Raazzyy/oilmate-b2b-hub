@@ -228,20 +228,35 @@ export default async function ProductPage(props: ProductPageProps) {
             <div className="space-y-4">
               <h3 className="text-xl font-bold mb-4">Характеристики</h3>
               <div className="space-y-0 text-sm">
-                {[
-                  { label: "Вязкость", value: product.viscosity },
-                  { label: "Тип", value: product.oilType },
-                  { label: "Объем", value: product.volume },
-                  { label: "Производитель", value: product.brand },
-                  { label: "Страна", value: product.country },
-                  { label: "Допуски", value: product.approvals },
-                  { label: "Применение", value: product.application || "Бензиновые и дизельные двигатели" }
-                ].filter(s => s.value).map((spec, i) => (
-                  <div key={i} className="flex justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1">
-                    <span className="text-muted-foreground">{spec.label}</span>
-                    <span className="font-semibold text-right">{spec.value}</span>
-                  </div>
-                ))}
+                {(() => {
+                  const labels: Record<string, string> = {
+                    viscosity: "Вязкость",
+                    oilType: "Тип масла",
+                    volume: "Объем",
+                    brand: "Производитель",
+                    country: "Страна",
+                    approvals: "Допуски",
+                    specification: "Спецификация",
+                    viscosityClass: "Класс вязкости",
+                    standard: "Стандарт",
+                    color: "Цвет",
+                    application: "Применение",
+                    type: "Тип",
+                  };
+
+                  return Object.entries(labels)
+                    .map(([key, label]) => ({
+                      label,
+                      value: product[key as keyof ProductData] as string
+                    }))
+                    .filter(s => s.value && typeof s.value === 'string' && s.value.trim() !== "")
+                    .map((spec, i) => (
+                      <div key={i} className="flex justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1">
+                        <span className="text-muted-foreground">{spec.label}</span>
+                        <span className="font-semibold text-right">{spec.value}</span>
+                      </div>
+                    ));
+                })()}
               </div>
             </div>
           </div>
