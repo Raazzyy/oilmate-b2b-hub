@@ -18,12 +18,11 @@ const ProductsSection = ({ products, title = "Популярные товары"
           </h2>
         </div>
 
-        {/* Native horizontal scroll container - adjusted for alignment with title */}
-        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-          {products.map((product, index) => (
-            <div 
-              key={product.id} 
-              className={`shrink-0 basis-[75%] sm:basis-[48%] md:basis-[32%] lg:basis-[24%] xl:basis-[20%] ${index === 0 ? '-ml-2' : ''}`}
+        <div className="flex flex-nowrap gap-3 overflow-x-auto pb-4 scrollbar-hide">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="shrink-0 basis-[75%] sm:basis-[48%] md:basis-[32%] lg:basis-[24%] xl:basis-[20%]"
             >
               <ProductCard product={product} />
             </div>

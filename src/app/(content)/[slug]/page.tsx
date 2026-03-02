@@ -43,13 +43,12 @@ export default async function DynamicPage({ params }: Props) {
       
       <div className="container max-w-4xl mx-auto py-8 md:py-16">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8 animate-in fade-in slide-in-from-left-4 duration-700">
-          <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
-            <Home className="h-4 w-4" />
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-8 animate-in fade-in slide-in-from-left-4 duration-700 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
+          <Link href="/" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
             Главная
           </Link>
-          <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground font-medium truncate">{page.title}</span>
+          <span className="opacity-40 text-xs">/</span>
+          <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">{page.title}</span>
         </nav>
 
         <header className="mb-12 md:mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
