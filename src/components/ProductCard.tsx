@@ -50,7 +50,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const imageSrc = typeof image === 'string' ? image : image.src;
 
   return (
-    <div className="group relative flex flex-col h-full p-3 transition-all duration-300">
+    <div className="group relative flex flex-col h-full transition-all duration-300">
       {/* Clickable area for product page */}
       <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container */}
@@ -76,18 +76,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         {/* Name - fixed height for alignment */}
-        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-1 h-10 group-hover:text-primary transition-colors">
+        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-1 h-10 group-hover:text-primary transition-colors pr-3">
           {name}
         </h3>
         
         {/* Volume and parameters inline - fixed height */}
-        <p className="text-xs text-muted-foreground mb-1 line-clamp-1">
+        <p className="text-xs text-muted-foreground mb-1 line-clamp-1 pr-3">
           {getSpecsLine()}
         </p>
       </Link>
 
       {/* Spacer to push price and button to bottom */}
-      <div className="mt-auto">
+      <div className="mt-auto pr-3 pb-3">
         {/* Price Row (Single line) */}
         <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
           <div className={`inline-flex items-baseline w-fit break-words ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>

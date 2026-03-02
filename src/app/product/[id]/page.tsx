@@ -141,11 +141,18 @@ export default async function ProductPage(props: ProductPageProps) {
   return (
     <div className="bg-background min-h-screen">
       <div className="container py-4 md:py-8">
-        {/* Back Button */}
-        <Link href="/catalog" className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-sm font-medium text-white bg-[#3b82f6] rounded-lg hover:bg-blue-600 transition-colors shadow-sm">
-          <ChevronLeft className="h-4 w-4" />
-          Назад в каталог
-        </Link>
+        {/* Breadcrumbs */}
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
+          <Link href="/" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
+            Главная
+          </Link>
+          <span className="opacity-40 text-xs">/</span>
+          <Link href="/catalog" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
+            Каталог
+          </Link>
+          <span className="opacity-40 text-xs">/</span>
+          <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">{product.name}</span>
+        </nav>
 
         {/* JSON-LD Structured Data */}
         <script
@@ -256,7 +263,7 @@ export default async function ProductPage(props: ProductPageProps) {
 
       {/* Similar Products — outside inner container so it doesn't have double padding */}
       {relatedProducts.length > 0 && (
-        <div className="border-t border-border/50">
+        <div className="">
           <ProductsSection title="Смотрите также" products={relatedProducts} />
         </div>
       )}
