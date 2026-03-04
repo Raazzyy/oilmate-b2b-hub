@@ -62,11 +62,8 @@ const HeroBanner = ({ slides, sideBanner }: HeroBannerProps) => {
                         sizes="(max-width: 1024px) 100vw, 66vw"
                       />
                     )}
-                    {/* Dark overlay if image is present */}
-                    {slide.backgroundImage && (
-                      <div className="absolute inset-0 bg-black/40" />
-                    )}
-
+                    {/* Dark overlay removed as requested */}
+                    
                     {/* Animated shimmer overlay */}
                     <div className="absolute inset-0 opacity-30">
                       <div 
@@ -86,22 +83,15 @@ const HeroBanner = ({ slides, sideBanner }: HeroBannerProps) => {
 
                     <div className="relative h-full p-5 md:p-8 flex flex-col justify-between">
                       <div className="relative z-10">
-                        <h2 className="text-3xl md:text-5xl font-black text-primary-foreground leading-tight whitespace-pre-line">
+                        <h2 className="text-3xl md:text-5xl font-black text-primary-foreground leading-tight whitespace-pre-line text-shadow-sm">
                           {slide.title}
                         </h2>
                       </div>
 
                       <div className="relative z-10 flex items-end justify-between">
-                        <Button className="bg-card text-foreground hover:bg-card/90 font-semibold px-5 md:px-8 h-10 md:h-12 rounded-xl text-sm md:text-lg pointer-events-none">
+                        <Button className="bg-card text-foreground hover:bg-card/90 font-semibold px-5 md:px-8 h-10 md:h-12 rounded-xl text-sm md:text-lg pointer-events-none shadow-sm">
                           {slide.buttonText}
                         </Button>
-
-                        {/* <div className="text-right text-primary-foreground hidden sm:block">
-                          <p className="text-sm md:text-lg mb-2 whitespace-pre-line">{slide.subtitle}</p>
-                          <div className="inline-flex items-center gap-2 bg-card/20 backdrop-blur-sm rounded-lg px-3 md:px-4 py-1.5 md:py-2 border border-white/20">
-                            <span className="text-sm md:text-lg font-semibold">{slide.badge}</span>
-                          </div>
-                        </div> */}
                       </div>
                     </div>
                   </Link>
@@ -114,14 +104,29 @@ const HeroBanner = ({ slides, sideBanner }: HeroBannerProps) => {
           {/* Fixed side banner */}
           <Link 
             href={sideBanner.href}
-            className={`h-[200px] md:h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br ${sideBanner.gradient || "from-accent via-accent to-primary/80"} p-5 md:p-6 flex flex-col justify-between relative group`}
+            className={`h-[200px] md:h-[380px] rounded-2xl overflow-hidden bg-gradient-to-br ${sideBanner.gradient || "from-accent via-accent to-primary/80"} p-5 md:p-6 flex flex-col justify-between relative group shadow-sm hover:shadow-md transition-shadow`}
           >
-            {/* Decorative circles */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+            {/* Background Image if available */}
+            {sideBanner.backgroundImage && (
+              <Image 
+                src={sideBanner.backgroundImage} 
+                alt={sideBanner.title}
+                fill
+                className="object-cover absolute inset-0 z-0"
+                sizes="(max-width: 1024px) 100vw, 33vw"
+              />
+            )}
+            
+            {/* Decorative circles (only visible if no image) */}
+            {!sideBanner.backgroundImage && (
+              <>
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl z-0" />
+                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl z-0" />
+              </>
+            )}
             
             <div className="relative z-10">
-              <h3 className="text-xl md:text-2xl font-bold text-primary-foreground leading-snug mb-2 md:mb-4 whitespace-pre-line">
+              <h3 className="text-xl md:text-2xl font-bold text-primary-foreground leading-snug mb-2 md:mb-4 whitespace-pre-line text-shadow-sm">
                 {sideBanner.title}
               </h3>
               

@@ -319,6 +319,7 @@ export interface StrapiSideBanner {
     buttonText: string;
     href: string;
     gradient?: string;
+    backgroundImage?: string;
 }
 
 const DEFAULT_SIDE_BANNER: StrapiSideBanner = {
@@ -331,7 +332,7 @@ const DEFAULT_SIDE_BANNER: StrapiSideBanner = {
 
 export async function getSideBanner(): Promise<StrapiSideBanner> {
     try {
-        const data = await fetchAPI("/side-banner", {}, { next: { revalidate: 0 } });
+        const data = await fetchAPI("/side-banner", { populate: "*" }, { next: { revalidate: 0 } });
 
         if (!data?.data || !data.data.title) {
             return DEFAULT_SIDE_BANNER;
@@ -342,7 +343,8 @@ export async function getSideBanner(): Promise<StrapiSideBanner> {
             subtitle: data.data.subtitle || DEFAULT_SIDE_BANNER.subtitle,
             buttonText: data.data.buttonText || DEFAULT_SIDE_BANNER.buttonText,
             href: data.data.href || DEFAULT_SIDE_BANNER.href,
-            gradient: data.data.gradient || DEFAULT_SIDE_BANNER.gradient
+            gradient: data.data.gradient || DEFAULT_SIDE_BANNER.gradient,
+            backgroundImage: data.data.image?.url ? getStrapiMedia(data.data.image.url) : undefined
         };
     } catch (error) {
         console.warn("Failed to fetch side banner from Strapi:", error);
