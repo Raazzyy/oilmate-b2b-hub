@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid, HelpCircle } from "lucide-react";
 import { getHomepageCategories, getStrapiMedia } from "@/lib/strapi";
+import CategoriesScroll from "@/components/CategoriesScroll";
 
 const getCategoryIcon = (slug: string) => {
   if (!slug) return HelpCircle;
@@ -26,8 +27,8 @@ export default async function Categories() {
   return (
     <section className="py-6 md:py-10">
       <div className="container">
-        {/* Horizontal scroll on all screen sizes */}
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+        {/* Horizontal scroll with drag support on all screen sizes */}
+        <CategoriesScroll>
           {strapiCategories.map((category) => {
             const IconComponent = getCategoryIcon(category.slug || '');
             const iconColor = getCategoryColor(category.slug || '');
@@ -74,7 +75,7 @@ export default async function Categories() {
               Все товары
             </span>
           </Link>
-        </div>
+        </CategoriesScroll>
       </div>
     </section>
   );
