@@ -8,6 +8,7 @@ import {
   StrapiProduct,
   mapStrapiProduct,
   getCategoryBySlug,
+  getCategoryFilterOptions,
 } from "@/lib/strapi";
 import CatalogFilters from "@/components/CatalogFilters";
 import MobileFilters from "@/components/MobileFilters";
@@ -79,11 +80,12 @@ export default async function CatalogPage(props: CatalogPageProps) {
     ? categoryNames[categorySlug] || "Каталог"
     : "Все товары";
 
-  const [products, category] = await Promise.all([
+  const [products, category, autoFilters] = await Promise.all([
     getProducts(categorySlug, searchParams),
     categorySlug && categorySlug !== "all"
       ? getCategoryBySlug(categorySlug)
       : Promise.resolve(null),
+    getCategoryFilterOptions(categorySlug),
   ]);
 
   return (
@@ -108,7 +110,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
       <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* ── Sidebar – sticky, self-contained scroll ── */}
         <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start">
-          <CatalogFilters category={category} categorySlugProp={categorySlug} />
+          <CatalogFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} />
         </aside>
 
         {/* ── Main content ── */}
@@ -124,7 +126,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
 
           {/* Mobile Filters Trigger (hidden on md) */}
           <div className="md:hidden mb-6">
-            <MobileFilters category={category} categorySlugProp={categorySlug} />
+            <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} />
           </div>
 
           {products.length > 0 ? (
