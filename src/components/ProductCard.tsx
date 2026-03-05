@@ -60,7 +60,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               src={imageSrc}
               alt={name}
               fill
-              className="object-contain p-2 transition-transform"
+              className="object-cover transition-transform"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>

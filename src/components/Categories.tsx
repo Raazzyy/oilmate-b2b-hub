@@ -39,18 +39,16 @@ export default async function Categories() {
                 className="group flex flex-col items-center text-center shrink-0"
                 style={{ minWidth: '80px' }}
               >
-                {/* Rectangular container */}
-                <div className="mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-[180px] items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
+                {/* Rectangular container — image fills the whole block */}
+                <div className="mb-2 md:mb-3 relative h-24 w-32 md:h-[120px] md:w-[180px] rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden transition-colors hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                   {category.image?.url ? (
-                    <div className="relative h-12 w-12 md:h-16 md:w-16">
-                      <Image
-                        src={getStrapiMedia(category.image.url) as string}
-                        alt={category.name}
-                        fill
-                        className="object-contain"
-                        sizes="64px"
-                      />
-                    </div>
+                    <Image
+                      src={getStrapiMedia(category.image.url) as string}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                    />
                   ) : (
                     <IconComponent className={`h-8 w-8 md:h-12 md:w-12 ${iconColor}`} strokeWidth={1.5} />
                   )}
@@ -68,7 +66,7 @@ export default async function Categories() {
             className="group flex flex-col items-center text-center shrink-0"
             style={{ minWidth: '80px' }}
           >
-            <div className="mb-2 md:mb-3 flex h-24 w-32 md:h-[120px] md:w-[180px] items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
+            <div className="mb-2 md:mb-3 relative h-24 w-32 md:h-[120px] md:w-[180px] flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700">
               <LayoutGrid className="h-8 w-8 md:h-12 md:w-12 text-foreground" strokeWidth={1.5} />
             </div>
             <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
