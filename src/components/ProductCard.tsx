@@ -87,22 +87,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </Link>
 
       {/* Spacer to push price and button to bottom */}
-      <div className="mt-auto pr-3 pb-3">
-        {/* Price Row (Single line) */}
-        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <div className={`inline-flex items-baseline w-fit break-words ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
-            <span className={`text-xl font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
-              {rubles.toLocaleString("ru-RU")}
+      <div className="mt-auto pb-3">
+        {/* Price Row — all inline */}
+        <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 pr-3">
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
+            <span className={`text-lg font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+              {rubles.toLocaleString("ru-RU")} ₽
             </span>
-            <sup className={`text-[10px] font-bold ml-px ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
-              {kopecks.toString().padStart(2, '0')}
-            </sup>
-            <span className={`text-base font-bold ml-0.5 ${oldPrice ? 'text-primary' : 'text-foreground'}`}>₽</span>
           </div>
           
           {oldPrice && (
             <span className="text-sm text-muted-foreground line-through decoration-muted-foreground/50 whitespace-nowrap">
-              {oldRubles}<sup className="text-[8px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
+              {oldRubles?.toLocaleString("ru-RU")} ₽
             </span>
           )}
         </div>
