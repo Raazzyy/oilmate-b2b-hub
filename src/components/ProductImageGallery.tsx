@@ -26,7 +26,7 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
   const currentImage = gallery[selectedIndex] || mainImageUrl;
 
   return (
-    <div className="flex flex-col gap-4 sticky top-24">
+    <div className="flex flex-col gap-4 md:sticky md:top-28">
       {/* Main large image */}
       <div className="relative aspect-square bg-white rounded-2xl border border-border p-8 flex items-center justify-center overflow-hidden">
         <Image
