@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import CatalogFilters from "./CatalogFilters";
-import { StrapiCategory } from "@/lib/strapi";
+import { StrapiCategory, StrapiFilter } from "@/lib/strapi";
 
 interface MobileFiltersProps {
   category?: StrapiCategory | null;
