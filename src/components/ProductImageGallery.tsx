@@ -16,11 +16,12 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
 
   const mainImageUrl = typeof image === "string" ? image : image.src;
 
-  // Build the full gallery: if multiple images from Strapi → use them; otherwise just the main image
-  const gallery: string[] =
-    images && images.length > 0
-      ? images
-      : [mainImageUrl];
+  // Build the full gallery: primary image + any additional images from Strapi
+  // We use a Set to ensure no duplicate URLs if the primary image is also in the images array
+  const gallery: string[] = Array.from(new Set([
+    mainImageUrl,
+    ...(images || [])
+  ])).filter(Boolean);
 
   const currentImage = gallery[selectedIndex] || mainImageUrl;
 
