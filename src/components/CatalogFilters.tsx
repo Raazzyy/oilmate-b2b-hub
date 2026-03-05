@@ -20,46 +20,10 @@ const sidebarCategories = [
   { slug: "marine", name: "Судовые масла", icon: Car },
 ];
 
-// Fallback filter sets per known category (shown when Strapi has no filters configured)
-const fallbackFilters: Record<string, StrapiFilter[]> = {
-  motor: [
-    { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Castrol", "Mobil", "Shell", "Total", "Лукойл"] },
-    { id: 2, name: "Объем", slug: "volume", type: "chips", options: ["4 л", "5 л"] },
-    { id: 3, name: "Тип масла", slug: "oilType", type: "chips", options: ["Синтетическое", "Полусинтетика"] },
-    { id: 4, name: "Вязкость", slug: "viscosity", type: "chips", options: ["5W-40", "5W-30"] },
-    { id: 5, name: "Допуски", slug: "approvals", type: "chips", options: ["MB 229.5", "ACEA C3", "BMW LL-04", "API SN"] },
-  ],
-  transmission: [
-    { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Castrol", "Mobil", "Shell", "Total"] },
-    { id: 2, name: "Объем", slug: "volume", type: "chips", options: ["1 л", "4 л", "20 л"] },
-    { id: 3, name: "Вязкость", slug: "viscosity", type: "chips", options: ["75W-90", "80W-90", "85W-140"] },
-  ],
-  lubricants: [
-    { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Castrol", "Shell", "Mobil"] },
-    { id: 2, name: "Класс консистенции", slug: "consistency", type: "chips", options: ["NLGI 0", "NLGI 1", "NLGI 2", "NLGI 3"] },
-    { id: 3, name: "Тип смазки", slug: "greaseType", type: "chips", options: ["Литиевая", "Молибденовая", "Кальциевая"] },
-  ],
-  antifreeze: [
-    { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Sintec", "Glysantin", "Felix"] },
-    { id: 2, name: "Объем", slug: "volume", type: "chips", options: ["1 л", "5 л", "10 л", "20 л"] },
-    { id: 3, name: "Тип", slug: "type", type: "chips", options: ["G11", "G12", "G12+", "G13"] },
-  ],
-  hydraulic: [
-    { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Castrol", "Mobil", "Shell"] },
-    { id: 2, name: "Объем", slug: "volume", type: "chips", options: ["5 л", "20 л", "60 л", "208 л"] },
-    { id: 3, name: "Класс вязкости", slug: "viscosity", type: "chips", options: ["HLP 32", "HLP 46", "HLP 68"] },
-  ],
-};
-
-// Generic fallback used when category slug not recognized
-const genericFallback: StrapiFilter[] = [
-  { id: 1, name: "Бренд", slug: "brand", type: "chips", options: ["Castrol", "Mobil", "Shell", "Total"] },
-  { id: 2, name: "Объем", slug: "volume", type: "chips", options: ["1 л", "4 л", "5 л", "20 л"] },
-];
-
 interface CatalogFiltersProps {
   category?: StrapiCategory | null;
   categorySlugProp?: string;
+  autoFilters?: StrapiFilter[];
 }
 
 const ChipButton = ({
@@ -83,7 +47,7 @@ const ChipButton = ({
   </button>
 );
 
-const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => {
+const CatalogFilters = ({ category, categorySlugProp, autoFilters = [] }: CatalogFiltersProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -148,14 +112,13 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
   const priceMax = searchParams?.get('maxPrice') || "";
 
   // Determine which filters to show:
-  // 1. If Strapi returned filters for this category → use them
-  // 2. Else use per-category fallback
-  // 3. Else use generic fallback
+  // 1. If Strapi returned filters setup specifically for this category → use them (allows manual override)
+  // 2. Else use autoFilters (generated dynamically from products)
   const strapiFilters = category?.filters;
   const filters: StrapiFilter[] =
     strapiFilters && strapiFilters.length > 0
       ? strapiFilters
-      : fallbackFilters[currentCatSlug] || genericFallback;
+      : autoFilters;
 
   const defaultOpen = ["categories", "price", ...filters.map((f) => f.slug)];
 

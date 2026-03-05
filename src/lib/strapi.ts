@@ -370,6 +370,94 @@ export async function getProducts(params: Record<string, unknown> = {}): Promise
     }
 }
 
+/**
+ * Automatically generates filter options based on the available products in a category.
+ * It fetches up to 1000 products to aggregate unique values for filterable attributes.
+ */
+export async function getCategoryFilterOptions(categorySlug?: string): Promise<StrapiFilter[]> {
+    try {
+        const filters: Record<string, unknown> = {};
+        if (categorySlug && categorySlug !== "all") {
+            filters.category = { slug: { $eq: categorySlug } };
+        }
+
+        // Fetch up to 1000 products to find unique attributes
+        const response = await fetchAPI("/products", {
+            filters,
+            pagination: { limit: 1000 },
+            fields: ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country']
+        });
+
+        if (!response?.data || response.data.length === 0) {
+            return [];
+        }
+
+        const products = response.data as StrapiProduct[];
+
+        // Maps to hold unique values for each attribute
+        const attributeValues: Record<string, Set<string>> = {
+            brand: new Set(),
+            volume: new Set(),
+            viscosity: new Set(),
+            oilType: new Set(),
+            approvals: new Set(),
+            type: new Set(),
+            viscosityClass: new Set(),
+            country: new Set(),
+        };
+
+        products.forEach(p => {
+            if (p.brand) attributeValues.brand.add(p.brand);
+            if (p.volume) attributeValues.volume.add(p.volume);
+            if (p.viscosity) attributeValues.viscosity.add(p.viscosity as string);
+            if (p.oilType) attributeValues.oilType.add(p.oilType);
+            if (p.type) attributeValues.type.add(p.type as string);
+            if (p.viscosityClass) attributeValues.viscosityClass.add(p.viscosityClass as string);
+            if (p.country) attributeValues.country.add(p.country as string);
+
+            // Approvals can be comma-separated, try to split them nicely if applicable
+            // For now just add as is, assuming they are neat strings in DB
+            if (p.approvals) {
+                const apps = (p.approvals as string).split(',').map(s => s.trim()).filter(Boolean);
+                apps.forEach(a => attributeValues.approvals.add(a));
+            }
+        });
+
+        const autoFilters: StrapiFilter[] = [];
+        let idCounter = 1;
+
+        const addFilterIfHasOptions = (slug: string, name: string) => {
+            const options = Array.from(attributeValues[slug]).sort();
+            if (options.length > 0) {
+                autoFilters.push({
+                    id: idCounter++,
+                    name,
+                    slug,
+                    type: 'chips',
+                    options
+                });
+            }
+        };
+
+        // Add them in a logical order
+        addFilterIfHasOptions('brand', 'Бренд');
+        addFilterIfHasOptions('volume', 'Объем');
+        addFilterIfHasOptions('viscosity', 'Вязкость');
+        addFilterIfHasOptions('oilType', 'Тип масла');
+        addFilterIfHasOptions('approvals', 'Допуски');
+        addFilterIfHasOptions('type', 'Тип');
+        addFilterIfHasOptions('viscosityClass', 'Класс вязкости');
+        addFilterIfHasOptions('country', 'Страна-производитель');
+
+        return autoFilters;
+
+    } catch (error) {
+        console.error("Failed to generate category filters:", error);
+        return [];
+    }
+}
+
+
 export async function getProductById(id: string): Promise<StrapiProduct | null> {
     try {
         const data = await fetchAPI(`/products/${id}`, {
