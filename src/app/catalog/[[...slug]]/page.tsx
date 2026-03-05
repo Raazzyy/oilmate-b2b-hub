@@ -10,6 +10,7 @@ import {
   getCategoryBySlug,
 } from "@/lib/strapi";
 import CatalogFilters from "@/components/CatalogFilters";
+import MobileFilters from "@/components/MobileFilters";
 
 // Data fetching from Strapi
 async function getProducts(
@@ -119,6 +120,11 @@ export default async function CatalogPage(props: CatalogPageProps) {
             <p className="text-sm text-muted-foreground">
               Найдено товаров: {products.length}
             </p>
+          </div>
+
+          {/* Mobile Filters Trigger (hidden on md) */}
+          <div className="md:hidden mb-6">
+            <MobileFilters category={category} categorySlugProp={categorySlug} />
           </div>
 
           {products.length > 0 ? (
