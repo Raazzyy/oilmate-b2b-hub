@@ -20,6 +20,8 @@ interface CartState {
     getItemQuantity: (productId: number | string) => number;
     getTotalItems: () => number;
     getTotalPrice: () => number;
+    selectedCity: string;
+    setSelectedCity: (city: string) => void;
     setClient: () => void;
 }
 
@@ -29,8 +31,10 @@ export const useCartStore = create<CartState>()(
             items: [],
             isCartOpen: false,
             isClient: false,
+            selectedCity: 'vladivostok',
 
             setIsCartOpen: (isOpen) => set({ isCartOpen: isOpen }),
+            setSelectedCity: (city) => set({ selectedCity: city }),
 
             setClient: () => set({ isClient: true }),
 

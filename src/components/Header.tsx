@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Droplets, Factory, Snowflake, Wrench, Loader2, LayoutGrid, HelpCircle } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, ChevronRight, Droplet, Cog, Droplets, Factory, Snowflake, Wrench, Loader2, LayoutGrid, HelpCircle, MapPin, ChevronDown, Check, Package, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -28,8 +28,13 @@ const getCategoryColor = (slug: string) => {
   return "text-foreground";
 };
 
+const cities = [
+  { id: "vladivostok", name: "Владивосток", description: "Пункт выдачи заказов и доставка по всему Приморскому краю" },
+  { id: "other", name: "Другой город", description: "Доставка заказов через транспортную компанию" },
+];
+
 const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCategory[], navigation?: StrapiNavigationItem[] }) => {
-  const { getTotalItems, setIsCartOpen, isClient, setClient } = useCartStore();
+  const { getTotalItems, setIsCartOpen, isClient, setClient, selectedCity, setSelectedCity } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProductData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -37,6 +42,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isCityOpen, setIsCityOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const catalogRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -160,6 +166,13 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
     router.push(`/catalog/${categoryId}`);
   };
 
+  const handleCitySelect = (cityId: string) => {
+    setSelectedCity(cityId);
+    setIsCityOpen(false);
+  };
+
+  const currentCityName = cities.find(c => c.id === selectedCity)?.name || "Владивосток";
+
   return (
     <>
       {/* Sticky mobile search on scroll */}
@@ -200,34 +213,62 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
         {/* Top navigation - hidden on mobile */}
         <div className="hidden md:block">
           <div className="container">
-            <nav className="flex items-center gap-6 pt-5 pb-0 text-sm">
-              {navigation.length > 0 ? (
-                navigation.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))
-              ) : (
-                ["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
-                  <Link
-                    key={item}
-                    href="#"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {item}
-                  </Link>
-                ))
-              )}
+            <nav className="flex items-center justify-between pt-5 pb-0 text-sm">
+              <div className="flex items-center gap-6">
+                {navigation.length > 0 ? (
+                  navigation.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))
+                ) : (
+                  ["Новости", "Акции", "Оптовикам", "Доставка", "О компании", "Контакты"].map((item) => (
+                    <Link
+                      key={item}
+                      href="#"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop City Selector */}
+              <button
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group"
+                onClick={() => setIsCityOpen(true)}
+              >
+                <MapPin className="h-3.5 w-3.5 text-primary" />
+                <span className="text-sm font-medium">
+                  {currentCityName}
+                </span>
+                <ChevronDown className="h-3.5 w-3.5 group-hover:translate-y-0.5 transition-transform" />
+              </button>
             </nav>
           </div>
         </div>
 
+        {/* Mobile City Selector */}
+        <div className="md:hidden container pt-2 pb-0">
+          <button
+            className="flex items-center gap-1 text-sm text-muted-foreground"
+            onClick={() => setIsCityOpen(true)}
+          >
+            <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span className="font-medium">
+              {currentCityName}
+            </span>
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
         {/* Main header */}
-        <div className="container py-3 md:pb-6 md:pt-5">
+        <div className="container py-3 md:py-4">
           <div className="flex items-center gap-2 md:gap-4">
             {/* Mobile menu button */}
             <Button
@@ -499,6 +540,84 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                   ))
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* City Selection Modal */}
+      {isCityOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setIsCityOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md md:rounded-2xl bg-card rounded-t-2xl md:rounded-2xl overflow-hidden animate-in slide-in-from-bottom md:slide-in-from-bottom-0 md:zoom-in-95 duration-300 shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-border">
+              <h2 className="text-xl font-bold">Выберите город</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-8 w-8 hover:bg-muted"
+                onClick={() => setIsCityOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="p-3 space-y-2">
+              {cities.map((city) => (
+                <button
+                  key={city.id}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left group ${
+                    selectedCity === city.id
+                      ? "bg-primary/10 border-primary/20 border"
+                      : "hover:bg-muted border border-transparent"
+                  }`}
+                  onClick={() => handleCitySelect(city.id)}
+                >
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                    selectedCity === city.id ? "bg-primary/20" : "bg-muted group-hover:bg-primary/10"
+                  }`}>
+                    <MapPin className={`h-6 w-6 ${selectedCity === city.id ? "text-primary" : "text-muted-foreground"}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-base font-bold ${selectedCity === city.id ? "text-primary" : "text-foreground"}`}>
+                        {city.name}
+                      </span>
+                      {selectedCity === city.id && <Check className="h-4 w-4 text-primary" />}
+                    </div>
+                    
+                    <div className="flex flex-col gap-1.5 mt-2">
+                      {city.id === "vladivostok" ? (
+                        <>
+                          <span className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                            <Package className="h-3.5 w-3.5 opacity-70" />
+                            Пункт выдачи
+                          </span>
+                          <span className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                            <Truck className="h-3.5 w-3.5 opacity-70" />
+                            Доставка по городу и Приморскому краю
+                          </span>
+                          <span className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                            <Truck className="h-3.5 w-3.5 opacity-70" />
+                            Доставка до ТК
+                          </span>
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 text-sm text-muted-foreground font-medium">
+                          <Truck className="h-4 w-4 opacity-70" />
+                          Доставка через транспортную компанию
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="p-5 bg-muted/30 border-t border-border mt-1">
+              <p className="text-xs text-muted-foreground text-center">
+                Выбор города влияет на доступные способы доставки при оформлении заказа
+              </p>
             </div>
           </div>
         </div>
