@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
+import BottomNav from "@/components/BottomNav";
 import { getCategories, getNavigationItems } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
@@ -39,9 +40,10 @@ export default async function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Header categories={categories} navigation={navigation} />
-            {children}
+            <main className="pb-[4.25rem] md:pb-0">{children}</main>
           <Footer />
           <CartDrawer />
+          <BottomNav />
           <CookieConsent />
         </Providers>
       </body>
