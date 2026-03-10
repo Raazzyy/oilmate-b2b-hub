@@ -157,27 +157,18 @@ const DEFAULT_SLIDES: HeroSlide[] = [
     {
         id: 1,
         title: "ЦЕНТР\nНИЗКИХ\nЦЕН",
-        subtitle: "Ищите товары со\nспециальным ценником",
-        badge: "Выгодно",
-        buttonText: "Подробнее",
         href: "/catalog/promo",
         gradient: "from-primary via-primary to-accent",
     },
     {
         id: 2,
         title: "НОВИНКИ\nСЕЗОНА",
-        subtitle: "Свежие поступления\nот ведущих брендов",
-        badge: "New",
-        buttonText: "Смотреть",
         href: "/catalog/new",
         gradient: "from-accent via-accent to-primary",
     },
     {
         id: 3,
         title: "СКИДКИ\nДО 30%",
-        subtitle: "На трансмиссионные\nмасла и антифризы",
-        badge: "Sale",
-        buttonText: "К акциям",
         href: "/catalog/promo",
         gradient: "from-primary via-accent to-primary",
     },
@@ -191,12 +182,9 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
             return DEFAULT_SLIDES;
         }
 
-        return data.data.map((item: { id: number; name?: string; title?: string; subtitle?: string; badge?: string; buttonText?: string; href?: string; gradient?: string; image?: StrapiImage }) => ({
+        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage }) => ({
             id: item.id,
             title: item.name || item.title || "",
-            subtitle: item.subtitle,
-            badge: item.badge,
-            buttonText: item.buttonText,
             href: item.href || "/",
             gradient: item.gradient || "from-primary via-primary to-accent",
             backgroundImage: item.image?.url
@@ -313,44 +301,6 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
     }
 }
 
-export interface StrapiSideBanner {
-    title: string;
-    subtitle?: string;
-    buttonText: string;
-    href: string;
-    gradient?: string;
-    backgroundImage?: string;
-}
-
-const DEFAULT_SIDE_BANNER: StrapiSideBanner = {
-    title: "Широкий ассортимент\nмоторных масел",
-    subtitle: "Для легковых и грузовых\nавтомобилей, спецтехники",
-    buttonText: "Смотреть каталог",
-    href: "/catalog/motor",
-    gradient: "from-accent via-accent to-primary/80"
-};
-
-export async function getSideBanner(): Promise<StrapiSideBanner> {
-    try {
-        const data = await fetchAPI("/side-banner", { populate: "*" }, { next: { revalidate: 0 } });
-
-        if (!data?.data || !data.data.title) {
-            return DEFAULT_SIDE_BANNER;
-        }
-
-        return {
-            title: data.data.title || DEFAULT_SIDE_BANNER.title,
-            subtitle: data.data.subtitle || DEFAULT_SIDE_BANNER.subtitle,
-            buttonText: data.data.buttonText || DEFAULT_SIDE_BANNER.buttonText,
-            href: data.data.href || DEFAULT_SIDE_BANNER.href,
-            gradient: data.data.gradient || DEFAULT_SIDE_BANNER.gradient,
-            backgroundImage: data.data.image?.url ? getStrapiMedia(data.data.image.url) : undefined
-        };
-    } catch (error) {
-        console.warn("Failed to fetch side banner from Strapi:", error);
-        return DEFAULT_SIDE_BANNER;
-    }
-}
 
 export async function getProducts(params: Record<string, unknown> = {}): Promise<StrapiResponse<StrapiProduct[]>> {
     try {
