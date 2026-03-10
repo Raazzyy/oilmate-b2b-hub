@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -144,13 +144,22 @@ interface CheckoutFormProps {
 }
 
 const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice, clearCart, selectedCity } = useCartStore();
   const { toast } = useToast();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [customerType, setCustomerType] = useState<CustomerType>("individual");
-  const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>(
+    selectedCity === "vladivostok" ? "pickup" : "shipping"
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-switch delivery type if city changes while on this screen
+  useEffect(() => {
+    if (selectedCity !== "vladivostok" && deliveryType !== "shipping") {
+      setDeliveryType("shipping");
+    }
+  }, [selectedCity, deliveryType]);
 
   // Individual fields
   const [fullName, setFullName] = useState("");
@@ -172,8 +181,14 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const deliveryOptions =
-    customerType === "individual" ? individualDeliveryOptions : businessDeliveryOptions;
+  const deliveryOptions = (
+    customerType === "individual" ? individualDeliveryOptions : businessDeliveryOptions
+  ).filter(opt => {
+    if (selectedCity !== "vladivostok") {
+      return opt.id === "shipping";
+    }
+    return true;
+  });
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
