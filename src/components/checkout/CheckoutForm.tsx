@@ -1,0 +1,728 @@
+"use client";
+
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/store/cart";
+import { useToast } from "@/hooks/use-toast";
+import {
+  MapPin,
+  Truck,
+  Package,
+  Building2,
+  User,
+  ChevronLeft,
+  Clock,
+  CircleCheck,
+  Info,
+  ExternalLink,
+} from "lucide-react";
+
+interface TransportCompany {
+  id: string;
+  name: string;
+  description: string;
+  calcUrl: string;
+  badge?: string;
+}
+
+const transportCompanies: TransportCompany[] = [
+  {
+    id: "kit",
+    name: "ТК Кит",
+    description: "Доставка заказа не более 12 кг — 550 ₽ по большинству направлений РФ",
+    calcUrl: "https://tkkit.ru/calculator",
+    badge: "Дешевле всех",
+  },
+  {
+    id: "cdek",
+    name: "СДЭК",
+    description: "Экспресс-доставка по всей России",
+    calcUrl: "https://www.cdek.ru/ru/calculator",
+  },
+  {
+    id: "dellin",
+    name: "Деловые Линии",
+    description: "Надёжная доставка для крупных грузов",
+    calcUrl: "https://www.dellin.ru/calculator/",
+  },
+  {
+    id: "troika",
+    name: "Тройка ДВ",
+    description: "Доставка по Дальнему Востоку",
+    calcUrl: "https://troikadv.ru",
+  },
+];
+
+type CustomerType = "individual" | "business";
+type DeliveryType = "pickup" | "city" | "shipping";
+
+interface DeliveryDetail {
+  icon?: React.ReactNode;
+  text: string;
+  highlight?: boolean;
+  variant?: "default" | "success" | "warning";
+}
+
+interface DeliveryOption {
+  id: DeliveryType;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  details?: DeliveryDetail[];
+}
+
+const individualDeliveryOptions: DeliveryOption[] = [
+  {
+    id: "pickup",
+    icon: <MapPin className="h-5 w-5" />,
+    title: "ПВЗ «Вмасле»",
+    subtitle: "Самовывоз",
+    details: [
+      { icon: <MapPin className="h-3.5 w-3.5" />, text: "г. Владивосток, Некрасовская 69 стр 1" },
+      { icon: <Clock className="h-3.5 w-3.5" />, text: "Пн–Пт: 10:00–18:00 · Сб, Вс — выходной" },
+      { text: "Заказ будет доставлен завтра", highlight: true },
+    ],
+  },
+  {
+    id: "city",
+    icon: <Truck className="h-5 w-5" />,
+    title: "Доставка по городу",
+    subtitle: "По вашему адресу",
+    details: [
+      { text: "Заказ будет доставлен завтра", highlight: true },
+      { icon: <CircleCheck className="h-3.5 w-3.5" />, text: "Бесплатная доставка", variant: "success" },
+    ],
+  },
+  {
+    id: "shipping",
+    icon: <Package className="h-5 w-5" />,
+    title: "Транспортной компанией",
+    subtitle: "Отправка по России",
+  },
+];
+
+const businessDeliveryOptions: DeliveryOption[] = [
+  {
+    id: "pickup",
+    icon: <MapPin className="h-5 w-5" />,
+    title: "ПВЗ «Вмасле»",
+    subtitle: "Самовывоз",
+    details: [
+      { icon: <MapPin className="h-3.5 w-3.5" />, text: "г. Владивосток, Некрасовская 69 стр 1" },
+      { icon: <Clock className="h-3.5 w-3.5" />, text: "Пн–Пт: 10:00–18:00 · Сб, Вс — выходной" },
+      { text: "Заказ будет доставлен завтра", highlight: true },
+      {
+        icon: <Info className="h-3.5 w-3.5" />,
+        text: "Самовывоз доступен только для фасовки до 20 л. Бочки 200 л доступны только для доставки по городу и до транспортной компании",
+        variant: "warning",
+      },
+    ],
+  },
+  {
+    id: "city",
+    icon: <Truck className="h-5 w-5" />,
+    title: "Доставка по городу",
+    subtitle: "По адресу вашей компании",
+    details: [
+      { text: "Заказ будет доставлен завтра", highlight: true },
+      { icon: <CircleCheck className="h-3.5 w-3.5" />, text: "Бесплатная доставка", variant: "success" },
+    ],
+  },
+  {
+    id: "shipping",
+    icon: <Package className="h-5 w-5" />,
+    title: "Доставка по России",
+    subtitle: "Транспортной компанией",
+  },
+];
+
+interface CheckoutFormProps {
+  onBack: () => void;
+  onComplete: () => void;
+}
+
+const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
+  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { toast } = useToast();
+
+  const [step, setStep] = useState<1 | 2>(1);
+  const [customerType, setCustomerType] = useState<CustomerType>("individual");
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>("pickup");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Individual fields
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+
+  // Business fields
+  const [inn, setInn] = useState("");
+  const [email, setEmail] = useState("");
+  const [bizPhone, setBizPhone] = useState("");
+  const [bizAddress, setBizAddress] = useState("");
+  const [bizCity, setBizCity] = useState("");
+
+  const [selectedTC, setSelectedTC] = useState<string>("kit");
+  const [customTCName, setCustomTCName] = useState("");
+
+  const [comment, setComment] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const deliveryOptions =
+    customerType === "individual" ? individualDeliveryOptions : businessDeliveryOptions;
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (customerType === "individual") {
+      if (!fullName.trim() || fullName.trim().length < 2)
+        newErrors.fullName = "Введите ФИО";
+      if (!phone.trim() || phone.trim().length < 10)
+        newErrors.phone = "Введите номер телефона";
+      if (deliveryType === "city" && !address.trim())
+        newErrors.address = "Введите адрес доставки";
+      if (deliveryType === "shipping" && !city.trim())
+        newErrors.city = "Введите город";
+      if (
+        deliveryType === "shipping" &&
+        selectedTC === "custom" &&
+        !customTCName.trim()
+      )
+        newErrors.customTC = "Введите название ТК";
+    } else {
+      if (!inn.trim() || (inn.trim().length !== 10 && inn.trim().length !== 12))
+        newErrors.inn = "ИНН должен содержать 10 или 12 цифр";
+      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        newErrors.email = "Введите корректный email";
+      if (!bizPhone.trim() || bizPhone.trim().length < 10)
+        newErrors.bizPhone = "Введите номер телефона";
+      if (deliveryType === "city" && !bizAddress.trim())
+        newErrors.bizAddress = "Введите адрес доставки";
+      if (deliveryType === "shipping" && !bizCity.trim())
+        newErrors.bizCity = "Введите город";
+    }
+
+    if (!privacyAccepted) newErrors.privacy = "Необходимо согласие";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    const tcName =
+      selectedTC === "custom"
+        ? customTCName
+        : transportCompanies.find((tc) => tc.id === selectedTC)?.name || selectedTC;
+
+    const deliveryLabel =
+      deliveryType === "pickup"
+        ? "Самовывоз (г. Владивосток, Некрасовская 69 стр 1)"
+        : deliveryType === "city"
+        ? "Доставка по городу"
+        : `Доставка по России (${tcName})`;
+
+    const orderData = {
+      name: customerType === "individual" ? fullName : `Юр. лицо (ИНН: ${inn})`,
+      phone: customerType === "individual" ? phone : bizPhone,
+      email: customerType === "business" ? email : "",
+      inn: customerType === "business" ? inn : undefined,
+      city:
+        customerType === "individual"
+          ? deliveryType === "shipping"
+            ? city
+            : undefined
+          : deliveryType === "shipping"
+          ? bizCity
+          : undefined,
+      address:
+        customerType === "individual"
+          ? deliveryType === "city"
+            ? address
+            : undefined
+          : deliveryType === "city"
+          ? bizAddress
+          : undefined,
+      deliveryType: deliveryType === "pickup" ? ("pickup" as const) : ("delivery" as const),
+      comment: [
+        `Тип клиента: ${customerType === "individual" ? "Физ. лицо" : "Юр. лицо"}`,
+        `Способ доставки: ${deliveryLabel}`,
+        comment ? `Комментарий: ${comment}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      items: items.map((item) => ({
+        name: item.product.name,
+        volume: item.product.volume,
+        quantity: item.quantity,
+        price: item.product.price,
+      })),
+      totalPrice: getTotalPrice(),
+    };
+
+    try {
+      const response = await fetch("/api/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order: orderData }),
+      });
+
+      setIsSubmitting(false);
+
+      if (response.ok) {
+        onComplete();
+        toast({
+          title: "Заказ оформлен!",
+          description: "Мы свяжемся с вами в ближайшее время",
+        });
+        setTimeout(() => clearCart(), 2000);
+      } else {
+        toast({
+          title: "Ошибка отправки",
+          description: "Не удалось отправить заказ. Попробуйте позже.",
+          variant: "destructive",
+        });
+      }
+    } catch {
+      setIsSubmitting(false);
+      toast({
+        title: "Ошибка",
+        description: "Что-то пошло не так.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const renderField = (
+    label: string,
+    value: string,
+    onChange: (v: string) => void,
+    errorKey: string,
+    placeholder: string,
+    type = "text",
+    maxLength?: number
+  ) => (
+    <div>
+      <label className="text-sm font-medium mb-1.5 block text-foreground">{label}</label>
+      <Input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          if (errors[errorKey]) setErrors((p) => ({ ...p, [errorKey]: "" }));
+        }}
+        className={errors[errorKey] ? "border-destructive" : ""}
+        maxLength={maxLength}
+      />
+      {errors[errorKey] && (
+        <p className="text-xs text-destructive mt-1">{errors[errorKey]}</p>
+      )}
+    </div>
+  );
+
+  const handleSelectType = (type: CustomerType) => {
+    setCustomerType(type);
+    setDeliveryType("pickup");
+    setStep(2);
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 pt-2 pb-3 border-b border-border">
+        <button
+          onClick={step === 1 ? onBack : () => setStep(1)}
+          className="p-1 -ml-1 rounded-lg hover:bg-muted transition-colors"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <h2 className="text-lg font-semibold">
+          {step === 1
+            ? "Оформление заказа"
+            : customerType === "individual"
+            ? "Физическое лицо"
+            : "Юридическое лицо"}
+        </h2>
+      </div>
+
+      {step === 1 ? (
+        /* Step 1: Customer type selection */
+        <div className="flex-1 overflow-y-auto px-6 pb-6 pt-5">
+          <p className="text-sm text-muted-foreground mb-5">Выберите тип покупателя</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => handleSelectType("individual")}
+              className="w-full flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary hover:bg-primary/5 transition-all text-left group"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-muted group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center shrink-0 transition-all">
+                <User className="h-7 w-7" />
+              </div>
+              <div>
+                <div className="text-base font-semibold text-foreground">Физическое лицо</div>
+                <div className="text-sm text-muted-foreground mt-0.5">
+                  Покупка для личного использования
+                </div>
+              </div>
+              <ChevronLeft className="h-5 w-5 ml-auto rotate-180 text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              onClick={() => handleSelectType("business")}
+              className="w-full flex items-center gap-4 p-5 rounded-2xl border border-border hover:border-primary hover:bg-primary/5 transition-all text-left group"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-muted group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center shrink-0 transition-all">
+                <Building2 className="h-7 w-7" />
+              </div>
+              <div>
+                <div className="text-base font-semibold text-foreground">Юридическое лицо</div>
+                <div className="text-sm text-muted-foreground mt-0.5">
+                  Покупка для компании с запросом счёта и закрывающими документами
+                </div>
+              </div>
+              <ChevronLeft className="h-5 w-5 ml-auto rotate-180 text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+          </div>
+
+          {/* Order summary */}
+          <div className="bg-muted rounded-xl p-4 mt-6">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-muted-foreground">
+                {items.length}{" "}
+                {items.length === 1 ? "товар" : items.length < 5 ? "товара" : "товаров"}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-foreground">Итого</span>
+              <span className="text-xl font-bold text-foreground">
+                {getTotalPrice().toLocaleString()} ₽
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Step 2: Delivery & contact form */
+        <>
+          <div className="flex-1 overflow-y-auto px-6 pb-6 pt-5">
+            {/* Delivery options */}
+            <div className="mb-5">
+              <h3 className="text-sm font-semibold mb-3 text-foreground">Способ получения</h3>
+              <div className="space-y-2">
+                {deliveryOptions.map((opt) => (
+                  <div key={opt.id}>
+                    <div
+                      onClick={() => setDeliveryType(opt.id)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && setDeliveryType(opt.id)}
+                      className={`w-full flex items-start gap-3 p-3.5 rounded-xl border transition-all text-left cursor-pointer ${
+                        deliveryType === opt.id
+                          ? "border-primary bg-primary/5 ring-1 ring-primary"
+                          : "border-border hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                          deliveryType === opt.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {opt.icon}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-foreground">{opt.title}</div>
+                        <div className="text-xs text-muted-foreground">{opt.subtitle}</div>
+                        {deliveryType === opt.id && opt.details && (
+                          <div className="mt-2.5 space-y-1.5 pt-2.5 border-t border-border/50">
+                            {opt.details.map((detail, i) => (
+                              <div
+                                key={i}
+                                className={`flex items-center gap-2 text-xs ${
+                                  detail.variant === "success"
+                                    ? "text-green-600 font-medium"
+                                    : detail.variant === "warning"
+                                    ? "text-muted-foreground"
+                                    : detail.highlight
+                                    ? "text-primary font-semibold text-sm"
+                                    : "text-muted-foreground"
+                                }`}
+                              >
+                                {detail.icon && <span className="shrink-0">{detail.icon}</span>}
+                                <span>{detail.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* TC selection inside shipping block */}
+                        {opt.id === "shipping" &&
+                          deliveryType === "shipping" &&
+                          customerType === "individual" && (
+                            <div
+                              className="mt-3 space-y-1.5 pt-3 border-t border-border/50"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div className="text-xs font-medium text-foreground mb-1.5">
+                                Выберите ТК
+                              </div>
+                              {transportCompanies.map((tc) => (
+                                <button
+                                  key={tc.id}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedTC(tc.id);
+                                  }}
+                                  className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left bg-background ${
+                                    selectedTC === tc.id
+                                      ? "border-primary ring-1 ring-primary"
+                                      : "border-border/60 hover:border-muted-foreground/30"
+                                  }`}
+                                >
+                                  <div
+                                    className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                      selectedTC === tc.id
+                                        ? "border-primary"
+                                        : "border-muted-foreground/30"
+                                    }`}
+                                  >
+                                    {selectedTC === tc.id && (
+                                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs font-medium text-foreground">
+                                        {tc.name}
+                                      </span>
+                                      {tc.badge && (
+                                        <span className="text-[10px] font-semibold text-green-700 bg-green-100 border border-green-300 rounded-full px-2 py-0.5 leading-none">
+                                          {tc.badge}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                                      {tc.description}
+                                    </div>
+                                    <a
+                                      href={tc.calcUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 mt-1 underline underline-offset-2"
+                                    >
+                                      Рассчитать стоимость
+                                      <ExternalLink className="h-2.5 w-2.5" />
+                                    </a>
+                                  </div>
+                                </button>
+                              ))}
+
+                              {/* Custom TC */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedTC("custom");
+                                }}
+                                className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left bg-background ${
+                                  selectedTC === "custom"
+                                    ? "border-primary ring-1 ring-primary"
+                                    : "border-border/60 hover:border-muted-foreground/30"
+                                }`}
+                              >
+                                <div
+                                  className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                    selectedTC === "custom"
+                                      ? "border-primary"
+                                      : "border-muted-foreground/30"
+                                  }`}
+                                >
+                                  {selectedTC === "custom" && (
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs font-medium text-foreground mb-1">
+                                    Другая ТК
+                                  </div>
+                                  {selectedTC === "custom" ? (
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                      <Input
+                                        placeholder="Название транспортной компании"
+                                        value={customTCName}
+                                        onChange={(e) => {
+                                          setCustomTCName(e.target.value);
+                                          if (errors.customTC)
+                                            setErrors((p) => ({ ...p, customTC: "" }));
+                                        }}
+                                        className={`h-8 text-xs ${
+                                          errors.customTC ? "border-destructive" : ""
+                                        }`}
+                                      />
+                                      {errors.customTC && (
+                                        <p className="text-[11px] text-destructive mt-1">
+                                          {errors.customTC}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="text-[11px] text-muted-foreground">
+                                      Укажите свою транспортную компанию
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            </div>
+                          )}
+                      </div>
+                      <div
+                        className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          deliveryType === opt.id
+                            ? "border-primary"
+                            : "border-muted-foreground/30"
+                        }`}
+                      >
+                        {deliveryType === opt.id && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact fields */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground">
+                {customerType === "individual" ? "Данные получателя" : "Данные компании"}
+              </h3>
+
+              {customerType === "individual" ? (
+                <>
+                  {renderField("ФИО", fullName, setFullName, "fullName", "Иванов Иван Иванович")}
+                  {renderField("Телефон", phone, setPhone, "phone", "+7 (999) 123-45-67", "tel")}
+                  {deliveryType === "city" &&
+                    renderField(
+                      "Адрес доставки",
+                      address,
+                      setAddress,
+                      "address",
+                      "ул. Примерная, д. 1, кв. 10"
+                    )}
+                  {deliveryType === "shipping" &&
+                    renderField("Город", city, setCity, "city", "Москва")}
+                </>
+              ) : (
+                <>
+                  {renderField("ИНН", inn, setInn, "inn", "1234567890", "text", 12)}
+                  {renderField("Email", email, setEmail, "email", "company@example.com", "email")}
+                  {renderField(
+                    "Телефон",
+                    bizPhone,
+                    setBizPhone,
+                    "bizPhone",
+                    "+7 (999) 123-45-67",
+                    "tel"
+                  )}
+                  {deliveryType === "city" &&
+                    renderField(
+                      "Адрес доставки",
+                      bizAddress,
+                      setBizAddress,
+                      "bizAddress",
+                      "ул. Примерная, д. 1"
+                    )}
+                  {deliveryType === "shipping" &&
+                    renderField("Город", bizCity, setBizCity, "bizCity", "Москва")}
+                </>
+              )}
+
+              {/* Comment */}
+              <div>
+                <label className="text-sm font-medium mb-1.5 block text-foreground">
+                  Комментарий
+                </label>
+                <Textarea
+                  placeholder="Дополнительная информация..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="resize-none"
+                  rows={2}
+                />
+              </div>
+            </div>
+
+            {/* Order summary */}
+            <div className="bg-muted rounded-xl p-4 mt-5">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm text-muted-foreground">
+                  {items.length}{" "}
+                  {items.length === 1 ? "товар" : items.length < 5 ? "товара" : "товаров"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-foreground">Итого</span>
+                <span className="text-xl font-bold text-foreground">
+                  {getTotalPrice().toLocaleString()} ₽
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Privacy consent & Submit */}
+          <div className="px-6 pb-6 pt-4 border-t border-border space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={privacyAccepted}
+                onChange={(e) => {
+                  setPrivacyAccepted(e.target.checked);
+                  if (errors.privacy) setErrors((p) => ({ ...p, privacy: "" }));
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-border accent-primary shrink-0"
+              />
+              <span
+                className={`text-xs leading-relaxed ${
+                  errors.privacy ? "text-destructive" : "text-muted-foreground"
+                }`}
+              >
+                Согласен с{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  className="text-primary underline underline-offset-2 hover:text-primary/80"
+                >
+                  политикой конфиденциальности
+                </a>{" "}
+                и обработки персональных данных
+              </span>
+            </label>
+            <Button
+              className="w-full h-12 gradient-primary hover:gradient-primary-hover text-primary-foreground font-semibold rounded-full"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? "Отправляем..."
+                : customerType === "individual"
+                ? "Оплатить заказ"
+                : "Запросить счёт на оплату"}
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CheckoutForm;
