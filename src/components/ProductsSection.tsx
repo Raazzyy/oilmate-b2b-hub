@@ -10,10 +10,10 @@ interface ProductsSectionProps {
 
 const ProductsSection = ({ products, title = "Популярные товары" }: ProductsSectionProps) => {
   return (
-    <section className="py-6 md:py-10 bg-card">
+    <section className="py-3 md:py-5 bg-card">
       <div className="container">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             {title}
           </h2>
         </div>
