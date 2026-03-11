@@ -90,6 +90,7 @@ export interface StrapiImage {
 export interface StrapiProduct {
     id: number;
     documentId: string;
+    sku?: string;
     name: string;
     brand?: string;
     volume?: string;
@@ -127,6 +128,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
     return {
         id: item.id,
         documentId: item.documentId,
+        sku: item.sku,
         name: item.name,
         brand: item.brand || "",
         volume: item.volume || "",

@@ -5,6 +5,7 @@ const oilProductImage = "/oil-product.png";
 export interface ProductData {
   id: number | string;
   documentId?: string;
+  sku?: string;
   name: string;
   brand: string;
   volume: string;
