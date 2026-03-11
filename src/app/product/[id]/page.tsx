@@ -247,7 +247,38 @@ export default async function ProductPage(props: ProductPageProps) {
             </div>
 
             {/* Controls — quantity + cart */}
-            <ProductDetailControls product={product} />
+            <div className="mb-8">
+              <ProductDetailControls product={product} />
+            </div>
+
+            {/* Official Supplier Block */}
+            {product.supplierName && (
+              <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-muted/60 mb-8 border border-border/50">
+                {product.supplierLogo ? (
+                  <div className="w-12 h-12 flex-shrink-0 relative rounded-xl overflow-hidden bg-white border border-border">
+                    <img 
+                      src={typeof product.supplierLogo === 'string' ? product.supplierLogo : (product.supplierLogo as any)?.src || ''} 
+                      alt={product.supplierName}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 flex-shrink-0 rounded-xl bg-white border border-border flex items-center justify-center font-bold text-lg text-foreground">
+                    {product.supplierName.charAt(0)}
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-foreground">
+                    {product.supplierName}
+                  </span>
+                  {product.supplierDescription && (
+                    <span className="text-xs text-muted-foreground mt-0.5">
+                      {product.supplierDescription}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Characteristics */}
             <div className="space-y-4">

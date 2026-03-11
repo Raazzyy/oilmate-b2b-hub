@@ -91,6 +91,9 @@ export interface StrapiProduct {
     id: number;
     documentId: string;
     sku?: string;
+    supplierName?: string;
+    supplierDescription?: string;
+    supplierLogo?: StrapiImage;
     name: string;
     brand?: string;
     volume?: string;
@@ -129,6 +132,9 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         id: item.id,
         documentId: item.documentId,
         sku: item.sku,
+        supplierName: item.supplierName,
+        supplierDescription: item.supplierDescription,
+        supplierLogo: getStrapiMedia(item.supplierLogo?.url),
         name: item.name,
         brand: item.brand || "",
         volume: item.volume || "",
@@ -418,6 +424,7 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
             populate: {
                 image: true,
                 images: true,
+                supplierLogo: true,
                 category: true,
                 seo: {
                     populate: "*"
