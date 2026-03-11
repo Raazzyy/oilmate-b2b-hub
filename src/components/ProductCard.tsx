@@ -54,8 +54,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
       {/* Clickable area for product page */}
       <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container */}
-        <div className="relative mb-3">
-          <div className="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
+        <div className="relative mb-2">
+          <div className="aspect-[4/4.5] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
             <Image
               src={imageSrc}
               alt={name}
@@ -75,29 +75,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </div>
 
-        {/* Name - fixed height for alignment */}
-        <h3 className="line-clamp-2 text-sm font-medium text-foreground leading-snug mb-1 h-10 group-hover:text-primary transition-colors pr-3">
+        {/* Name */}
+        <h3 className="line-clamp-2 text-xs font-medium text-foreground leading-snug mb-1 h-8 group-hover:text-primary transition-colors pr-2">
           {name}
         </h3>
         
-        {/* Volume and parameters inline - fixed height */}
-        <p className="text-xs text-muted-foreground mb-1 line-clamp-1 pr-3">
+        {/* Specs */}
+        <p className="text-[11px] text-muted-foreground mb-1 line-clamp-1 pr-2">
           {getSpecsLine()}
         </p>
       </Link>
 
-      {/* Spacer to push price and button to bottom */}
-      <div className="mt-auto pb-3">
-        {/* Price Row — all inline */}
-        <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 pr-3">
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 rounded-md' : ''}`}>
-            <span className={`text-lg font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+      {/* Price & button */}
+      <div className="mt-auto pb-2">
+        <div className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 pr-2">
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-1.5 py-0.5 rounded-md' : ''}`}>
+            <span className={`text-base font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")} ₽
             </span>
           </div>
           
           {oldPrice && (
-            <span className="text-sm text-muted-foreground line-through decoration-muted-foreground/50 whitespace-nowrap">
+            <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50 whitespace-nowrap">
               {oldRubles?.toLocaleString("ru-RU")} ₽
             </span>
           )}

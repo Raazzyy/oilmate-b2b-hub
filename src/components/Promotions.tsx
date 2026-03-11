@@ -29,10 +29,10 @@ const Promotions = ({ promotions }: PromotionsProps) => {
   if (!promotions || promotions.length === 0) return null;
 
   return (
-    <section className="py-6 md:py-10 bg-background">
+    <section className="py-3 md:py-5 bg-background">
       <div className="container">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-foreground">Акции и предложения</h2>
+          <h2 className="text-xl font-semibold text-foreground">Акции и предложения</h2>
         </div>
 
         <Carousel
