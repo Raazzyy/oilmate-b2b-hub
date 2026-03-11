@@ -150,6 +150,14 @@ export default async function ProductPage(props: ProductPageProps) {
           <Link href="/catalog" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
             Каталог
           </Link>
+          {product.category && categoryNames[product.category] && (
+            <>
+              <span className="opacity-40 text-xs">/</span>
+              <Link href={`/catalog/${product.category}`} className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
+                {categoryNames[product.category]}
+              </Link>
+            </>
+          )}
           <span className="opacity-40 text-xs">/</span>
           <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">{product.name}</span>
         </nav>
