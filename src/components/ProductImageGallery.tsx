@@ -26,9 +26,9 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
   const currentImage = gallery[selectedIndex] || mainImageUrl;
 
   return (
-    <div className="flex flex-col gap-4 md:sticky md:top-28">
+    <div className="flex flex-col gap-4">
       {/* Main large image */}
-      <div className="relative aspect-square bg-white rounded-2xl border border-border p-8 flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[4/4.5] md:aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center overflow-hidden">
         <Image
           key={currentImage}
           src={currentImage}
@@ -36,14 +36,14 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
           fill
           priority
           className={cn(
-            "object-contain transition-opacity duration-300",
+            "object-cover transition-opacity duration-300",
             isLoading ? "opacity-0" : "opacity-100"
           )}
           onLoad={() => setIsLoading(false)}
           sizes="(max-width: 768px) 100vw, 40vw"
         />
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-transparent z-10">
             <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           </div>
         )}
@@ -60,17 +60,17 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
                 setSelectedIndex(index);
               }}
               className={cn(
-                "relative h-20 w-20 rounded-xl border-2 bg-white p-2 flex-shrink-0 transition-all overflow-hidden",
+                "relative h-20 w-20 rounded-xl border-2 bg-gradient-to-br from-muted to-muted/50 flex-shrink-0 transition-all overflow-hidden",
                 selectedIndex === index
                   ? "border-primary shadow-sm"
-                  : "border-transparent hover:border-gray-200"
+                  : "border-transparent hover:border-primary/50"
               )}
             >
               <Image
                 src={img}
                 alt={`${name} — фото ${index + 1}`}
                 fill
-                className="object-contain p-2"
+                className="object-cover"
                 sizes="80px"
               />
             </button>
