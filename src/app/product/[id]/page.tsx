@@ -257,7 +257,7 @@ export default async function ProductPage(props: ProductPageProps) {
                 {product.supplierLogo ? (
                   <div className="w-12 h-12 flex-shrink-0 relative rounded-xl overflow-hidden bg-white border border-border">
                     <img 
-                      src={typeof product.supplierLogo === 'string' ? product.supplierLogo : (product.supplierLogo as any)?.src || ''} 
+                      src={typeof product.supplierLogo === 'string' ? product.supplierLogo : (product.supplierLogo as { src: string })?.src || ''} 
                       alt={product.supplierName}
                       className="object-cover w-full h-full"
                     />
