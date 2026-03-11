@@ -378,7 +378,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                           <button
                             key={product.id}
                             className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
-                            onClick={() => handleProductClick(product.id)}
+                            onClick={() => handleProductClick(product.documentId || product.id)}
                           >
                             <div className="relative w-10 h-10 md:w-12 md:h-12 bg-muted rounded-lg overflow-hidden shrink-0">
                                 <Image 

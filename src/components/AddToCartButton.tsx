@@ -30,12 +30,17 @@ const AddToCartButton = ({ product, className, quantity = 1 }: AddToCartButtonPr
     setTimeout(() => setAdded(false), 1500);
   };
 
+  const isOutOfStock = product.stock !== undefined ? product.stock <= 0 : product.inStock === false;
+
   return (
     <Button 
       variant="ghost" 
+      disabled={isOutOfStock}
       className={`w-full rounded-xl font-medium h-10 transition-all ${
         added 
           ? "bg-green-100 text-green-700 hover:bg-green-100" 
+          : isOutOfStock
+          ? "bg-red-50 text-red-400 cursor-not-allowed"
           : "bg-muted hover:bg-primary hover:text-primary-foreground"
       } ${className || ''}`}
       onClick={handleAddToCart}
@@ -45,6 +50,8 @@ const AddToCartButton = ({ product, className, quantity = 1 }: AddToCartButtonPr
           <Check className="h-4 w-4 mr-1" />
           Добавлено
         </>
+      ) : isOutOfStock ? (
+        "Нет в наличии"
       ) : (
         "В корзину"
       )}

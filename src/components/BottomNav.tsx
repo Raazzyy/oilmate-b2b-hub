@@ -60,7 +60,7 @@ const BottomNav = () => {
                     item.active && "stroke-[2.5]"
                   )}
                 />
-                {item.badge && item.badge > 0 && (
+                {item.badge > 0 && (
                   <span className="absolute -right-2.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>

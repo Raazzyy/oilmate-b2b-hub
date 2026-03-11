@@ -41,18 +41,36 @@ export const useCartStore = create<CartState>()(
             addToCart: (product, quantity = 1) => {
                 set((state) => {
                     const existingItem = state.items.find((item) => item.product.id === product.id);
+                    const currentQty = existingItem ? existingItem.quantity : 0;
+                    const newQty = currentQty + quantity;
+
+                    // Enforce stock limit if stock is defined
+                    if (product.stock !== undefined && newQty > product.stock) {
+                        const availableToAdd = product.stock - currentQty;
+                        if (availableToAdd <= 0) return state; // Already at limit
+
+                        return {
+                            items: state.items.map((item) =>
+                                item.product.id === product.id
+                                    ? { ...item, quantity: product.stock! }
+                                    : item
+                            ),
+                            isCartOpen: true,
+                        };
+                    }
+
                     if (existingItem) {
                         return {
                             items: state.items.map((item) =>
                                 item.product.id === product.id
-                                    ? { ...item, quantity: item.quantity + quantity }
+                                    ? { ...item, quantity: newQty }
                                     : item
                             ),
-                            isCartOpen: true, // Auto-open cart on add
+                            isCartOpen: true,
                         };
                     }
                     return {
-                        items: [...state.items, { product, quantity }],
+                        items: [...state.items, { product, quantity: Math.min(quantity, product.stock ?? 999999) }],
                         isCartOpen: true,
                     };
                 });
@@ -71,6 +89,12 @@ export const useCartStore = create<CartState>()(
                             items: state.items.filter((item) => item.product.id !== productId),
                         };
                     }
+
+                    const item = state.items.find(i => i.product.id === productId);
+                    if (item && item.product.stock !== undefined && quantity > item.product.stock) {
+                        quantity = item.product.stock;
+                    }
+
                     return {
                         items: state.items.map((item) =>
                             item.product.id === productId ? { ...item, quantity } : item
