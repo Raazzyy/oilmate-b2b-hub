@@ -33,6 +33,7 @@ const ProductDetailControls = ({ product }: ProductDetailControlsProps) => {
           size="icon"
           className="h-8 w-8 rounded-lg hover:bg-muted font-bold"
           onClick={increaseQty}
+          disabled={product.stock !== undefined && quantity >= product.stock}
         >
           <Plus className="h-4 w-4" />
         </Button>

@@ -274,6 +274,8 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
         .filter(Boolean)
         .join("\n"),
       items: items.map((item) => ({
+        documentId: item.product.documentId,
+        id: item.product.id,
         name: item.product.name,
         volume: item.product.volume,
         quantity: item.quantity,

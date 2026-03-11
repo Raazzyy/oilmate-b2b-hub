@@ -99,6 +99,7 @@ export interface StrapiProduct {
     images?: StrapiImage[];
     description?: string;
     inStock?: boolean;
+    stock?: number;
     oilType?: string;
     isUniversal?: boolean;
     category?: {
@@ -135,6 +136,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         images: item.images?.map(img => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
         description: item.description,
         inStock: item.inStock ?? true,
+        stock: item.stock,
         oilType: item.oilType || "",
         isUniversal: item.isUniversal,
         category: item.category?.slug || "all",

@@ -14,6 +14,7 @@ export interface ProductData {
   images?: string[];
   description?: string;
   inStock: boolean;
+  stock?: number;
   oilType: string;
   isUniversal?: boolean;
   category: string;
@@ -34,6 +35,7 @@ export interface ProductData {
 export const allProducts: ProductData[] = [
   {
     id: 1,
+    documentId: 'o4i9ovouhkd9hg7n6y5l2sgn',
     name: "Shell Helix Ultra 5W-40 синтетическое",
     brand: "Shell",
     volume: "4 л",
@@ -49,6 +51,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 2,
+    documentId: 'rm19rnrpls04svcj1b9pa0tw',
     name: "Mobil 1 ESP Formula 5W-30 синтетическое",
     brand: "Mobil",
     volume: "4 л",
@@ -63,6 +66,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 3,
+    documentId: 'un83efg2pd5nckm1v27hqp2m',
     name: "Castrol EDGE 5W-30 LL синтетическое",
     brand: "Castrol",
     volume: "4 л",
@@ -78,6 +82,7 @@ export const allProducts: ProductData[] = [
   {
     id: 4,
     name: "Лукойл Genesis Armortech 5W-40",
+    documentId: 'acshi1drevbe64gkmvkrxeau',
     brand: "Лукойл",
     volume: "4 л",
     price: 1890,
@@ -92,6 +97,7 @@ export const allProducts: ProductData[] = [
   {
     id: 5,
     name: "Total Quartz INEO ECS 5W-30",
+    documentId: 'm4pooi13rw05uobxded1cmxh',
     brand: "Total",
     volume: "5 л",
     price: 4299,
@@ -106,6 +112,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 6,
+    documentId: 'f7rllxdiefx446ov4fj48vbr',
     name: "Mannol Extra Getriebeoel 75W-90",
     brand: "Mannol",
     volume: "1 л",
@@ -120,6 +127,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 7,
+    documentId: 'gmqi61qyd3bor4myjxbx7haw',
     name: "Liqui Moly Hypoid GL5 75W-90",
     brand: "Liqui Moly",
     volume: "1 л",
@@ -134,6 +142,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 8,
+    documentId: 'k8f4thpocvuo45ae7re0f4dh',
     name: "Shell Spirax S6 AXME 75W-90",
     brand: "Shell",
     volume: "1 л",
@@ -148,6 +157,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 9,
+    documentId: 'pje5u2p94of5wyf3ivufa12h',
     name: "Mobil ATF 3309",
     brand: "Mobil",
     volume: "1 л",
@@ -161,6 +171,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 10,
+    documentId: 'lhjr56mc91tazcxr9w6u5etm',
     name: "Fuchs Renolin B 46 HVI",
     brand: "Fuchs",
     volume: "20 л",
@@ -174,6 +185,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 11,
+    documentId: 'jjyoo65ld0nisf3l3cwalcbi',
     name: "Felix Prolonger G12+ красный",
     brand: "Felix",
     volume: "5 л",
@@ -189,6 +201,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 12,
+    documentId: 'a0mm5ovd489s5lx6ixae084x',
     name: "Sintec Antifreeze Ultra G11 зеленый",
     brand: "Sintec",
     volume: "5 л",
@@ -205,6 +218,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 13,
+    documentId: 'ss2o599ztwxxphfnn4f3e8z3',
     name: "Liqui Moly LM 47 Langzeitfett + MoS2",
     brand: "Liqui Moly",
     volume: "400 г",
@@ -218,6 +232,7 @@ export const allProducts: ProductData[] = [
   },
   {
     id: 14,
+    documentId: 'z5cv8fvzqc4hjn3kjk37fsn6',
     name: "Shell Argina S3 40",
     brand: "Shell",
     volume: "20 л",
