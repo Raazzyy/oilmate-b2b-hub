@@ -141,7 +141,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
             </h1>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-3 gap-y-8">
             {categories.map((cat) => {
               const IconComponent = getCategoryIcon(cat.slug || '');
               const iconColor = getCategoryColor(cat.slug || '');
@@ -149,22 +149,28 @@ export default async function CatalogPage(props: CatalogPageProps) {
                 <Link
                   key={cat.id}
                   href={`/catalog/${cat.slug}`}
-                  className="group flex flex-col items-center text-center p-4 md:p-6 border border-border rounded-styled bg-card hover:bg-muted/50 transition-colors shadow-sm hover:shadow-md"
+                  className="group flex flex-col items-center text-center gap-3 transition-transform duration-200 hover:-translate-y-0.5"
                 >
-                  <div className="mb-3 relative h-20 w-20 md:h-28 md:w-28 rounded-2xl bg-muted/30 overflow-hidden flex items-center justify-center transition-transform group-hover:scale-105">
+                  {/* Full-width square container — adapts to any column width */}
+                  <div className="w-full aspect-square rounded-2xl bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center transition-all duration-200 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 group-hover:shadow-md">
                     {cat.image?.url ? (
-                      <Image
-                        src={getStrapiMedia(cat.image.url) as string}
-                        alt={cat.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 80px, 112px"
-                      />
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={getStrapiMedia(cat.image.url) as string}
+                          alt={cat.name}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 45vw, (max-width: 768px) 30vw, (max-width: 1024px) 22vw, 18vw"
+                        />
+                      </div>
                     ) : (
-                      <IconComponent className={`h-8 w-8 md:h-12 md:w-12 ${iconColor}`} strokeWidth={1.5} />
+                      <IconComponent
+                        className={`h-10 w-10 md:h-14 md:w-14 transition-transform duration-300 group-hover:scale-110 ${iconColor}`}
+                        strokeWidth={1.5}
+                      />
                     )}
                   </div>
-                  <span className="text-sm md:text-base font-semibold text-foreground leading-tight text-center group-hover:text-primary transition-colors">
+                  <span className="text-xs md:text-sm font-medium text-foreground leading-snug text-center px-1 group-hover:text-primary transition-colors">
                     {cat.name}
                   </span>
                 </Link>
