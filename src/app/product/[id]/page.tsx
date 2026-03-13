@@ -207,38 +207,35 @@ export default async function ProductPage(props: ProductPageProps) {
             
             {/* SKU */}
             {product.sku && (
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-2">
                 Артикул: {product.sku}
               </p>
             )}
             
             {/* Stock indicator */}
             {(product.stock ?? 0) > 0 ? (
-              <p className={cn("text-sm text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5", product.sku ? "mb-6" : "mb-6")}>
+              <p className={cn("text-sm text-green-600 dark:text-green-400 font-medium flex items-center gap-1.5", product.sku ? "mb-4" : "mb-4")}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                 В наличии — {product.stock} шт.
               </p>
             ) : (
-              <p className={cn("text-sm text-red-500 font-medium", product.sku ? "mb-6" : "mb-6")}>
+              <p className={cn("text-sm text-red-500 font-medium", product.sku ? "mb-4" : "mb-4")}>
                 Нет в наличии
               </p>
 
             )}
 
             {/* Price Block */}
-            <div className="flex flex-col mb-8">
+            <div className="flex flex-col mb-6">
               {product.oldPrice && (
                 <span className="text-lg text-muted-foreground line-through decoration-muted-foreground/50 mb-1 ml-1">
-                  {oldRubles}<sup className="text-[10px]">{String(oldKopecks).padStart(2, '0')}</sup>₽
+                  {oldRubles}₽
                 </span>
               )}
               <div className={`inline-flex items-baseline w-fit px-6 py-2 rounded-xl dark:bg-muted/30 border border-transparent ${product.oldPrice ? 'bg-gradient-to-r from-primary/10 to-accent/10 border-primary/5' : 'bg-[#f2f4f7]'}`}>
                 <span className="text-4xl font-black text-foreground tracking-tighter">
                   {rubles.toLocaleString("ru-RU")}
                 </span>
-                <sup className="ml-0.5 text-xl font-bold text-foreground">
-                  {kopecks.toString().padStart(2, '0')}
-                </sup>
                 <span className="ml-1.5 text-2xl font-bold text-foreground">₽</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-2 ml-1">
@@ -247,13 +244,13 @@ export default async function ProductPage(props: ProductPageProps) {
             </div>
 
             {/* Controls — quantity + cart */}
-            <div className="mb-8">
+            <div className="mb-5">
               <ProductDetailControls product={product} />
             </div>
 
             {/* Official Supplier Block */}
             {product.supplierName && (
-              <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-muted/60 mb-8 border border-border/50">
+              <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-muted/60 mb-5 border border-border/50">
                 {product.supplierLogo ? (
                   <div className="w-12 h-12 flex-shrink-0 relative rounded-xl overflow-hidden bg-white border border-border">
                     <img 

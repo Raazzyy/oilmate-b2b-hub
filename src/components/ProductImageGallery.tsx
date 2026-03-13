@@ -28,7 +28,7 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
   return (
     <div className="flex flex-col gap-4">
       {/* Main large image */}
-      <div className="relative aspect-[4/4.5] md:aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-[3/4] bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center overflow-hidden">
         <Image
           key={currentImage}
           src={currentImage}
