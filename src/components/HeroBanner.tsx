@@ -40,7 +40,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
     <section className="pt-2 pb-6 md:pt-4 md:pb-10">
       <div className="container">
         {/* Full-width Carousel banner */}
-        <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden shadow-sm">
+        <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[3.5/1] lg:aspect-[4/1] rounded-2xl overflow-hidden shadow-sm">
           {/* Carousel */}
           <div className="overflow-hidden h-full" ref={emblaRef}>
             <div className="flex h-full">
