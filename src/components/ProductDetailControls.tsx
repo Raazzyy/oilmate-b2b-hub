@@ -42,7 +42,7 @@ const ProductDetailControls = ({ product }: ProductDetailControlsProps) => {
   };
 
   return (
-    <div className="flex items-center gap-4 mb-10">
+    <div className="flex items-center gap-4 mb-6">
       <div className="flex items-center border border-border rounded-xl bg-background px-2 h-12 shadow-sm">
         <Button
           variant="ghost"
