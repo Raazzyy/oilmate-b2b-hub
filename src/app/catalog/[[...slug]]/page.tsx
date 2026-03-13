@@ -120,6 +120,14 @@ export default async function CatalogPage(props: CatalogPageProps) {
     Object.keys(searchParams).some(k => k !== 'search' && k !== 'sort')
   );
 
+  // Compute dynamic price range from actual Strapi products
+  const priceRange = products.length > 0
+    ? {
+        min: Math.floor(Math.min(...products.map(p => p.price))),
+        max: Math.ceil(Math.max(...products.map(p => p.price))),
+      }
+    : { min: 0, max: 30000 };
+
   return (
     <div className="container py-6 md:py-10">
       {/* Breadcrumbs */}
@@ -192,7 +200,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* ── Sidebar – sticky, self-contained scroll ── */}
           <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start">
-            <CatalogFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} />
+            <CatalogFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} />
           </aside>
 
           {/* ── Main content ── */}
@@ -216,7 +224,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
             {/* Mobile Filters & Sort (hidden on md) */}
             <div className="md:hidden flex gap-2 mb-6">
               <CatalogSort isMobile />
-              <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} hasActiveFilters={hasActiveFilters} />
+              <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} hasActiveFilters={hasActiveFilters} />
             </div>
 
             {products.length > 0 ? (
