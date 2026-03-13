@@ -7,6 +7,8 @@ import ProductsSection from "@/components/ProductsSection";
 import { getHeroSlides, getHomepageProducts, getStrapiMedia, getPromotions, StrapiProduct, mapStrapiProduct } from "@/lib/strapi";
 import { ProductData } from "@/data/products";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const slides = await getHeroSlides();
   const promotions = await getPromotions();

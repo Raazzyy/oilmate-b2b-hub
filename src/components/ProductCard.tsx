@@ -25,54 +25,56 @@ const ProductCard = ({ product }: ProductCardProps) => {
     oilType,
     isUniversal = true,
     category,
+    label,
   } = product;
 
   // Формируем строку характеристик
   const getSpecsLine = () => {
-    // Для смазок показываем вес вместо объема
-    if (category === 'lubricants') {
-      return `${oilType} · ${volume}`;
-    }
     return `${oilType} · ${volume}`;
   };
   
-  // Разделяем цену на рубли и копейки
+  // Разделяем цену
   const rubles = Math.floor(price);
-  const kopecks = Math.round((price - rubles) * 100) || 99;
-  
   const oldRubles = oldPrice ? Math.floor(oldPrice) : null;
-  const oldKopecks = oldPrice ? Math.round((oldPrice - Math.floor(oldPrice)) * 100) || 99 : null;
 
   // Рассчитываем процент скидки
-  const discountPercent = oldPrice ? Math.round((1 - price / oldPrice) * 100) : null;
+  const discountPercent = oldPrice && oldPrice > price 
+    ? Math.round((1 - price / oldPrice) * 100) 
+    : null;
 
   // Handle image source
   const imageSrc = typeof image === 'string' ? image : image.src;
 
   return (
     <div className="group relative flex flex-col h-full transition-all duration-300">
-      {/* Clickable area for product page */}
       <Link href={`/product/${documentId || id}`} className="block">
-        {/* Image container */}
+        {/* Image container with 3:4 Aspect Ratio */}
         <div className="relative mb-2">
-          <div className="aspect-[4/4.5] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
+          <div className="aspect-[3/4] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
             <Image
               src={imageSrc}
               alt={name}
               fill
-              className="object-cover transition-transform"
+              className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
           
-          {/* Discount badge - Split style with original gradient */}
-          {discountPercent && discountPercent > 0 && (
-            <div className="absolute left-2 bottom-2 flex items-center overflow-hidden rounded-lg bg-card border border-border text-[10px] font-bold shadow-sm z-10">
-              <div className="px-2 py-1 text-foreground">
-                Распродажа
-              </div>
+          {/* Badges: Red for discount, Blue for custom label (Gradients from reference repo) */}
+          {(discountPercent && discountPercent > 0) || label ? (
+            <div className="absolute left-2 bottom-2 flex flex-col items-start gap-1.5 z-10">
+              {discountPercent && discountPercent > 0 && (
+                <div className="bg-gradient-to-r from-[hsl(0,80%,45%)] to-[hsl(0,90%,55%)] text-white rounded-full px-2.5 py-1 flex items-center justify-center shadow-sm">
+                  <span className="text-[9px] font-bold leading-none">-{discountPercent}%</span>
+                </div>
+              )}
+              {label && (
+                <div className="bg-gradient-to-r from-[hsl(211,100%,30%)] to-[hsl(211,100%,50%)] text-white rounded-full px-3.5 py-1.5 flex items-center justify-center shadow-sm">
+                  <span className="text-[9px] font-bold uppercase tracking-wide leading-none">{label}</span>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Name */}
@@ -89,8 +91,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
       {/* Price & button */}
       <div className="mt-auto pb-2">
         <div className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 pr-2">
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/20 to-accent/20 px-1.5 py-0.5 rounded-md' : ''}`}>
-            <span className={`text-base font-bold ${oldPrice ? 'text-primary' : 'text-foreground'}`}>
+          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/10 to-accent/10 px-2 py-0.5 rounded-md' : ''}`}>
+            <span className={`text-base font-bold ${oldPrice ? 'text-primary font-extrabold' : 'text-foreground'}`}>
               {rubles.toLocaleString("ru-RU")} ₽
             </span>
           </div>

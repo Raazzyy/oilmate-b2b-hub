@@ -6,6 +6,7 @@ export interface ProductData {
   id: number | string;
   documentId?: string;
   sku?: string;
+  label?: string;
   supplierName?: string;
   supplierDescription?: string;
   supplierLogo?: string | StaticImageData;
