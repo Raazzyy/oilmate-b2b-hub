@@ -452,7 +452,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-[70] md:hidden">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -546,7 +546,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
       )}
       {/* City Selection Modal */}
       {isCityOpen && (
-        <div className="fixed inset-0 z-[60]">
+        <div className="fixed inset-0 z-[80]">
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setIsCityOpen(false)}

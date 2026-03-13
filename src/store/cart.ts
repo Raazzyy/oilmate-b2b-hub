@@ -66,12 +66,10 @@ export const useCartStore = create<CartState>()(
                                     ? { ...item, quantity: newQty }
                                     : item
                             ),
-                            isCartOpen: true,
                         };
                     }
                     return {
                         items: [...state.items, { product, quantity: Math.min(quantity, product.stock ?? 999999) }],
-                        isCartOpen: true,
                     };
                 });
             },
