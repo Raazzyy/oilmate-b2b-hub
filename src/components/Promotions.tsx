@@ -52,13 +52,6 @@ const Promotions = ({ promotions }: PromotionsProps) => {
                                 alt={promo.title || "Promotion"} 
                                 aspectRatio="video"
                             />
-                            {promo.title && (
-                                <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent text-white">
-                                    <h3 className="text-xl font-bold leading-tight mb-2 drop-shadow-sm">
-                                        {promo.title}
-                                    </h3>
-                                </div>
-                            )}
                         </div>
                     </Link>
                 </CarouselItem>
