@@ -130,7 +130,7 @@ import { ProductData } from "@/data/products";
  * Map Strapi product to UI ProductData
  */
 export function mapStrapiProduct(item: StrapiProduct): ProductData {
-    const attrs = (item as any).attributes || item;
+    const attrs = (item as unknown as { attributes: StrapiProduct }).attributes || item;
     
     const mapped: ProductData = {
         id: item.id,
@@ -146,7 +146,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         price: attrs.price,
         oldPrice: attrs.oldPrice,
         image: getStrapiMedia(attrs.image?.url) || "/oil-product.png",
-        images: attrs.images?.map((img: any) => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
+        images: attrs.images?.map((img: StrapiImage) => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
         description: attrs.description,
         inStock: attrs.inStock ?? true,
         stock: attrs.stock,
