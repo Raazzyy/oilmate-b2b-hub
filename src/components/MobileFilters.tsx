@@ -10,16 +10,22 @@ interface MobileFiltersProps {
   category?: StrapiCategory | null;
   categorySlugProp?: string;
   autoFilters?: StrapiFilter[];
+  hasActiveFilters?: boolean;
 }
 
-export default function MobileFilters({ category, categorySlugProp, autoFilters }: MobileFiltersProps) {
+export default function MobileFilters({ category, categorySlugProp, autoFilters, hasActiveFilters = false }: MobileFiltersProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-card border">
+        <button
+          className="basis-2/3 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-medium transition-all active:scale-95"
+        >
           <SlidersHorizontal className="h-4 w-4" />
-          Фильтры каталога
-        </Button>
+          Фильтр
+          {hasActiveFilters && (
+            <span className="w-2 h-2 bg-accent-foreground rounded-full" />
+          )}
+        </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 flex flex-col pt-12 bg-background">
         <SheetTitle className="sr-only">Фильтры каталога</SheetTitle>
