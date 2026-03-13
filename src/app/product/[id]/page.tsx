@@ -219,7 +219,7 @@ export default async function ProductPage(props: ProductPageProps) {
                 В наличии — {product.stock} шт.
               </p>
             ) : (
-              <p className={cn("text-sm text-red-500 font-medium", product.sku ? "mb-4" : "mb-4")}>
+              <p className={cn("text-sm text-red-500 font-medium", product.sku ? "mb-6" : "mb-6")}>
                 Нет в наличии
               </p>
 
@@ -244,13 +244,13 @@ export default async function ProductPage(props: ProductPageProps) {
             </div>
 
             {/* Controls — quantity + cart */}
-            <div className="mb-5">
+            <div className="mb-6">
               <ProductDetailControls product={product} />
             </div>
 
             {/* Official Supplier Block */}
             {product.supplierName && (
-              <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-muted/60 mb-5 border border-border/50">
+              <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-muted/60 mb-6 border border-border/50">
                 {product.supplierLogo ? (
                   <div className="w-12 h-12 flex-shrink-0 relative rounded-xl overflow-hidden bg-white border border-border">
                     <img 
