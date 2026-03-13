@@ -4,4 +4,5 @@ export interface HeroSlide {
     href: string;
     gradient: string;
     backgroundImage?: string;
+    desktopImage?: string;
 }
