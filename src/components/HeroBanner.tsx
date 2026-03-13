@@ -40,7 +40,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
     <section className="pt-2 pb-6 md:pt-4 md:pb-10">
       <div className="container">
         {/* Full-width Carousel banner */}
-        <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[3.5/1] lg:aspect-[4/1] rounded-2xl overflow-hidden shadow-sm">
+        <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden shadow-sm">
           {/* Carousel */}
           <div className="overflow-hidden h-full" ref={emblaRef}>
             <div className="flex h-full">
@@ -51,14 +51,28 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
                   className="flex-[0_0_100%] min-w-0 h-full relative overflow-hidden block"
                 >
                   {slide.backgroundImage ? (
-                    <Image 
-                      src={slide.backgroundImage} 
-                      alt={slide.title || "Слайд"}
-                      fill
-                      priority={index === 0}
-                      className="object-cover"
-                      sizes="100vw"
-                    />
+                    <>
+                      {/* Mobile image */}
+                      <Image 
+                        src={slide.backgroundImage} 
+                        alt={slide.title || "Слайд"}
+                        fill
+                        priority={index === 0}
+                        className={`object-cover ${slide.desktopImage ? 'md:hidden' : ''}`}
+                        sizes="100vw"
+                      />
+                      {/* Desktop image (shown only when desktopImage exists) */}
+                      {slide.desktopImage && (
+                        <Image 
+                          src={slide.desktopImage} 
+                          alt={slide.title || "Слайд"}
+                          fill
+                          priority={index === 0}
+                          className="object-cover hidden md:block"
+                          sizes="100vw"
+                        />
+                      )}
+                    </>
                   ) : (
                     <div className={`w-full h-full bg-gradient-to-br ${slide.gradient || "from-muted to-muted/50"}`} />
                   )}

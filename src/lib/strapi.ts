@@ -207,13 +207,16 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
             return DEFAULT_SLIDES;
         }
 
-        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage; isActive?: boolean }) => ({
+        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage; desktopImage?: StrapiImage; isActive?: boolean }) => ({
             id: item.id,
             title: item.name || item.title || "",
             href: item.href || "/",
             gradient: item.gradient || "from-primary via-primary to-accent",
             backgroundImage: item.image?.url
                 ? getStrapiMedia(item.image.url)
+                : undefined,
+            desktopImage: item.desktopImage?.url
+                ? getStrapiMedia(item.desktopImage.url)
                 : undefined
         }));
     } catch (error) {
