@@ -15,6 +15,7 @@ import {
 } from "@/lib/strapi";
 import CatalogFilters from "@/components/CatalogFilters";
 import MobileFilters from "@/components/MobileFilters";
+import CatalogSort from "@/components/CatalogSort";
 
 const getCategoryIcon = (slug: string) => {
   if (!slug) return HelpCircle;
@@ -39,7 +40,7 @@ async function getProducts(
   searchParams: Record<string, string | string[] | undefined> = {}
 ): Promise<ProductData[]> {
   const filters: Record<string, unknown> = {};
-  const { search, minPrice, maxPrice, ...otherFilters } = searchParams;
+  const { search, minPrice, maxPrice, sort, ...otherFilters } = searchParams;
 
   if (categorySlug && categorySlug !== "all") {
     filters.category = { slug: { $eq: categorySlug } };
@@ -78,7 +79,9 @@ async function getProducts(
     }
   });
 
-  const response = await fetchStrapiProducts({ filters });
+  const sortParam = sort === "price_asc" ? "price:asc" : sort === "price_desc" ? "price:desc" : undefined;
+
+  const response = await fetchStrapiProducts({ filters, sort: sortParam });
   return (response.data as StrapiProduct[]).map(mapStrapiProduct);
 }
 
@@ -110,6 +113,12 @@ export default async function CatalogPage(props: CatalogPageProps) {
     isRootCatalog ? Promise.resolve([]) : getCategoryFilterOptions(categorySlug),
     isRootCatalog ? getCategories() : Promise.resolve([]),
   ]);
+
+  const hasActiveFilters = Boolean(
+    searchParams.minPrice || 
+    searchParams.maxPrice || 
+    Object.keys(searchParams).some(k => k !== 'search' && k !== 'sort')
+  );
 
   return (
     <div className="container py-6 md:py-10">
@@ -188,18 +197,26 @@ export default async function CatalogPage(props: CatalogPageProps) {
 
           {/* ── Main content ── */}
           <div className="flex-1 min-w-0">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold tracking-tight mb-1">
-                {searchQuery ? `Поиск: "${searchQuery}"` : categoryName}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Найдено товаров: {products.length}
-              </p>
+            <div className="mb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight mb-1">
+                  {searchQuery ? `Поиск: "${searchQuery}"` : categoryName}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Найдено товаров: {products.length}
+                </p>
+              </div>
+
+              {/* Desktop Sort Dropdown */}
+              <div className="hidden md:block">
+                <CatalogSort />
+              </div>
             </div>
 
-            {/* Mobile Filters Trigger (hidden on md) */}
-            <div className="md:hidden mb-6">
-              <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} />
+            {/* Mobile Filters & Sort (hidden on md) */}
+            <div className="md:hidden flex gap-2 mb-6">
+              <CatalogSort isMobile />
+              <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} hasActiveFilters={hasActiveFilters} />
             </div>
 
             {products.length > 0 ? (
