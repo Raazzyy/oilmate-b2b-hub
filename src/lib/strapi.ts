@@ -198,13 +198,16 @@ const DEFAULT_SLIDES: HeroSlide[] = [
 
 export async function getHeroSlides(): Promise<HeroSlide[]> {
     try {
-        const data = await fetchAPI("/hero-slides", { populate: "*" });
+        const data = await fetchAPI("/hero-slides", { 
+            populate: "*",
+            filters: { isActive: { $ne: false } }
+        });
 
         if (!data?.data || data.data.length === 0) {
             return DEFAULT_SLIDES;
         }
 
-        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage }) => ({
+        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage; isActive?: boolean }) => ({
             id: item.id,
             title: item.name || item.title || "",
             href: item.href || "/",
@@ -447,9 +450,12 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
     }
 }
 
-export async function getPromotions(): Promise<{ id: number; documentId: string; title?: string; href: string; image?: StrapiImage }[]> {
+export async function getPromotions(): Promise<{ id: number; documentId: string; title?: string; href: string; image?: StrapiImage; isActive?: boolean }[]> {
     try {
-        const data = await fetchAPI("/promotions", { populate: "*" });
+        const data = await fetchAPI("/promotions", { 
+            populate: "*",
+            filters: { isActive: { $ne: false } }
+        });
 
         if (!data?.data) return [];
 
