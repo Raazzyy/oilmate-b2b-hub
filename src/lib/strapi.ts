@@ -36,11 +36,11 @@ export async function fetchAPI(
             headers: {
                 "Content-Type": "application/json",
             },
-            next: { revalidate: 60 }, // Default 1 minute revalidation
+            next: { revalidate: 0 }, // Force fresh data during development/debugging
             ...options,
         };
 
-        const queryString = qs.stringify(urlParamsObject, { encodeValuesOnly: true });
+        const queryString = qs.stringify({ ...urlParamsObject, _t: Date.now() }, { encodeValuesOnly: true });
         const requestUrl = `${STRAPI_API_URL}/api${path}${queryString ? `?${queryString}` : ""}`;
 
         // Trigger API call
@@ -57,6 +57,7 @@ export async function fetchAPI(
         }
 
         const data = await response.json();
+        // console.log(`[Strapi Debug] ${path} raw data:`, JSON.stringify(data).substring(0, 500) + "...");
         return data;
     } catch (error) {
         console.error(error);
@@ -91,6 +92,7 @@ export interface StrapiProduct {
     id: number;
     documentId: string;
     sku?: string;
+    label?: string;
     supplierName?: string;
     supplierDescription?: string;
     supplierLogo?: StrapiImage;
@@ -128,39 +130,49 @@ import { ProductData } from "@/data/products";
  * Map Strapi product to UI ProductData
  */
 export function mapStrapiProduct(item: StrapiProduct): ProductData {
-    return {
+    const attrs = (item as unknown as { attributes: StrapiProduct }).attributes || item;
+    
+    const mapped: ProductData = {
         id: item.id,
         documentId: item.documentId,
-        sku: item.sku,
-        supplierName: item.supplierName,
-        supplierDescription: item.supplierDescription,
-        supplierLogo: getStrapiMedia(item.supplierLogo?.url),
-        name: item.name,
-        brand: item.brand || "",
-        volume: item.volume || "",
-        price: item.price,
-        oldPrice: item.oldPrice,
-        image: getStrapiMedia(item.image?.url) || "/oil-product.png",
-        images: item.images?.map(img => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
-        description: item.description,
-        inStock: item.inStock ?? true,
-        stock: item.stock,
-        oilType: item.oilType || "",
-        isUniversal: item.isUniversal,
-        category: item.category?.slug || "all",
-        viscosity: item.viscosity as string,
-        approvals: item.approvals as string,
-        specification: item.specification as string,
-        viscosityClass: item.viscosityClass as string,
-        application: item.application as string,
-        standard: item.standard as string,
-        color: item.color as string,
-        type: item.type as string,
-        rating: item.rating as number,
-        isNew: item.isNew as boolean,
-        isHit: item.isHit as boolean,
-        country: item.country as string,
+        sku: attrs.sku,
+        label: attrs.label,
+        supplierName: attrs.supplierName,
+        supplierDescription: attrs.supplierDescription,
+        supplierLogo: getStrapiMedia(attrs.supplierLogo?.url),
+        name: attrs.name,
+        brand: attrs.brand || "",
+        volume: attrs.volume || "",
+        price: attrs.price,
+        oldPrice: attrs.oldPrice,
+        image: getStrapiMedia(attrs.image?.url) || "/oil-product.png",
+        images: attrs.images?.map((img: StrapiImage) => getStrapiMedia(img.url)).filter(Boolean) as string[] | undefined,
+        description: attrs.description,
+        inStock: attrs.inStock ?? true,
+        stock: attrs.stock,
+        oilType: attrs.oilType || "",
+        isUniversal: attrs.isUniversal,
+        category: attrs.category?.slug || "all",
+        viscosity: attrs.viscosity as string,
+        approvals: attrs.approvals as string,
+        specification: attrs.specification as string,
+        viscosityClass: attrs.viscosityClass as string,
+        application: attrs.application as string,
+        standard: attrs.standard as string,
+        color: attrs.color as string,
+        type: attrs.type as string,
+        rating: attrs.rating as number,
+        isNew: attrs.isNew as boolean,
+        isHit: attrs.isHit as boolean,
+        country: attrs.country as string,
     };
+    console.log(`[Strapi Map] Product ${item.id}:`, {
+        name: mapped.name,
+        price: mapped.price,
+        oldPrice: mapped.oldPrice,
+        label: mapped.label
+    });
+    return mapped;
 }
 
 const DEFAULT_SLIDES: HeroSlide[] = [
@@ -227,7 +239,7 @@ export interface StrapiCategory {
 
 export async function getCategories(): Promise<StrapiCategory[]> {
     try {
-        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true, filters: true } }, { next: { revalidate: 60 } });
+        const data = await fetchAPI("/categories", { sort: "name:asc", populate: { image: true, filters: true } }, { next: { revalidate: 0 } });
         return data?.data || [];
     } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -281,10 +293,7 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
         const data = await fetchAPI("/homepage", {
             populate: {
                 featuredProducts: {
-                    populate: {
-                        image: true,
-                        category: true
-                    }
+                    populate: "*"
                 }
             }
         }, { next: { revalidate: 0 } });
@@ -345,7 +354,7 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         const response = await fetchAPI("/products", {
             filters,
             pagination: { limit: 1000 },
-            fields: ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country']
+            fields: ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country', 'oldPrice', 'label']
         });
 
         if (!response?.data || response.data.length === 0) {
