@@ -304,11 +304,14 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                            className="w-full flex items-center gap-4 p-3 hover:bg-muted rounded-xl transition-colors text-left group"
                            onClick={() => handleCategoryClick(category.slug)}
                          >
-                           <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                           <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
                              {category.image?.url ? (
-                               <div className="relative w-6 h-6">
-                                 <Image src={getStrapiMedia(category.image.url) as string} alt={category.name} fill className="object-contain" />
-                               </div>
+                               <Image 
+                                 src={getStrapiMedia(category.image.url) as string} 
+                                 alt={category.name} 
+                                 fill 
+                                 className="object-cover" 
+                               />
                              ) : (
                                <IconComponent className={`h-5 w-5 ${iconColor}`} />
                              )}
@@ -486,7 +489,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                       className="w-full flex items-center gap-3 p-3 hover:bg-muted rounded-xl transition-colors text-left"
                       onClick={() => handleCategoryClick(category.slug)}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden relative">
+                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
                         {category.image?.url ? (
                           <Image src={getStrapiMedia(category.image.url) as string} alt={category.name} fill className="object-cover" />
                         ) : (
@@ -504,7 +507,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                     router.push("/catalog");
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <LayoutGrid className="h-5 w-5 text-foreground" />
                   </div>
                   <span className="font-medium">Все товары</span>
