@@ -11,9 +11,10 @@ interface MobileFiltersProps {
   categorySlugProp?: string;
   autoFilters?: StrapiFilter[];
   hasActiveFilters?: boolean;
+  priceRange?: { min: number; max: number };
 }
 
-export default function MobileFilters({ category, categorySlugProp, autoFilters, hasActiveFilters = false }: MobileFiltersProps) {
+export default function MobileFilters({ category, categorySlugProp, autoFilters, hasActiveFilters = false, priceRange }: MobileFiltersProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -30,7 +31,7 @@ export default function MobileFilters({ category, categorySlugProp, autoFilters,
       <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 flex flex-col pt-12 bg-background">
         <SheetTitle className="sr-only">Фильтры каталога</SheetTitle>
         <div className="flex-1 overflow-hidden px-4">
-            <CatalogFilters category={category} categorySlugProp={categorySlugProp} autoFilters={autoFilters} />
+            <CatalogFilters category={category} categorySlugProp={categorySlugProp} autoFilters={autoFilters} priceRange={priceRange} />
         </div>
       </SheetContent>
     </Sheet>

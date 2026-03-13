@@ -1,93 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronDown, LayoutGrid } from "lucide-react";
-import { allProducts, ProductData } from "@/data/products";
-
-// Get available filter options from actual products
-const getAvailableFilters = (products: ProductData[], category: string | null) => {
-  const categoryProducts = category && category !== "all" 
-    ? products.filter(p => p.category === category)
-    : products;
-
-  const brands = [...new Set(categoryProducts.map(p => p.brand))].sort();
-  const volumes = [...new Set(categoryProducts.map(p => p.volume))].sort();
-  
-  // Category-specific filters based on actual product data
-  const specificFilters: { label: string; key: keyof ProductData; options: string[] }[] = [];
-
-  if (category === "motor") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
-    const approvals = [...new Set(categoryProducts.map(p => p.approvals).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
-    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
-    if (approvals.length > 0) specificFilters.push({ label: "Допуски", key: "approvals", options: approvals as string[] });
-  }
-
-  if (category === "transmission") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
-    const specs = [...new Set(categoryProducts.map(p => p.specification).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
-    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
-    if (specs.length > 0) specificFilters.push({ label: "Спецификация", key: "specification", options: specs as string[] });
-  }
-
-  if (category === "hydraulic") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const viscosityClasses = [...new Set(categoryProducts.map(p => p.viscosityClass).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
-    if (viscosityClasses.length > 0) specificFilters.push({ label: "Класс вязкости", key: "viscosityClass", options: viscosityClasses as string[] });
-  }
-
-  if (category === "industrial") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
-    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
-  }
-
-  if (category === "lubricants") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип смазки", key: "oilType", options: oilTypes as string[] });
-    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
-  }
-
-  if (category === "antifreeze") {
-    const types = [...new Set(categoryProducts.map(p => p.type).filter(Boolean))];
-    const standards = [...new Set(categoryProducts.map(p => p.standard).filter(Boolean))];
-    const colors = [...new Set(categoryProducts.map(p => p.color).filter(Boolean))];
-    
-    if (types.length > 0) specificFilters.push({ label: "Тип", key: "type", options: types as string[] });
-    if (standards.length > 0) specificFilters.push({ label: "Стандарт", key: "standard", options: standards as string[] });
-    if (colors.length > 0) specificFilters.push({ label: "Цвет", key: "color", options: colors as string[] });
-  }
-
-  if (category === "marine") {
-    const oilTypes = [...new Set(categoryProducts.map(p => p.oilType).filter(Boolean))];
-    const viscosities = [...new Set(categoryProducts.map(p => p.viscosity).filter(Boolean))];
-    const applications = [...new Set(categoryProducts.map(p => p.application).filter(Boolean))];
-    
-    if (oilTypes.length > 0) specificFilters.push({ label: "Тип масла", key: "oilType", options: oilTypes as string[] });
-    if (viscosities.length > 0) specificFilters.push({ label: "Вязкость", key: "viscosity", options: viscosities as string[] });
-    if (applications.length > 0) specificFilters.push({ label: "Применение", key: "application", options: applications as string[] });
-  }
-
-  return { brands, volumes, specificFilters };
-};
+import { ChevronLeft, ChevronDown } from "lucide-react";
+import { StrapiFilter } from "@/lib/strapi";
 
 const CheckboxFilter = ({ 
   items, 
@@ -148,88 +69,89 @@ const CheckboxFilter = ({
 interface CatalogFiltersProps {
   category?: { name: string; slug: string } | null;
   categorySlugProp?: string;
-  autoFilters?: unknown;
+  autoFilters?: StrapiFilter[];
+  priceRange?: { min: number; max: number };
 }
 
-const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => {
+const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRange }: CatalogFiltersProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const activeCategory = categorySlugProp || pathname?.split("/").filter(Boolean).pop() || "";
 
-  // Helper to update URL params
-  const updateFilters = (newFilters: Record<string, string[]>, min?: string, max?: string) => {
-    const params = new URLSearchParams(searchParams?.toString());
-    
-    // Clear existing dynamic filters
-    const currentKeys = Array.from(params.keys());
-    currentKeys.forEach(key => {
-      if (key !== 'search' && key !== 'sort') {
-        params.delete(key);
+  const priceMin = priceRange?.min ?? 0;
+  const priceMax = priceRange?.max ?? 30000;
+
+  const [localMin, setLocalMin] = useState(searchParams?.get('minPrice') || "");
+  const [localMax, setLocalMax] = useState(searchParams?.get('maxPrice') || "");
+
+  // Sync local state when URL changes externally
+  useEffect(() => {
+    setLocalMin(searchParams?.get('minPrice') || "");
+    setLocalMax(searchParams?.get('maxPrice') || "");
+  }, [searchParams]);
+
+  // Collect all current non-price filter values from URL
+  const getCurrentFilters = () => {
+    const allFilters: Record<string, string[]> = {};
+    searchParams?.forEach((value, key) => {
+      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
+        allFilters[key] = value.split(',').filter(Boolean);
       }
     });
+    return allFilters;
+  };
 
-    // Add active checks
-    Object.entries(newFilters).forEach(([key, values]) => {
-      if (values.length > 0) {
-        params.set(key, values.join(','));
-      }
+  const pushFilters = (
+    filters: Record<string, string[]>,
+    min: string,
+    max: string
+  ) => {
+    const params = new URLSearchParams();
+    // preserve search and sort
+    if (searchParams?.get('search')) params.set('search', searchParams.get('search')!);
+    if (searchParams?.get('sort')) params.set('sort', searchParams.get('sort')!);
+
+    Object.entries(filters).forEach(([key, values]) => {
+      if (values.length > 0) params.set(key, values.join(','));
     });
 
-    if (min && min !== "0") params.set('minPrice', min);
-    else params.delete('minPrice');
-    
-    if (max && max !== "30000") params.set('maxPrice', max);
-    else params.delete('maxPrice');
+    if (min && Number(min) > priceMin) params.set('minPrice', min);
+    if (max && Number(max) < priceMax) params.set('maxPrice', max);
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const toggleFilter = (filterSlug: string, option: string) => {
-    const currentValues = searchParams?.get(filterSlug)?.split(',').filter(Boolean) || [];
-    let newValues: string[];
-    
-    if (currentValues.includes(option)) {
-      newValues = currentValues.filter((v) => v !== option);
-    } else {
-      newValues = [...currentValues, option];
-    }
-
-    const allFilters: Record<string, string[]> = {};
-    searchParams?.forEach((value, key) => {
-      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
-         allFilters[key] = value.split(',').filter(Boolean);
-      }
-    });
-    
-    allFilters[filterSlug] = newValues;
-    updateFilters(allFilters, searchParams?.get('minPrice') || "", searchParams?.get('maxPrice') || "");
+    const filters = getCurrentFilters();
+    const current = filters[filterSlug] || [];
+    filters[filterSlug] = current.includes(option)
+      ? current.filter(v => v !== option)
+      : [...current, option];
+    pushFilters(
+      filters,
+      searchParams?.get('minPrice') || "",
+      searchParams?.get('maxPrice') || ""
+    );
   };
 
-  const priceMinRaw = searchParams?.get('minPrice') || "";
-  const priceMaxRaw = searchParams?.get('maxPrice') || "";
-  const [priceMin, setPriceMin] = useState(priceMinRaw);
-  const [priceMax, setPriceMax] = useState(priceMaxRaw);
-
   const handlePriceApply = () => {
-    const allFilters: Record<string, string[]> = {};
-    searchParams?.forEach((value, key) => {
-      if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
-         allFilters[key] = value.split(',').filter(Boolean);
-      }
-    });
-    updateFilters(allFilters, priceMin, priceMax);
+    pushFilters(getCurrentFilters(), localMin, localMax);
+  };
+
+  const handleSliderCommit = ([from, to]: number[]) => {
+    const mn = from > priceMin ? String(from) : "";
+    const mx = to < priceMax ? String(to) : "";
+    setLocalMin(mn);
+    setLocalMax(mx);
+    pushFilters(getCurrentFilters(), mn, mx);
   };
 
   const handleReset = () => {
     router.push(pathname || "/catalog", { scroll: false });
   };
 
-  // Get exact available filters from the original Vite logic
-  const availableFilters = useMemo(() => 
-    getAvailableFilters(allProducts, activeCategory && activeCategory !== "catalog" ? activeCategory : null), 
-    [activeCategory]
-  );
+  const getSelected = (slug: string) =>
+    searchParams?.get(slug)?.split(',').filter(Boolean) || [];
 
   return (
     <div
@@ -254,92 +176,60 @@ const CatalogFilters = ({ category, categorySlugProp }: CatalogFiltersProps) => 
       <div className="bg-card rounded-2xl p-5 mb-4 shadow-sm border border-border/50">
         <h3 className="font-medium text-foreground mb-5 text-base">Фильтры</h3>
 
-        {/* ── Price filter (exact copy) ── */}
+        {/* ── Price filter — dynamic range ── */}
         <div className="mb-8">
           <span className="text-sm font-semibold text-foreground mb-3 block">Цена, ₽</span>
           <div className="flex gap-2 mb-3">
             <Input
               type="number"
-              placeholder="от 0"
-              value={priceMin}
-              onChange={(e) => setPriceMin(e.target.value)}
+              placeholder={`от ${priceMin}`}
+              value={localMin}
+              onChange={(e) => setLocalMin(e.target.value)}
               onBlur={handlePriceApply}
-              onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply() }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
               className="rounded-lg border-border text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
             <Input
               type="number"
-              placeholder="до 30 000"
-              value={priceMax}
-              onChange={(e) => setPriceMax(e.target.value)}
+              placeholder={`до ${priceMax.toLocaleString()}`}
+              value={localMax}
+              onChange={(e) => setLocalMax(e.target.value)}
               onBlur={handlePriceApply}
-              onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply() }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
               className="rounded-lg border-border text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
           </div>
           <Slider
-            min={0}
-            max={30000}
-            step={100}
+            min={priceMin}
+            max={priceMax}
+            step={Math.max(1, Math.round((priceMax - priceMin) / 200))}
             minStepsBetweenThumbs={1}
             value={[
-              priceMin ? parseInt(priceMin) : 0,
-              priceMax ? parseInt(priceMax) : 30000,
+              localMin ? parseInt(localMin) : priceMin,
+              localMax ? parseInt(localMax) : priceMax,
             ]}
             onValueChange={([from, to]) => {
-              setPriceMin(from > 0 ? String(from) : "");
-              setPriceMax(to < 30000 ? String(to) : "");
+              setLocalMin(from > priceMin ? String(from) : "");
+              setLocalMax(to < priceMax ? String(to) : "");
             }}
-            onValueCommit={([from, to]) => {
-              const allFilters: Record<string, string[]> = {};
-              searchParams?.forEach((value, key) => {
-                if (key !== 'search' && key !== 'sort' && key !== 'minPrice' && key !== 'maxPrice') {
-                  allFilters[key] = value.split(',').filter(Boolean);
-                }
-              });
-              updateFilters(allFilters, from > 0 ? String(from) : "", to < 30000 ? String(to) : "");
-            }}
+            onValueCommit={handleSliderCommit}
             className="cursor-grab active:cursor-grabbing [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:rounded-full [&_[role=slider]]:bg-accent [&_[role=slider]]:border-accent [&_[role=slider]]:cursor-grab [&_[role=slider]]:active:cursor-grabbing [&_[role=slider]]:shadow-md [&_span.absolute]:bg-accent"
           />
         </div>
 
-        {/* Brand filter */}
-        {availableFilters.brands.length > 0 && (
-          <div className="mb-8">
-            <span className="text-sm font-semibold text-foreground mb-3 block">Бренд</span>
-            <CheckboxFilter
-              items={availableFilters.brands}
-              selected={searchParams?.get("brand")?.split(',').filter(Boolean) || []}
-              onToggle={(item) => toggleFilter("brand", item)}
-              visibleCount={5}
-            />
-          </div>
-        )}
-        
-        {/* Volume filter */}
-        {availableFilters.volumes.length > 0 && activeCategory !== 'lubricants' && (
-          <div className="mb-8">
-            <span className="text-sm font-semibold text-foreground mb-3 block">Объём, л</span>
-            <CheckboxFilter
-              items={availableFilters.volumes}
-              selected={searchParams?.get("volume")?.split(',').filter(Boolean) || []}
-              onToggle={(item) => toggleFilter("volume", item)}
-              visibleCount={5}
-            />
-          </div>
-        )}
-
-        {/* Category-specific filters */}
-        {availableFilters.specificFilters.map(filter => (
-          <div key={filter.key} className="mb-8">
-            <span className="text-sm font-semibold text-foreground mb-3 block">{filter.label}</span>
-            <CheckboxFilter
-              items={filter.options}
-              selected={searchParams?.get(filter.key)?.split(',').filter(Boolean) || []}
-              onToggle={(item) => toggleFilter(filter.key, item)}
-              visibleCount={5}
-            />
-          </div>
+        {/* ── Dynamic filter sections from Strapi ── */}
+        {autoFilters.map(filter => (
+          filter.options && filter.options.length > 0 && (
+            <div key={filter.slug} className="mb-8">
+              <span className="text-sm font-semibold text-foreground mb-3 block">{filter.name}</span>
+              <CheckboxFilter
+                items={filter.options}
+                selected={getSelected(filter.slug)}
+                onToggle={(item) => toggleFilter(filter.slug, item)}
+                visibleCount={5}
+              />
+            </div>
+          )
         ))}
 
         <Button
