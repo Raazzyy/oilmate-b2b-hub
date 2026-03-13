@@ -12,7 +12,7 @@ interface ProductDetailControlsProps {
 }
 
 const ProductDetailControls = ({ product }: ProductDetailControlsProps) => {
-  const { getItemQuantity, updateQuantity, addToCart, isClient } = useCartStore();
+  const { getItemQuantity, updateQuantity, isClient } = useCartStore();
   const cartQuantity = isClient ? getItemQuantity(product.id) : 0;
   
   const [quantity, setQuantity] = useState(1);
@@ -76,6 +76,7 @@ const ProductDetailControls = ({ product }: ProductDetailControlsProps) => {
           <AddToCartButton
             product={product}
             showStepper={false}
+            quantity={quantity}
             className="w-full h-12 text-base font-bold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all px-0"
           />
         )}
