@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductDetailControls from "@/components/ProductDetailControls";
-import { getProductById, getStrapiMedia, getProducts as fetchStrapiProducts, mapStrapiProduct, StrapiProduct } from "@/lib/strapi";
+import { getProductById, getStrapiMedia, getProducts as fetchStrapiProducts, mapStrapiProduct, StrapiProduct, getCategoryBySlug } from "@/lib/strapi";
 import ProductsSection from "@/components/ProductsSection";
 
 interface ProductPageProps {
@@ -122,16 +122,20 @@ export default async function ProductPage(props: ProductPageProps) {
     notFound();
   }
 
-  // Fetch related products
-  const relatedResponse = await fetchStrapiProducts({
-    filters: {
-      category: { slug: { $eq: product.category } },
-      documentId: { $ne: product.documentId }
-    },
-    pagination: { limit: 10 }
-  });
+  // Fetch related products and category data in parallel
+  const [relatedResponse, categoryData] = await Promise.all([
+    fetchStrapiProducts({
+      filters: {
+        category: { slug: { $eq: product.category } },
+        documentId: { $ne: product.documentId }
+      },
+      pagination: { limit: 10 }
+    }),
+    product.category !== "all" ? getCategoryBySlug(product.category) : Promise.resolve(null)
+  ]);
 
   const relatedProducts: ProductData[] = (relatedResponse.data as StrapiProduct[]).map(mapStrapiProduct);
+  const activeFilterSlugs = new Set(categoryData?.filters?.map(f => f.slug) || []);
 
   const rubles = Math.floor(product.price);
   const kopecks = Math.round((product.price - rubles) * 100) || 0;
@@ -282,7 +286,7 @@ export default async function ProductPage(props: ProductPageProps) {
               <h3 className="text-xl font-bold mb-4">Характеристики</h3>
               <div className="space-y-0 text-sm">
                 {(() => {
-                  const labels: Record<string, string> = {
+                  const hardcodedLabels: Record<string, string> = {
                     viscosity: "Вязкость",
                     oilType: "Тип масла",
                     volume: "Объем",
@@ -297,18 +301,36 @@ export default async function ProductPage(props: ProductPageProps) {
                     type: "Тип",
                   };
 
-                  return Object.entries(labels)
-                    .map(([key, label]) => ({
-                      label,
-                      value: product[key as keyof ProductData] as string
-                    }))
-                    .filter(s => s.value && typeof s.value === 'string' && s.value.trim() !== "")
-                    .map((spec, i) => (
-                      <div key={i} className="flex justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1">
-                        <span className="text-muted-foreground">{spec.label}</span>
-                        <span className="font-semibold text-right">{spec.value}</span>
-                      </div>
-                    ));
+                  const specs: { label: string; value: string }[] = [];
+
+                  // 1. Add hardcoded fields if basic OR in filters OR if no filters defined
+                  const basicFields = ["brand", "volume", "country"];
+                  Object.entries(hardcodedLabels).forEach(([key, label]) => {
+                    const value = product[key as keyof ProductData];
+                    if (value && typeof value === 'string' && value.trim() !== "") {
+                        if (basicFields.includes(key) || activeFilterSlugs.has(key) || activeFilterSlugs.size === 0) {
+                            specs.push({ label, value });
+                        }
+                    }
+                  });
+
+                  // 2. Add dynamic characteristics if they exist and match filters
+                  if (product.characteristics) {
+                    product.characteristics.forEach(char => {
+                        if (activeFilterSlugs.has(char.key) || activeFilterSlugs.size === 0) {
+                            specs.push({ label: char.key, value: char.value });
+                        }
+                    });
+                  }
+
+                  if (specs.length === 0) return <p className="text-muted-foreground italic px-1">Характеристики не указаны</p>;
+
+                  return specs.map((spec, i) => (
+                    <div key={i} className="flex justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1">
+                      <span className="text-muted-foreground">{spec.label}</span>
+                      <span className="font-semibold text-right">{spec.value}</span>
+                    </div>
+                  ));
                 })()}
               </div>
             </div>
