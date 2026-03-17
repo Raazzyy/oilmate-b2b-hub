@@ -123,7 +123,7 @@ export interface StrapiProduct {
     [key: string]: unknown;
 }
 
-import { HeroSlide } from "@/types";
+import { HeroSlide, Promotion } from "@/types";
 import { ProductData } from "@/data/products";
 
 /**
@@ -196,29 +196,60 @@ const DEFAULT_SLIDES: HeroSlide[] = [
     },
 ];
 
+interface StrapiHeroSlideItem {
+    id: number;
+    name?: string;
+    title?: string;
+    href?: string;
+    gradient?: string;
+    image?: StrapiImage;
+    desktopImage?: StrapiImage;
+    isActive?: boolean;
+}
+
 export async function getHeroSlides(): Promise<HeroSlide[]> {
     try {
-        const data = await fetchAPI("/hero-slides", { 
-            populate: "*",
-            filters: { isActive: { $ne: false } }
+        // Fetch from Homepage single type to respect drag-and-drop order
+        const data = await fetchAPI("/homepage", { 
+            populate: {
+                heroSlides: {
+                    populate: "*",
+                }
+            }
         });
 
-        if (!data?.data || data.data.length === 0) {
-            return DEFAULT_SLIDES;
+        const slides = data?.data?.heroSlides;
+
+        if (!slides || slides.length === 0) {
+            // Fallback to all active slides if homepage is not configured
+            const allSlidesData = await fetchAPI("/hero-slides", { 
+                populate: "*",
+                filters: { isActive: { $ne: false } }
+            });
+            
+            if (!allSlidesData?.data || allSlidesData.data.length === 0) {
+                return DEFAULT_SLIDES;
+            }
+            return allSlidesData.data.map((item: StrapiHeroSlideItem) => ({
+                id: item.id,
+                title: item.name || item.title || "",
+                href: item.href || "/",
+                gradient: item.gradient || "from-primary via-primary to-accent",
+                backgroundImage: item.image?.url ? getStrapiMedia(item.image.url) : undefined,
+                desktopImage: item.desktopImage?.url ? getStrapiMedia(item.desktopImage.url) : undefined
+            }));
         }
 
-        return data.data.map((item: { id: number; name?: string; title?: string; href?: string; gradient?: string; image?: StrapiImage; desktopImage?: StrapiImage; isActive?: boolean }) => ({
-            id: item.id,
-            title: item.name || item.title || "",
-            href: item.href || "/",
-            gradient: item.gradient || "from-primary via-primary to-accent",
-            backgroundImage: item.image?.url
-                ? getStrapiMedia(item.image.url)
-                : undefined,
-            desktopImage: item.desktopImage?.url
-                ? getStrapiMedia(item.desktopImage.url)
-                : undefined
-        }));
+        return slides
+            .filter((item: StrapiHeroSlideItem) => item.isActive !== false)
+            .map((item: StrapiHeroSlideItem) => ({
+                id: item.id,
+                title: item.name || item.title || "",
+                href: item.href || "/",
+                gradient: item.gradient || "from-primary via-primary to-accent",
+                backgroundImage: item.image?.url ? getStrapiMedia(item.image.url) : undefined,
+                desktopImage: item.desktopImage?.url ? getStrapiMedia(item.desktopImage.url) : undefined
+            }));
     } catch (error) {
         console.warn("Using default slides. Failed to fetch from Strapi:", error);
         return DEFAULT_SLIDES;
@@ -453,22 +484,54 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
     }
 }
 
-export async function getPromotions(): Promise<{ id: number; documentId: string; title?: string; href: string; image?: StrapiImage; isActive?: boolean }[]> {
+interface StrapiPromotionItem {
+    id: number;
+    title?: string;
+    href?: string;
+    image?: StrapiImage;
+    desktopImage?: StrapiImage;
+    isActive?: boolean;
+}
+
+export async function getPromotions(): Promise<Promotion[]> {
     try {
-        const data = await fetchAPI("/promotions", { 
-            populate: "*",
-            filters: { isActive: { $ne: false } }
+        // Fetch from Homepage single type to respect drag-and-drop order
+        const data = await fetchAPI("/homepage", { 
+            populate: {
+                promotions: {
+                    populate: "*",
+                }
+            }
         });
 
-        if (!data?.data) return [];
+        const promos = data?.data?.promotions;
 
-        return data.data.map((item: { id: number; documentId: string; title?: string; href: string; image?: StrapiImage }) => ({
-            id: item.id,
-            documentId: item.documentId,
-            title: item.title,
-            href: item.href || "/",
-            image: item.image
-        }));
+        if (!promos || promos.length === 0) {
+            // Fallback to all active promotions
+            const allPromosData = await fetchAPI("/promotions", { 
+                populate: "*",
+                filters: { isActive: { $ne: false } }
+            });
+            
+            if (!allPromosData?.data) return [];
+            return allPromosData.data.map((item: StrapiPromotionItem) => ({
+                id: item.id,
+                title: item.title,
+                href: item.href || "/",
+                image: item.image?.url ? getStrapiMedia(item.image.url) : undefined,
+                desktopImage: item.desktopImage?.url ? getStrapiMedia(item.desktopImage.url) : undefined
+            }));
+        }
+
+        return promos
+            .filter((item: StrapiPromotionItem) => item.isActive !== false)
+            .map((item: StrapiPromotionItem) => ({
+                id: item.id,
+                title: item.title,
+                href: item.href || "/",
+                image: item.image?.url ? getStrapiMedia(item.image.url) : undefined,
+                desktopImage: item.desktopImage?.url ? getStrapiMedia(item.desktopImage.url) : undefined
+            }));
     } catch (error) {
         console.error("Failed to fetch promotions:", error);
         return [];
