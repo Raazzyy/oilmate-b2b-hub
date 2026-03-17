@@ -34,16 +34,23 @@ const getCategoryColor = (slug: string) => {
   return "text-foreground";
 };
 
+// Core fields that exist directly on the Product content type
+const CORE_PRODUCT_FIELDS = [
+  'brand', 'volume', 'viscosity', 'oilType', 'approvals', 
+  'viscosityClass', 'type', 'color', 'country', 'standard',
+  'specification', 'application'
+];
+
 // Data fetching from Strapi
 async function getProducts(
   categorySlug?: string,
   searchParams: Record<string, string | string[] | undefined> = {}
 ): Promise<ProductData[]> {
-  const filters: Record<string, unknown> = {};
+  const strapiFilters: Record<string, unknown> = {};
   const { search, minPrice, maxPrice, sort, ...otherFilters } = searchParams;
 
   if (categorySlug && categorySlug !== "all") {
-    filters.category = { slug: { $eq: categorySlug } };
+    strapiFilters.category = { slug: { $eq: categorySlug } };
   }
 
   // Price filtering
@@ -51,7 +58,7 @@ async function getProducts(
     const priceFilter: Record<string, unknown> = {};
     if (minPrice) priceFilter.$gte = minPrice;
     if (maxPrice) priceFilter.$lte = maxPrice;
-    filters.price = priceFilter;
+    strapiFilters.price = priceFilter;
   }
 
   // Search filtering
@@ -59,7 +66,7 @@ async function getProducts(
     const lowerQuery = search.toLowerCase();
     const capitalizedQuery = search.charAt(0).toUpperCase() + search.slice(1).toLowerCase();
     
-    filters.$or = [
+    strapiFilters.$or = [
       { name: { $containsi: search } },
       { name: { $containsi: lowerQuery } },
       { name: { $containsi: capitalizedQuery } },
@@ -69,19 +76,51 @@ async function getProducts(
     ];
   }
 
-  // Dynamic filters from chips
+// Dynamic filters
+  const criteria: any[] = [];
+  
   Object.entries(otherFilters).forEach(([key, value]) => {
     if (value && typeof value === 'string') {
-      const options = value.split(',');
-      if (options.length > 0) {
-        filters[key] = { $in: options };
+      const options = value.split(',').filter(Boolean);
+      if (options.length === 0) return;
+
+      if (CORE_PRODUCT_FIELDS.includes(key)) {
+        // Hybrid filter: check both core field and characteristics component
+        criteria.push({
+          $or: [
+            { [key]: { $in: options } },
+            { 
+              characteristics: {
+                $and: [
+                  { key: { $eq: key } },
+                  { value: { $in: options } }
+                ]
+              }
+            }
+          ]
+        });
+      } else {
+        // Pure dynamic characteristic filter
+        criteria.push({
+          characteristics: {
+            $and: [
+              { key: { $eq: key } },
+              { value: { $in: options } }
+            ]
+          }
+        });
       }
     }
   });
 
+  if (criteria.length > 0) {
+    if (!strapiFilters.$and) strapiFilters.$and = [];
+    (strapiFilters.$and as any[]).push(...criteria);
+  }
+
   const sortParam = sort === "price_asc" ? "price:asc" : sort === "price_desc" ? "price:desc" : undefined;
 
-  const response = await fetchStrapiProducts({ filters, sort: sortParam });
+  const response = await fetchStrapiProducts({ filters: strapiFilters, sort: sortParam });
   return (response.data as StrapiProduct[]).map(mapStrapiProduct);
 }
 

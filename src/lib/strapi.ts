@@ -52,8 +52,9 @@ export async function fetchAPI(
         }
 
         if (!response.ok) {
-            console.error(response.statusText);
-            throw new Error(`An error occurred please try again: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            console.error(`[Strapi API Error] ${response.status} ${response.statusText}:`, errorData);
+            throw new Error(`An error occurred please try again: ${response.statusText} - ${JSON.stringify(errorData)}`);
         }
 
         const data = await response.json();
@@ -120,6 +121,11 @@ export interface StrapiProduct {
         canonicalURL?: string;
         keywords?: string;
     };
+    characteristics?: {
+        id: number;
+        key: string;
+        value: string;
+    }[];
     [key: string]: unknown;
 }
 
@@ -165,6 +171,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         isNew: attrs.isNew as boolean,
         isHit: attrs.isHit as boolean,
         country: attrs.country as string,
+        characteristics: attrs.characteristics,
     };
     console.log(`[Strapi Map] Product ${item.id}:`, {
         name: mapped.name,
@@ -382,78 +389,105 @@ export async function getProducts(params: Record<string, unknown> = {}): Promise
  */
 export async function getCategoryFilterOptions(categorySlug?: string): Promise<StrapiFilter[]> {
     try {
+        // 1. Fetch the category with its manual filters
+        let manualFilters: StrapiFilter[] = [];
+        if (categorySlug && categorySlug !== "all") {
+            const cat = await getCategoryBySlug(categorySlug);
+            if (cat?.filters && cat.filters.length > 0) {
+                manualFilters = cat.filters;
+            }
+        }
+
         const filters: Record<string, unknown> = {};
         if (categorySlug && categorySlug !== "all") {
             filters.category = { slug: { $eq: categorySlug } };
         }
 
-        // Fetch up to 1000 products to find unique attributes
+        // 2. Aggregate values
+        // Fetch products with necessary fields
+        const coreFields = ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country'];
         const response = await fetchAPI("/products", {
             filters,
-            pagination: { limit: 1000 },
-            fields: ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country', 'oldPrice', 'label']
+            pagination: { pageSize: 60 },
+            populate: { characteristics: true },
+            fields: ['id', 'documentId', ...coreFields]
         });
 
         if (!response?.data || response.data.length === 0) {
-            return [];
+            return manualFilters.length > 0 ? manualFilters : [];
         }
 
         const products = response.data as StrapiProduct[];
 
-        // Maps to hold unique values for each attribute
-        const attributeValues: Record<string, Set<string>> = {
-            brand: new Set(),
-            volume: new Set(),
-            viscosity: new Set(),
-            oilType: new Set(),
-            approvals: new Set(),
-            type: new Set(),
-            viscosityClass: new Set(),
-            country: new Set(),
-        };
+        // A map to store options for each relevant slug
+        const aggregatedOptions: Record<string, Set<string>> = {};
+
+        // If manual filters exist, only aggregate for those
+        // Otherwise, aggregate for all core fields
+        const targetSlugs = manualFilters.length > 0 
+            ? manualFilters.map(f => f.slug)
+            : coreFields;
+        
+        targetSlugs.forEach(slug => aggregatedOptions[slug] = new Set());
 
         products.forEach(p => {
-            if (p.brand) attributeValues.brand.add(p.brand);
-            if (p.volume) attributeValues.volume.add(p.volume);
-            if (p.viscosity) attributeValues.viscosity.add(p.viscosity as string);
-            if (p.oilType) attributeValues.oilType.add(p.oilType);
-            if (p.type) attributeValues.type.add(p.type as string);
-            if (p.viscosityClass) attributeValues.viscosityClass.add(p.viscosityClass as string);
-            if (p.country) attributeValues.country.add(p.country as string);
+            const attrs = (p as unknown as { attributes: StrapiProduct }).attributes || p;
+            
+            // Check core fields
+            coreFields.forEach(field => {
+                if (aggregatedOptions[field] && attrs[field]) {
+                    const val = attrs[field];
+                    if (field === 'approvals' && typeof val === 'string') {
+                         val.split(',').map(s => s.trim()).filter(Boolean).forEach(a => aggregatedOptions[field].add(a));
+                    } else if (typeof val === 'string') {
+                        aggregatedOptions[field].add(val);
+                    }
+                }
+            });
 
-            // Approvals can be comma-separated, try to split them nicely if applicable
-            // For now just add as is, assuming they are neat strings in DB
-            if (p.approvals) {
-                const apps = (p.approvals as string).split(',').map(s => s.trim()).filter(Boolean);
-                apps.forEach(a => attributeValues.approvals.add(a));
+            // Check dynamic characteristics
+            if (attrs.characteristics) {
+                attrs.characteristics.forEach(char => {
+                    if (aggregatedOptions[char.key] && char.value) {
+                        aggregatedOptions[char.key].add(char.value);
+                    }
+                });
             }
         });
 
-        const autoFilters: StrapiFilter[] = [];
-        let idCounter = 1;
+        // 3. Construct final filters
+        if (manualFilters.length > 0) {
+            return manualFilters.map(f => ({
+                ...f,
+                options: Array.from(aggregatedOptions[f.slug] || []).sort()
+            })).filter(f => f.options && f.options.length > 0);
+        }
 
-        const addFilterIfHasOptions = (slug: string, name: string) => {
-            const options = Array.from(attributeValues[slug]).sort();
+        // Fallback: existing auto-logic
+        const autoFilters: StrapiFilter[] = [];
+        const coreNames: Record<string, string> = {
+            brand: 'Бренд',
+            volume: 'Объем',
+            viscosity: 'Вязкость',
+            oilType: 'Тип масла',
+            approvals: 'Допуски',
+            type: 'Тип',
+            viscosityClass: 'Класс вязкости',
+            country: 'Страна-производитель'
+        };
+
+        coreFields.forEach(field => {
+            const options = Array.from(aggregatedOptions[field]).sort();
             if (options.length > 0) {
                 autoFilters.push({
-                    id: idCounter++,
-                    name,
-                    slug,
+                    id: Math.random(), // transient id
+                    name: coreNames[field] || field,
+                    slug: field,
                     type: 'chips',
                     options
                 });
             }
-        };
-
-        // Add them in a logical order
-        addFilterIfHasOptions('brand', 'Бренд');
-        addFilterIfHasOptions('volume', 'Объем');
-        addFilterIfHasOptions('viscosity', 'Вязкость');
-        addFilterIfHasOptions('oilType', 'Тип масла');
-        addFilterIfHasOptions('approvals', 'Допуски');
-        addFilterIfHasOptions('type', 'Тип');
-        addFilterIfHasOptions('viscosityClass', 'Класс вязкости');
-        addFilterIfHasOptions('country', 'Страна-производитель');
+        });
 
         return autoFilters;
 

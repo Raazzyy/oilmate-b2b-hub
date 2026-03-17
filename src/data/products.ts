@@ -35,6 +35,11 @@ export interface ProductData {
   isNew?: boolean;
   isHit?: boolean;
   country?: string;
+  characteristics?: {
+    id: number;
+    key: string;
+    value: string;
+  }[];
 }
 
 export const allProducts: ProductData[] = [
