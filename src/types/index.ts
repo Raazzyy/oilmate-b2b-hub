@@ -6,3 +6,11 @@ export interface HeroSlide {
     backgroundImage?: string;
     desktopImage?: string;
 }
+
+export interface Promotion {
+    id: number;
+    title?: string;
+    image?: string;
+    desktopImage?: string;
+    href: string;
+}

@@ -10,16 +10,9 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import ImageWithSkeleton from "./ImageWithSkeleton";
 import { getStrapiMedia, StrapiImage } from "@/lib/strapi";
-
-interface Promotion {
-  id: number;
-  title?: string;
-  image?: StrapiImage;
-  href: string;
-}
+import { Promotion } from "@/types";
 
 interface PromotionsProps {
   promotions: Promotion[];
@@ -31,27 +24,42 @@ const Promotions = ({ promotions }: PromotionsProps) => {
   return (
     <section className="py-3 md:py-5 bg-background">
       <div className="container">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-foreground">Акции и предложения</h2>
-        </div>
-
         <Carousel
           opts={{
             align: "start",
             loop: true,
           }}
-          className="w-full"
+          className="w-full relative group"
         >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-foreground">Акции и предложения</h2>
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0 h-8 w-8 rounded-full border border-border bg-background hover:bg-muted" />
+              <CarouselNext className="static translate-y-0 h-8 w-8 rounded-full border border-border bg-background hover:bg-muted" />
+            </div>
+          </div>
+
           <CarouselContent className="-ml-4">
             {promotions.map((promo) => (
                 <CarouselItem key={promo.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                    <Link href={promo.href} className="block group">
+                    <Link href={promo.href} className="block group/item">
                         <div className="relative overflow-hidden rounded-3xl bg-card border border-border h-full flex flex-col aspect-video">
+                            {/* Mobile/Default image */}
                             <ImageWithSkeleton 
-                                src={getStrapiMedia(promo.image?.url) || "/oil-product.png"} 
+                                src={promo.image || "/oil-product.png"} 
                                 alt={promo.title || "Promotion"} 
                                 aspectRatio="video"
+                                className={promo.desktopImage ? "md:hidden" : ""}
                             />
+                            {/* Desktop image */}
+                            {promo.desktopImage && (
+                              <ImageWithSkeleton 
+                                  src={promo.desktopImage} 
+                                  alt={promo.title || "Promotion"} 
+                                  aspectRatio="video"
+                                  className="hidden md:block"
+                              />
+                            )}
                         </div>
                     </Link>
                 </CarouselItem>

@@ -101,11 +101,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
 
   const isRootCatalog = !categorySlug && !searchQuery;
 
-  const categoryName = categorySlug
-    ? categoryNames[categorySlug] || "Каталог"
-    : "Все товары";
-
-  const [products, category, autoFilters, categories] = await Promise.all([
+  const [products, categoryData, autoFilters, categories] = await Promise.all([
     isRootCatalog ? Promise.resolve([]) : getProducts(categorySlug, searchParams),
     categorySlug && categorySlug !== "all"
       ? getCategoryBySlug(categorySlug)
@@ -113,6 +109,10 @@ export default async function CatalogPage(props: CatalogPageProps) {
     isRootCatalog ? Promise.resolve([]) : getCategoryFilterOptions(categorySlug),
     isRootCatalog ? getCategories() : Promise.resolve([]),
   ]);
+
+  const categoryName = searchQuery 
+    ? `Поиск: ${searchQuery}`
+    : categoryData?.name || (categorySlug ? categoryNames[categorySlug] || "Каталог" : "Все товары");
 
   const hasActiveFilters = Boolean(
     searchParams.minPrice || 
@@ -142,7 +142,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
               Каталог
             </Link>
             <span className="opacity-40 text-xs">/</span>
-            <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">{categorySlug ? categoryName : `Поиск: ${searchQuery}`}</span>
+            <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">{categoryName}</span>
           </>
         ) : (
           <span className="text-foreground font-medium bg-muted px-3 py-1 rounded-full">Каталог</span>
@@ -199,8 +199,8 @@ export default async function CatalogPage(props: CatalogPageProps) {
         // Regular catalog with sidebar and products
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* ── Sidebar – sticky, self-contained scroll ── */}
-          <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start">
-            <CatalogFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} />
+            <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start">
+            <CatalogFilters category={categoryData} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} />
           </aside>
 
           {/* ── Main content ── */}
@@ -208,7 +208,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
             <div className="mb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight mb-1">
-                  {searchQuery ? `Поиск: "${searchQuery}"` : categoryName}
+                  {categoryName}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Найдено товаров: {products.length}
@@ -224,7 +224,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
             {/* Mobile Filters & Sort (hidden on md) */}
             <div className="md:hidden flex gap-2 mb-6">
               <CatalogSort isMobile />
-              <MobileFilters category={category} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} hasActiveFilters={hasActiveFilters} />
+              <MobileFilters category={categoryData} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} hasActiveFilters={hasActiveFilters} />
             </div>
 
             {products.length > 0 ? (
