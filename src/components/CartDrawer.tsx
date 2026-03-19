@@ -92,7 +92,7 @@ const CartDrawer = () => {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex gap-4 p-4 bg-muted rounded-xl">
-                    <div className="w-20 h-20 bg-background rounded-lg flex items-center justify-center shrink-0">
+                    <div className="w-16 aspect-[3/4] bg-muted rounded-lg overflow-hidden shrink-0 relative">
                       <img
                         src={
                           typeof item.product.image === "string"
@@ -100,7 +100,7 @@ const CartDrawer = () => {
                             : item.product.image.src
                         }
                         alt={item.product.name}
-                        className="w-full h-full object-contain p-2"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
