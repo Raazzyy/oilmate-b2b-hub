@@ -126,6 +126,7 @@ export interface StrapiProduct {
         key: string;
         value: string;
     }[];
+    relatedProducts?: StrapiProduct[];
     [key: string]: unknown;
 }
 
@@ -172,6 +173,7 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         isHit: attrs.isHit as boolean,
         country: attrs.country as string,
         characteristics: attrs.characteristics,
+        relatedProducts: attrs.relatedProducts?.map((p: StrapiProduct) => mapStrapiProduct(p)),
     };
     console.log(`[Strapi Map] Product ${item.id}:`, {
         name: mapped.name,
@@ -508,6 +510,12 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
                 category: true,
                 seo: {
                     populate: "*"
+                },
+                relatedProducts: {
+                    populate: {
+                        image: true,
+                        category: true
+                    }
                 }
             }
         });

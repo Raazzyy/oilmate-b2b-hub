@@ -77,35 +77,35 @@ const ProductCard = ({ product }: ProductCardProps) => {
           ) : null}
         </div>
 
-        {/* Name */}
-        <h3 className="line-clamp-2 text-xs font-medium text-foreground leading-snug mb-1 h-8 group-hover:text-primary transition-colors pr-2">
-          {name}
-        </h3>
-        
-        {/* Specs */}
-        <p className="text-[11px] text-muted-foreground mb-1 line-clamp-1 pr-2">
-          {getSpecsLine()}
-        </p>
-      </Link>
-
-      {/* Price & button */}
-      <div className="mt-auto pb-2">
-        <div className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 pr-2">
-          <div className={`inline-flex items-baseline w-fit ${oldPrice ? 'bg-gradient-to-r from-primary/10 to-accent/10 px-2 py-0.5 rounded-md' : ''}`}>
-            <span className={`text-base font-bold ${oldPrice ? 'text-primary font-extrabold' : 'text-foreground'}`}>
-              {rubles.toLocaleString("ru-RU")} ₽
-            </span>
-          </div>
-          
+        {/* Price Block */}
+        <div className="mt-3 mb-1.5 flex items-baseline gap-2 px-0.5">
+          <span className={`text-[16px] xl:text-[18px] font-bold tracking-tight ${oldPrice ? 'bg-gradient-to-r from-[hsl(211,60%,95%)] to-[hsl(211,60%,90%)] text-foreground rounded-lg px-2.5 py-0.5' : 'text-foreground'}`}>
+            {rubles.toLocaleString("ru-RU")} <span className="text-[14px]">₽</span>
+          </span>
           {oldPrice && (
-            <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50 whitespace-nowrap">
+            <span className="text-[12px] text-muted-foreground line-through decoration-muted-foreground/50">
               {oldRubles?.toLocaleString("ru-RU")} ₽
             </span>
           )}
         </div>
 
-        {/* Add to cart */}
-        <AddToCartButton product={product} />
+        {/* Name */}
+        <h3 className="line-clamp-2 text-[13px] xl:text-[14px] font-medium text-foreground leading-snug mb-1 group-hover:text-primary transition-colors px-0.5">
+          {name}
+        </h3>
+        
+        {/* Specs */}
+        <p className="text-[11px] xl:text-[12px] text-muted-foreground mb-1 line-clamp-1 px-0.5">
+          {getSpecsLine()}
+        </p>
+      </Link>
+
+      {/* Button */}
+      <div className="mt-auto pb-2">
+        <AddToCartButton 
+          product={product} 
+          className={(product.stock !== undefined && product.stock <= 0) || product.inStock === false ? "" : "bg-primary text-primary-foreground hover:bg-primary/90"} 
+        />
       </div>
     </div>
   );
