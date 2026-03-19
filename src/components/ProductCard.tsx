@@ -104,7 +104,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <div className="mt-auto pb-2">
         <AddToCartButton 
           product={product} 
-          className={(product.stock !== undefined && product.stock <= 0) || product.inStock === false ? "" : "bg-primary text-primary-foreground hover:bg-primary/90"} 
+          className="" 
         />
       </div>
     </div>
