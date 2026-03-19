@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
+import { cities } from "@/data/cities";
+import { cn } from "@/lib/utils";
 import {
   MapPin,
   Truck,
@@ -144,7 +146,7 @@ interface CheckoutFormProps {
 }
 
 const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
-  const { items, getTotalPrice, clearCart, selectedCity } = useCartStore();
+  const { items, getTotalPrice, clearCart, selectedCity, setSelectedCity } = useCartStore();
   const { toast } = useToast();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -428,6 +430,28 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
         /* Step 2: Delivery & contact form */
         <>
           <div className="flex-1 overflow-y-auto px-6 pb-6 pt-5">
+            {/* City selection */}
+            <div className="mb-5">
+              <h3 className="text-sm font-semibold mb-3 text-foreground">Город получения</h3>
+              <div className="flex p-1 bg-muted rounded-xl gap-1">
+                {cities.map((city) => (
+                  <button
+                    key={city.id}
+                    onClick={() => setSelectedCity(city.id)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all",
+                      selectedCity === city.id
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    )}
+                  >
+                    <MapPin className={cn("h-4 w-4", selectedCity === city.id ? "text-primary" : "opacity-50")} />
+                    {city.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Delivery options */}
             <div className="mb-5">
               <h3 className="text-sm font-semibold mb-3 text-foreground">Способ получения</h3>

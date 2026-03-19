@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image, { StaticImageData } from "next/image";
 import { categoryNames, ProductData } from "@/data/products";
+import { cities } from "@/data/cities";
 import { useCartStore } from "@/store/cart";
 import { getProducts, mapStrapiProduct, getStrapiMedia, StrapiCategory, StrapiNavigationItem } from "@/lib/strapi";
 
@@ -28,10 +29,7 @@ const getCategoryColor = (slug: string) => {
   return "text-foreground";
 };
 
-const cities = [
-  { id: "vladivostok", name: "Владивосток", description: "Пункт выдачи заказов и доставка по всему Приморскому краю" },
-  { id: "other", name: "Другой город", description: "Доставка заказов через транспортную компанию" },
-];
+
 
 const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCategory[], navigation?: StrapiNavigationItem[] }) => {
   const { getTotalItems, setIsCartOpen, isClient, setClient, selectedCity, setSelectedCity } = useCartStore();
