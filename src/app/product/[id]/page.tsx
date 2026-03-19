@@ -122,19 +122,25 @@ export default async function ProductPage(props: ProductPageProps) {
     notFound();
   }
 
+  let relatedProducts = product.relatedProducts || [];
+
   // Fetch related products and category data in parallel
   const [relatedResponse, categoryData] = await Promise.all([
-    fetchStrapiProducts({
-      filters: {
-        category: { slug: { $eq: product.category } },
-        documentId: { $ne: product.documentId }
-      },
-      pagination: { limit: 10 }
-    }),
+    relatedProducts.length > 0
+      ? Promise.resolve({ data: [] })
+      : fetchStrapiProducts({
+          filters: {
+            category: { slug: { $eq: product.category } },
+            documentId: { $ne: product.documentId }
+          },
+          pagination: { limit: 10 }
+        }),
     product.category !== "all" ? getCategoryBySlug(product.category) : Promise.resolve(null)
   ]);
 
-  const relatedProducts: ProductData[] = (relatedResponse.data as StrapiProduct[]).map(mapStrapiProduct);
+  if (relatedProducts.length === 0) {
+    relatedProducts = (relatedResponse.data as StrapiProduct[]).map(mapStrapiProduct);
+  }
   const activeFilterSlugs = new Set(categoryData?.filters?.map(f => f.slug) || []);
 
   const rubles = Math.floor(product.price);

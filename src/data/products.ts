@@ -40,6 +40,7 @@ export interface ProductData {
     key: string;
     value: string;
   }[];
+  relatedProducts?: ProductData[];
 }
 
 export const allProducts: ProductData[] = [
