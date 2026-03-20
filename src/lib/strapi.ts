@@ -281,6 +281,7 @@ export interface StrapiCategory {
     description?: string;
     image?: StrapiImage;
     filters?: StrapiFilter[];
+    showInNav?: boolean;
 }
 
 export async function getCategories(): Promise<StrapiCategory[]> {
@@ -289,6 +290,24 @@ export async function getCategories(): Promise<StrapiCategory[]> {
         return data?.data || [];
     } catch (error) {
         console.error("Failed to fetch categories:", error);
+        return [];
+    }
+}
+
+/**
+ * Returns only categories where showInNav is true.
+ * Used by the Header dropdown to control which categories are shown.
+ */
+export async function getNavCategories(): Promise<StrapiCategory[]> {
+    try {
+        const data = await fetchAPI("/categories", {
+            sort: "name:asc",
+            populate: { image: true },
+            filters: { showInNav: { $eq: true } }
+        }, { next: { revalidate: 0 } });
+        return data?.data || [];
+    } catch (error) {
+        console.error("Failed to fetch nav categories:", error);
         return [];
     }
 }
