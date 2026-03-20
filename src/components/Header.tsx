@@ -302,7 +302,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                            className="w-full flex items-center gap-4 p-3 hover:bg-muted rounded-xl transition-colors text-left group"
                            onClick={() => handleCategoryClick(category.slug)}
                          >
-                           <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
+                           <div className="w-10 h-10 rounded-sm bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
                              {category.image?.url ? (
                                <Image 
                                  src={getStrapiMedia(category.image.url) as string} 
