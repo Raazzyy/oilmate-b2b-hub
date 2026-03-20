@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
 import BottomNav from "@/components/BottomNav";
-import { getNavCategories, getNavigationItems } from "@/lib/strapi";
+import { getNavCategories, getNavigationItems, getFooterData } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -35,13 +35,14 @@ export default async function RootLayout({
 }>) {
   const categories = await getNavCategories();
   const navigation = await getNavigationItems();
+  const footerData = await getFooterData();
   return (
     <html lang="ru">
       <body className={inter.className}>
         <Providers>
           <Header categories={categories} navigation={navigation} />
             <main className="pb-[4.25rem] md:pb-0">{children}</main>
-          <Footer />
+          <Footer data={footerData} />
           <CartDrawer />
           <BottomNav />
           <CookieConsent />

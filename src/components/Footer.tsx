@@ -1,37 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, Send } from "lucide-react";
-
-const sections = [
-  {
-    title: "О нас",
-    links: [
-      "Политика обработки данных",
-      "Документы сайта",
-      "Вакансии",
-      "Наши магазины",
-    ],
-  },
-  {
-    title: "Покупателям",
-    links: [
-      "Вопросы — ответы",
-      "Заказы и доставка",
-      "Возврат товара",
-      "Акции и скидки",
-    ],
-  },
-  {
-    title: "Контакты",
-    links: [
-      "Общие контакты",
-      "Отдел продаж",
-      "Для предложений по ассортименту",
-      "Партнерская программа",
-    ],
-  },
-];
+import { Send } from "lucide-react";
+import Link from "next/link";
+import { FooterData } from "@/lib/strapi";
 
 const VKIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
@@ -39,12 +10,49 @@ const VKIcon = () => (
   </svg>
 );
 
-const Footer = () => {
+const defaultSections = [
+  {
+    title: "О нас",
+    links: [
+      { label: "Политика обработки данных", href: "#" },
+      { label: "Документы сайта", href: "#" },
+      { label: "Вакансии", href: "#" },
+      { label: "Наши магазины", href: "#" },
+    ],
+  },
+  {
+    title: "Покупателям",
+    links: [
+      { label: "Вопросы — ответы", href: "#" },
+      { label: "Заказы и доставка", href: "#" },
+      { label: "Возврат товара", href: "#" },
+      { label: "Акции и скидки", href: "#" },
+    ],
+  },
+  {
+    title: "Контакты",
+    links: [
+      { label: "Общие контакты", href: "#" },
+      { label: "Отдел продаж", href: "#" },
+      { label: "Для предложений по ассортименту", href: "#" },
+      { label: "Партнерская программа", href: "#" },
+    ],
+  },
+];
+
+const Footer = ({ data }: { data: FooterData | null }) => {
   const [openSection, setOpenSection] = useState<number | null>(null);
 
   const toggle = (i: number) => {
     setOpenSection(openSection === i ? null : i);
   };
+
+  const phone = data?.phone || "8 800 770 70 21";
+  const phoneDescription = data?.phoneDescription || "круглосуточный телефон";
+  const telegramUrl = data?.telegramUrl || "#";
+  const vkUrl = data?.vkUrl || "#";
+  const copyrightText = data?.copyrightText || "© OilMate 2024–2026. Все права защищены.";
+  const sections = data?.sections || defaultSections;
 
   return (
     <footer className="bg-[hsl(220,9%,98%)] dark:bg-card text-foreground">
@@ -55,13 +63,13 @@ const Footer = () => {
           <div>
             <h2 className="text-xl font-bold mb-5 tracking-tight">OilMate</h2>
             <div className="mb-4">
-              <a href="tel:88007707021" className="text-lg font-semibold hover:opacity-80 transition-opacity">
-                8 800 770 70 21
+              <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-lg font-semibold hover:opacity-80 transition-opacity">
+                {phone}
               </a>
-              <p className="text-xs opacity-60 mt-1">круглосуточный телефон</p>
+              <p className="text-xs opacity-60 mt-1">{phoneDescription}</p>
             </div>
             <a
-              href="#"
+              href={telegramUrl}
               className="inline-flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition-opacity"
             >
               <Send className="h-4 w-4" />
@@ -70,20 +78,20 @@ const Footer = () => {
           </div>
 
           {/* Link columns */}
-          {sections.map((section) => (
-            <div key={section.title}>
+          {sections.map((section, idx) => (
+            <div key={`${section.title}-${idx}`}>
               <h3 className="mb-4 text-xs font-bold uppercase tracking-widest opacity-70">
                 {section.title}
               </h3>
               <ul className="space-y-2.5">
-                {section.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
+                {section.links.map((link, lIdx) => (
+                  <li key={`${link.label}-${lIdx}`}>
+                    <Link
+                      href={link.href || "#"}
                       className="text-sm opacity-70 hover:opacity-100 transition-opacity"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -92,13 +100,13 @@ const Footer = () => {
         </div>
 
         {/* Copyright + bottom bar */}
-        <p className="mt-10 text-xs opacity-40">© OilMate 2024–2026. Все права защищены.</p>
+        <p className="mt-10 text-xs opacity-40">{copyrightText}</p>
         <div className="mt-3 pt-4 border-t border-foreground/10 flex items-center">
           <div className="flex items-center gap-5">
-            <a href="#" className="opacity-50 hover:opacity-100 transition-opacity">
+            <a href={telegramUrl} className="opacity-50 hover:opacity-100 transition-opacity">
               <Send className="h-5 w-5" />
             </a>
-            <a href="#" className="opacity-50 hover:opacity-100 transition-opacity">
+            <a href={vkUrl} className="opacity-50 hover:opacity-100 transition-opacity">
               <VKIcon />
             </a>
           </div>
@@ -110,16 +118,16 @@ const Footer = () => {
         <div className="px-4 pt-6 pb-4">
           <h2 className="text-lg font-bold tracking-tight">OilMate</h2>
           <div className="mt-3">
-            <a href="tel:88007707021" className="text-base font-semibold">8 800 770 70 21</a>
-            <p className="text-xs opacity-50 mt-0.5">круглосуточный телефон</p>
+            <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-base font-semibold">{phone}</a>
+            <p className="text-xs opacity-50 mt-0.5">{phoneDescription}</p>
           </div>
-          <a href="#" className="inline-flex items-center gap-2 text-sm opacity-70 mt-3">
+          <a href={telegramUrl} className="inline-flex items-center gap-2 text-sm opacity-70 mt-3">
             <Send className="h-4 w-4" /> Telegram
           </a>
         </div>
 
         {sections.map((section, i) => (
-          <div key={section.title} className="border-t border-foreground/10">
+          <div key={`${section.title}-${i}`} className="border-t border-foreground/10">
             <button
               onClick={() => toggle(i)}
               className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold"
@@ -131,11 +139,11 @@ const Footer = () => {
             </button>
             {openSection === i && (
               <ul className="px-4 pb-3 space-y-2.5">
-                {section.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm opacity-70 hover:opacity-100 transition-opacity">
-                      {link}
-                    </a>
+                {section.links.map((link, lIdx) => (
+                  <li key={`${link.label}-${lIdx}`}>
+                    <Link href={link.href || "#"} className="text-sm opacity-70 hover:opacity-100 transition-opacity">
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -144,12 +152,12 @@ const Footer = () => {
         ))}
 
         <div className="px-4 py-5 border-t border-foreground/10">
-          <p className="text-xs opacity-40 mb-4">© OilMate 2024–2026. Все права защищены.</p>
+          <p className="text-xs opacity-40 mb-4">{copyrightText}</p>
           <div className="flex items-center gap-5">
-            <a href="#" className="opacity-50 hover:opacity-100 transition-opacity">
+            <a href={telegramUrl} className="opacity-50 hover:opacity-100 transition-opacity">
               <Send className="h-5 w-5" />
             </a>
-            <a href="#" className="opacity-50 hover:opacity-100 transition-opacity">
+            <a href={vkUrl} className="opacity-50 hover:opacity-100 transition-opacity">
               <VKIcon />
             </a>
           </div>
@@ -158,5 +166,6 @@ const Footer = () => {
     </footer>
   );
 };
+
 
 export default Footer;
