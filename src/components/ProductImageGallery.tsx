@@ -60,7 +60,7 @@ const ProductImageGallery = ({ image, images, name }: ProductImageGalleryProps) 
                 setSelectedIndex(index);
               }}
               className={cn(
-                "relative h-20 w-20 rounded-xl border-2 bg-gradient-to-br from-muted to-muted/50 flex-shrink-0 transition-all overflow-hidden",
+                "relative aspect-[3/4] w-16 rounded-xl border-2 bg-gradient-to-br from-muted to-muted/50 flex-shrink-0 transition-all overflow-hidden",
                 selectedIndex === index
                   ? "border-primary shadow-sm"
                   : "border-transparent hover:border-primary/50"
