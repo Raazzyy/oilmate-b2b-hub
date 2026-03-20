@@ -158,7 +158,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
       className="w-full h-full flex flex-col [&::-webkit-scrollbar]:hidden"
       style={{ overflowY: "auto", scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
     >
-      <div className="bg-card rounded-2xl p-4 mb-3 shadow-sm border border-border/50">
+      <div className="bg-card rounded-2xl p-4 mb-3 border border-border/50">
         <Link
           href="/catalog"
           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
@@ -173,7 +173,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
         )}
       </div>
 
-      <div className="bg-card rounded-2xl p-5 mb-4 shadow-sm border border-border/50">
+      <div className="bg-card rounded-2xl p-5 mb-4 border border-border/50">
         <h3 className="font-medium text-foreground mb-5 text-base">Фильтры</h3>
 
         {/* ── Price filter — dynamic range ── */}
