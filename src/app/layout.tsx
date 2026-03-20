@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
 import BottomNav from "@/components/BottomNav";
-import { getCategories, getNavigationItems } from "@/lib/strapi";
+import { getNavCategories, getNavigationItems } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -33,7 +33,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const categories = await getCategories();
+  const categories = await getNavCategories();
   const navigation = await getNavigationItems();
   return (
     <html lang="ru">
