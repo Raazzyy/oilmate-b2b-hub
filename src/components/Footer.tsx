@@ -55,7 +55,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
   const sections = data?.sections || defaultSections;
 
   return (
-    <footer className="bg-[hsl(220,9%,98%)] dark:bg-card text-foreground">
+    <footer className="relative z-10 bg-[hsl(220,9%,98%)] dark:bg-card text-foreground">
       {/* ── Desktop ── */}
       <div className="container hidden md:block py-10">
         <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-8">
