@@ -154,10 +154,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
     searchParams?.get(slug)?.split(',').filter(Boolean) || [];
 
   return (
-    <div
-      className="w-full h-full flex flex-col [&::-webkit-scrollbar]:hidden"
-      style={{ overflowY: "auto", scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
-    >
+    <div className="w-full flex flex-col">
       <div className="bg-card rounded-2xl p-4 mb-3 border border-border/50">
         <Link
           href="/catalog"
