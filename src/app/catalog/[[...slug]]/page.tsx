@@ -238,7 +238,7 @@ export default async function CatalogPage(props: CatalogPageProps) {
         // Regular catalog with sidebar and products
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* ── Sidebar – sticky, self-contained scroll ── */}
-            <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start max-h-[calc(100vh-2rem)] flex flex-col">
+            <aside className="w-full md:w-60 shrink-0 hidden md:block sticky top-4 self-start max-h-[calc(100vh-2rem)] flex flex-col z-0">
             <CatalogFilters category={categoryData} categorySlugProp={categorySlug} autoFilters={autoFilters} priceRange={priceRange} />
           </aside>
 

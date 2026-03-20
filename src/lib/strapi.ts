@@ -682,3 +682,45 @@ export async function getNavigationItems(): Promise<StrapiNavigationItem[]> {
         return [];
     }
 }
+
+// --- Footer ---
+
+export interface FooterLink {
+    id: number;
+    label: string;
+    href: string;
+}
+
+export interface FooterSection {
+    id: number;
+    title: string;
+    links: FooterLink[];
+}
+
+export interface FooterData {
+    phone: string;
+    phoneDescription: string;
+    telegramUrl: string;
+    vkUrl: string;
+    sections: FooterSection[];
+    copyrightText: string;
+}
+
+export async function getFooterData(): Promise<FooterData | null> {
+    try {
+        const data = await fetchAPI("/footer", {
+            populate: {
+                sections: {
+                    populate: {
+                        links: true
+                    }
+                }
+            }
+        });
+        return data?.data || null;
+    } catch (error) {
+        console.error("Failed to fetch footer data:", error);
+        return null;
+    }
+}
+
