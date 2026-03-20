@@ -43,10 +43,10 @@ export default function CatalogSort({ isMobile = false }: { isMobile?: boolean }
 
   if (isMobile) {
     return (
-      <div className="relative basis-1/3" ref={sortRef}>
+      <div className="relative basis-1/3 flex flex-col" ref={sortRef}>
         <button
           onClick={() => setIsSortOpen(!isSortOpen)}
-          className="w-full flex items-center justify-center py-2.5 rounded-xl bg-muted text-foreground text-sm font-medium transition-all active:scale-95"
+          className="w-full h-full flex items-center justify-center py-2.5 rounded-xl bg-muted text-foreground text-sm font-medium transition-all active:scale-95"
         >
           <ArrowUpDown className="h-4 w-4" />
         </button>
