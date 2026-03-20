@@ -1,6 +1,7 @@
 "use client";
 
-import { Send } from "lucide-react";
+import { useState } from "react";
+import { Send, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { FooterData } from "@/lib/strapi";
 
