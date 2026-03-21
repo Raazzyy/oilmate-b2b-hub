@@ -69,14 +69,14 @@ export async function generateMetadata(props: ProductPageProps) {
   if (!strapiProduct) {
     return {
       title: `${product.name} | OilMate`,
-      description: `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}.`,
+      description: `Купить ${product.name} оптом. Бренд: ${product.brand}.`,
     };
   }
 
   const seo = strapiProduct.seo || {};
   
   const title = (seo.metaTitle as string) || `${product.name} | OilMate`;
-  const description = (seo.metaDescription as string) || `Купить ${product.name} оптом. Бренд: ${product.brand}. Объем: ${product.volume}. Выгодные цены для бизнеса.`;
+  const description = (seo.metaDescription as string) || `Купить ${product.name} оптом. Бренд: ${product.brand}. Выгодные цены для бизнеса.`;
   const images = [];
 
   if (seo.metaImage?.url) {
