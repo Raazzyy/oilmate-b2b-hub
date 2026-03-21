@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
-import { ProductData } from "@/data/products";
+import { ProductData, categoryNames } from "@/data/products";
 
 import Image from "next/image";
 
