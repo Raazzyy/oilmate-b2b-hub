@@ -12,7 +12,6 @@ export interface ProductData {
   supplierLogo?: string | StaticImageData;
   name: string;
   brand: string;
-  volume: string;
   price: number;
   oldPrice?: number;
   image: string | StaticImageData;
@@ -20,25 +19,18 @@ export interface ProductData {
   description?: string;
   inStock: boolean;
   stock?: number;
-  oilType: string;
   isUniversal?: boolean;
   category: string;
-  viscosity?: string;
-  approvals?: string;
-  specification?: string;
-  viscosityClass?: string;
-  application?: string;
-  standard?: string;
-  color?: string;
-  type?: string;
   rating?: number;
   isNew?: boolean;
   isHit?: boolean;
   country?: string;
-  characteristics?: {
+  productAttributes?: {
     id: number;
-    key: string;
+    name: string;
+    slug: string;
     value: string;
+    isFilter: boolean;
   }[];
   relatedProducts?: ProductData[];
 }
@@ -280,8 +272,6 @@ export function searchProducts(query: string): ProductData[] {
     product.name.toLowerCase().includes(lowerQuery) ||
     product.brand.toLowerCase().includes(lowerQuery) ||
     product.category.toLowerCase().includes(lowerQuery) ||
-    product.oilType.toLowerCase().includes(lowerQuery) ||
-    (product.viscosity && product.viscosity.toLowerCase().includes(lowerQuery)) ||
-    (product.approvals && product.approvals.toLowerCase().includes(lowerQuery))
+    (product.productAttributes && product.productAttributes.some(attr => attr.value.toLowerCase().includes(lowerQuery)))
   ).slice(0, 6); // Limit to 6 results
 }

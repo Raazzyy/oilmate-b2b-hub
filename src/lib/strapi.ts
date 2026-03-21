@@ -89,6 +89,20 @@ export interface StrapiImage {
     formats?: Record<string, unknown>;
 }
 
+export interface StrapiAttribute {
+    id: number;
+    documentId: string;
+    name: string;
+    slug: string;
+}
+
+export interface StrapiProductAttribute {
+    id: number;
+    attribute?: StrapiAttribute;
+    value: string;
+    isFilter: boolean;
+}
+
 export interface StrapiProduct {
     id: number;
     documentId: string;
@@ -99,7 +113,6 @@ export interface StrapiProduct {
     supplierLogo?: StrapiImage;
     name: string;
     brand?: string;
-    volume?: string;
     price: number;
     oldPrice?: number;
     image?: StrapiImage;
@@ -107,7 +120,6 @@ export interface StrapiProduct {
     description?: string;
     inStock?: boolean;
     stock?: number;
-    oilType?: string;
     isUniversal?: boolean;
     category?: {
         slug: string;
@@ -121,11 +133,7 @@ export interface StrapiProduct {
         canonicalURL?: string;
         keywords?: string;
     };
-    characteristics?: {
-        id: number;
-        key: string;
-        value: string;
-    }[];
+    productAttributes?: StrapiProductAttribute[];
     relatedProducts?: StrapiProduct[];
     [key: string]: unknown;
 }
@@ -139,6 +147,23 @@ import { ProductData } from "@/data/products";
 export function mapStrapiProduct(item: StrapiProduct): ProductData {
     const attrs = (item as unknown as { attributes: StrapiProduct }).attributes || item;
     
+    // Process attributes gracefully supporting Strapi v4/v5 payload formats
+    const rawAttrs = attrs.productAttributes || [];
+    const mappedAttrs = rawAttrs.map((pa: StrapiProductAttribute) => {
+        // Handle Strapi v4 nested attributes if present
+        const attrData = (pa.attribute as unknown as { data?: { attributes?: StrapiAttribute } })?.data?.attributes 
+                      || (pa.attribute as unknown as { attributes?: StrapiAttribute })?.attributes 
+                      || pa.attribute;
+                      
+        return {
+            id: pa.id,
+            name: attrData?.name || "Неизвестно",
+            slug: attrData?.slug || "unknown",
+            value: pa.value,
+            isFilter: pa.isFilter ?? false
+        };
+    }).filter(a => a.name !== "Неизвестно");
+
     const mapped: ProductData = {
         id: item.id,
         documentId: item.documentId,
@@ -149,7 +174,6 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         supplierLogo: getStrapiMedia(attrs.supplierLogo?.url),
         name: attrs.name,
         brand: attrs.brand || "",
-        volume: attrs.volume || "",
         price: attrs.price,
         oldPrice: attrs.oldPrice,
         image: getStrapiMedia(attrs.image?.url) || "/oil-product.png",
@@ -157,30 +181,15 @@ export function mapStrapiProduct(item: StrapiProduct): ProductData {
         description: attrs.description,
         inStock: attrs.inStock ?? true,
         stock: attrs.stock,
-        oilType: attrs.oilType || "",
         isUniversal: attrs.isUniversal,
         category: attrs.category?.slug || "all",
-        viscosity: attrs.viscosity as string,
-        approvals: attrs.approvals as string,
-        specification: attrs.specification as string,
-        viscosityClass: attrs.viscosityClass as string,
-        application: attrs.application as string,
-        standard: attrs.standard as string,
-        color: attrs.color as string,
-        type: attrs.type as string,
         rating: attrs.rating as number,
         isNew: attrs.isNew as boolean,
         isHit: attrs.isHit as boolean,
         country: attrs.country as string,
-        characteristics: attrs.characteristics,
+        productAttributes: mappedAttrs,
         relatedProducts: attrs.relatedProducts?.map((p: StrapiProduct) => mapStrapiProduct(p)),
     };
-    console.log(`[Strapi Map] Product ${item.id}:`, {
-        name: mapped.name,
-        price: mapped.price,
-        oldPrice: mapped.oldPrice,
-        label: mapped.label
-    });
     return mapped;
 }
 
@@ -426,11 +435,15 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
 
         // 2. Aggregate values
         // Fetch products with necessary fields
-        const coreFields = ['brand', 'volume', 'viscosity', 'oilType', 'approvals', 'type', 'viscosityClass', 'country'];
+        const coreFields = ['brand', 'country'];
         const response = await fetchAPI("/products", {
             filters,
             pagination: { pageSize: 60 },
-            populate: { characteristics: true },
+            populate: { 
+                productAttributes: {
+                    populate: { attribute: true }
+                } 
+            },
             fields: ['id', 'documentId', ...coreFields]
         });
 
@@ -442,38 +455,52 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
 
         // A map to store options for each relevant slug
         const aggregatedOptions: Record<string, Set<string>> = {};
+        const coreNames: Record<string, string> = {
+            brand: 'Бренд',
+            country: 'Страна-производитель'
+        };
 
         // If manual filters exist, only aggregate for those
-        // Otherwise, aggregate for all core fields
-        const targetSlugs = manualFilters.length > 0 
-            ? manualFilters.map(f => f.slug)
-            : coreFields;
-        
+        const targetSlugs = manualFilters.map(f => f.slug);
         targetSlugs.forEach(slug => aggregatedOptions[slug] = new Set());
+        
+        // If no manual filters, we will discover dynamic filters on the fly
+        const autoSlugs = new Set<string>(coreFields);
 
         products.forEach(p => {
             const attrs = (p as unknown as { attributes: StrapiProduct }).attributes || p;
             
             // Check core fields
             coreFields.forEach(field => {
-                if (aggregatedOptions[field] && attrs[field]) {
-                    const val = attrs[field];
-                    if (field === 'approvals' && typeof val === 'string') {
-                         val.split(',').map(s => s.trim()).filter(Boolean).forEach(a => aggregatedOptions[field].add(a));
-                    } else if (typeof val === 'string') {
-                        aggregatedOptions[field].add(val);
+                if (attrs[field] && typeof attrs[field] === 'string') {
+                    if (targetSlugs.length === 0 || targetSlugs.includes(field)) {
+                        if (!aggregatedOptions[field]) aggregatedOptions[field] = new Set();
+                        aggregatedOptions[field].add(attrs[field] as string);
                     }
                 }
             });
 
-            // Check dynamic characteristics
-            if (attrs.characteristics) {
-                attrs.characteristics.forEach(char => {
-                    if (aggregatedOptions[char.key] && char.value) {
-                        aggregatedOptions[char.key].add(char.value);
+            // Check dynamic productAttributes
+            const rawAttrs = attrs.productAttributes || [];
+            rawAttrs.forEach((pa: StrapiProductAttribute) => {
+                if (pa.isFilter && pa.value) {
+                    const attrData = (pa.attribute as unknown as { data?: { attributes?: StrapiAttribute } })?.data?.attributes 
+                                  || (pa.attribute as unknown as { attributes?: StrapiAttribute })?.attributes 
+                                  || pa.attribute;
+                    const slug = attrData?.slug;
+                    const name = attrData?.name;
+                    
+                    if (slug && name && (targetSlugs.length === 0 || targetSlugs.includes(slug))) {
+                        if (!aggregatedOptions[slug]) aggregatedOptions[slug] = new Set();
+                        coreNames[slug] = name; // Save name for auto filters
+                        autoSlugs.add(slug);
+
+                        pa.value.split(',').map(s => s.trim()).filter(Boolean).forEach(v => {
+                            aggregatedOptions[slug].add(v);
+                        });
                     }
-                });
-            }
+                }
+            });
         });
 
         // 3. Construct final filters
@@ -486,19 +513,9 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
 
         // Fallback: existing auto-logic
         const autoFilters: StrapiFilter[] = [];
-        const coreNames: Record<string, string> = {
-            brand: 'Бренд',
-            volume: 'Объем',
-            viscosity: 'Вязкость',
-            oilType: 'Тип масла',
-            approvals: 'Допуски',
-            type: 'Тип',
-            viscosityClass: 'Класс вязкости',
-            country: 'Страна-производитель'
-        };
 
-        coreFields.forEach(field => {
-            const options = Array.from(aggregatedOptions[field]).sort();
+        Array.from(autoSlugs).forEach(field => {
+            const options = Array.from(aggregatedOptions[field] || []).sort();
             if (options.length > 0) {
                 autoFilters.push({
                     id: Math.random(), // transient id
@@ -715,8 +732,10 @@ export async function getFooterData(): Promise<FooterData | null> {
                         links: true
                     }
                 }
-            }
+            },
+            publicationState: "preview"
         });
+        console.log("[Footer Debug] Raw Response:", JSON.stringify(data, null, 2));
         return data?.data || null;
     } catch (error) {
         console.error("Failed to fetch footer data:", error);

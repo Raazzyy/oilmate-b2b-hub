@@ -182,7 +182,7 @@ export default async function ProductPage(props: ProductPageProps) {
               "@type": "Product",
               name: product.name,
               image: product.image,
-              description: `Моторное масло ${product.name} ${product.volume} ${product.brand}`,
+              description: `${product.name} ${product.brand}`,
               brand: {
                 "@type": "Brand",
                 name: product.brand
@@ -292,49 +292,31 @@ export default async function ProductPage(props: ProductPageProps) {
               <h3 className="text-xl font-bold mb-4">Характеристики</h3>
               <div className="space-y-0 text-sm">
                 {(() => {
-                  const hardcodedLabels: Record<string, string> = {
-                    viscosity: "Вязкость",
-                    oilType: "Тип масла",
-                    volume: "Объем",
-                    brand: "Производитель",
-                    country: "Страна",
-                    approvals: "Допуски",
-                    specification: "Спецификация",
-                    viscosityClass: "Класс вязкости",
-                    standard: "Стандарт",
-                    color: "Цвет",
-                    application: "Применение",
-                    type: "Тип",
-                  };
-
                   const specs: { label: string; value: string }[] = [];
 
-                  // 1. Add hardcoded fields if basic OR in filters OR if no filters defined
-                  const basicFields = ["brand", "volume", "country"];
-                  Object.entries(hardcodedLabels).forEach(([key, label]) => {
-                    const value = product[key as keyof ProductData];
-                    if (value && typeof value === 'string' && value.trim() !== "") {
-                        if (basicFields.includes(key) || activeFilterSlugs.has(key) || activeFilterSlugs.size === 0) {
-                            specs.push({ label, value });
-                        }
-                    }
-                  });
+                  // 1. Oбщие поля (brand, country)
+                  if (product.brand) {
+                    specs.push({ label: "Производитель", value: product.brand });
+                  }
+                  if (product.country) {
+                    specs.push({ label: "Страна", value: product.country });
+                  }
 
-                  // 2. Add dynamic characteristics if they exist and match filters
-                  if (product.characteristics) {
-                    product.characteristics.forEach(char => {
-                        if (activeFilterSlugs.has(char.key) || activeFilterSlugs.size === 0) {
-                            specs.push({ label: char.key, value: char.value });
-                        }
+                  // 2. Динaмичecкиe хaрaктeристики из справочника
+                  if (product.productAttributes && product.productAttributes.length > 0) {
+                    product.productAttributes.forEach(attr => {
+                      if (attr.name && attr.value) {
+                         specs.push({ label: attr.name, value: attr.value });
+                      }
                     });
                   }
 
                   if (specs.length === 0) return <p className="text-muted-foreground italic px-1">Характеристики не указаны</p>;
 
                   return specs.map((spec, i) => (
-                    <div key={i} className="flex justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1">
-                      <span className="text-muted-foreground">{spec.label}</span>
-                      <span className="font-semibold text-right">{spec.value}</span>
+                    <div key={i} className="flex flex-row justify-between py-3 border-b border-border/40 hover:bg-muted/5 transition-colors px-1 gap-4">
+                      <span className="text-muted-foreground w-1/2">{spec.label}</span>
+                      <span className="font-semibold text-right w-1/2">{spec.value}</span>
                     </div>
                   ));
                 })()}

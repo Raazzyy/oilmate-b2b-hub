@@ -17,12 +17,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     documentId,
     name,
     brand,
-    volume,
     price,
     oldPrice,
     image,
     inStock,
-    oilType,
     isUniversal = true,
     category,
     label,
@@ -30,7 +28,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   // Формируем строку характеристик
   const getSpecsLine = () => {
-    return `${oilType} · ${volume}`;
+    const attrs = product.productAttributes?.slice(0, 2).map(a => a.value) || [];
+    return attrs.join(" · ") || categoryNames[category] || "";
   };
   
   // Разделяем цену
