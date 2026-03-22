@@ -90,9 +90,9 @@ async function getProducts(
           $or: [
             { [key]: { $in: options } },
             { 
-              characteristics: {
+              productAttributes: {
                 $and: [
-                  { key: { $eq: key } },
+                  { attribute: { slug: { $eq: key } } },
                   { value: { $in: options } }
                 ]
               }
@@ -102,9 +102,9 @@ async function getProducts(
       } else {
         // Pure dynamic characteristic filter
         criteria.push({
-          characteristics: {
+          productAttributes: {
             $and: [
-              { key: { $eq: key } },
+              { attribute: { slug: { $eq: key } } },
               { value: { $in: options } }
             ]
           }
