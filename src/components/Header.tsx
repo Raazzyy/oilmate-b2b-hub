@@ -392,7 +392,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{product.name}</p>
                               <p className="text-xs text-muted-foreground">
-                                {categoryNames[product.category]} • {product.volume}
+                                {categoryNames[product.category]}
                               </p>
                             </div>
                             <div className="text-right shrink-0">

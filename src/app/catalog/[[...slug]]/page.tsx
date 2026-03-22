@@ -36,9 +36,7 @@ const getCategoryColor = (slug: string) => {
 
 // Core fields that exist directly on the Product content type
 const CORE_PRODUCT_FIELDS = [
-  'brand', 'volume', 'viscosity', 'oilType', 'approvals', 
-  'viscosityClass', 'type', 'color', 'country', 'standard',
-  'specification', 'application'
+  'brand', 'country'
 ];
 
 // Data fetching from Strapi
@@ -90,9 +88,9 @@ async function getProducts(
           $or: [
             { [key]: { $in: options } },
             { 
-              characteristics: {
+              productAttributes: {
                 $and: [
-                  { key: { $eq: key } },
+                  { attribute: { slug: { $eq: key } } },
                   { value: { $in: options } }
                 ]
               }
@@ -102,9 +100,9 @@ async function getProducts(
       } else {
         // Pure dynamic characteristic filter
         criteria.push({
-          characteristics: {
+          productAttributes: {
             $and: [
-              { key: { $eq: key } },
+              { attribute: { slug: { $eq: key } } },
               { value: { $in: options } }
             ]
           }

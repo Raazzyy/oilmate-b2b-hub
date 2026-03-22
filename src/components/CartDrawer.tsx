@@ -108,7 +108,7 @@ const CartDrawer = () => {
                         {item.product.name}
                       </h4>
                       <p className="text-xs text-muted-foreground mb-2">
-                        {categoryNames[item.product.category]} • {item.product.volume}
+                        {categoryNames[item.product.category]}
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">

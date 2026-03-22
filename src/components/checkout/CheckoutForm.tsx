@@ -279,7 +279,6 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
         documentId: item.product.documentId,
         id: item.product.id,
         name: item.product.name,
-        volume: item.product.volume,
         quantity: item.quantity,
         price: item.product.price,
       })),
