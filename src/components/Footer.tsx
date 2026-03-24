@@ -48,6 +48,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
     setOpenSection(openSection === i ? null : i);
   };
 
+  const siteName = data?.siteName || "OilMate";
   const phone = data?.phone || "8 800 770 70 21";
   const phoneDescription = data?.phoneDescription || "круглосуточный телефон";
   const telegramUrl = data?.telegramUrl || "#";
@@ -62,7 +63,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
         <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-8">
           {/* Brand + contacts */}
           <div>
-            <h2 className="text-xl font-bold mb-5 tracking-tight">OilMate</h2>
+            <h2 className="text-xl font-bold mb-5 tracking-tight">{siteName}</h2>
             <div className="mb-4">
               <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-lg font-semibold hover:opacity-80 transition-opacity">
                 {phone}
@@ -71,6 +72,8 @@ const Footer = ({ data }: { data: FooterData | null }) => {
             </div>
             <a
               href={telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm opacity-80 hover:opacity-100 transition-opacity"
             >
               <Send className="h-4 w-4" />
@@ -104,10 +107,20 @@ const Footer = ({ data }: { data: FooterData | null }) => {
         <p className="mt-10 text-xs opacity-40">{copyrightText}</p>
         <div className="mt-3 pt-4 border-t border-foreground/10 flex items-center">
           <div className="flex items-center gap-5">
-            <a href={telegramUrl} className="opacity-50 hover:opacity-100 transition-opacity">
+            <a
+              href={telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            >
               <Send className="h-5 w-5" />
             </a>
-            <a href={vkUrl} className="opacity-50 hover:opacity-100 transition-opacity">
+            <a
+              href={vkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            >
               <VKIcon />
             </a>
           </div>
@@ -117,12 +130,17 @@ const Footer = ({ data }: { data: FooterData | null }) => {
       {/* ── Mobile accordion ── */}
       <div className="md:hidden">
         <div className="px-4 pt-6 pb-4">
-          <h2 className="text-lg font-bold tracking-tight">OilMate</h2>
+          <h2 className="text-lg font-bold tracking-tight">{siteName}</h2>
           <div className="mt-3">
             <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-base font-semibold">{phone}</a>
             <p className="text-xs opacity-50 mt-0.5">{phoneDescription}</p>
           </div>
-          <a href={telegramUrl} className="inline-flex items-center gap-2 text-sm opacity-70 mt-3">
+          <a
+            href={telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm opacity-70 mt-3"
+          >
             <Send className="h-4 w-4" /> Telegram
           </a>
         </div>
@@ -155,10 +173,20 @@ const Footer = ({ data }: { data: FooterData | null }) => {
         <div className="px-4 py-5 border-t border-foreground/10">
           <p className="text-xs opacity-40 mb-4">{copyrightText}</p>
           <div className="flex items-center gap-5">
-            <a href={telegramUrl} className="opacity-50 hover:opacity-100 transition-opacity">
+            <a
+              href={telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            >
               <Send className="h-5 w-5" />
             </a>
-            <a href={vkUrl} className="opacity-50 hover:opacity-100 transition-opacity">
+            <a
+              href={vkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-50 hover:opacity-100 transition-opacity"
+            >
               <VKIcon />
             </a>
           </div>

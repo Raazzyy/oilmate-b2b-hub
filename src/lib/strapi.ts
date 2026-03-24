@@ -19,6 +19,33 @@ export function getStrapiMedia(url: string | null) {
     return `${STRAPI_API_URL}${url}`;
 }
 
+/**
+ * Ensures social media links are absolute URLs
+ */
+export function formatSocialUrl(url: string | undefined, type: 'telegram' | 'vk'): string {
+    if (!url || url === "#") return "#";
+    
+    // If it's already an absolute URL, return as is
+    if (url.startsWith("http") || url.startsWith("//")) {
+        return url;
+    }
+
+    // Handle common prefixes without protocol
+    if (url.startsWith("t.me/") || url.startsWith("vk.com/")) {
+        return `https://${url}`;
+    }
+
+    // Handle bare handles
+    if (type === 'telegram') {
+        return `https://t.me/${url.replace(/^@/, '')}`;
+    }
+    if (type === 'vk') {
+        return `https://vk.com/${url}`;
+    }
+
+    return url;
+}
+
 import qs from "qs";
 
 /**
@@ -367,7 +394,13 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
         const data = await fetchAPI("/homepage", {
             populate: {
                 featuredProducts: {
-                    populate: "*"
+                    populate: {
+                        image: true,
+                        category: true,
+                        productAttributes: {
+                            populate: { attribute: true }
+                        }
+                    }
                 }
             }
         }, { next: { revalidate: 0 } });
@@ -444,13 +477,12 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         const coreFields = ['brand', 'country'];
         const response = await fetchAPI("/products", {
             filters,
-            pagination: { pageSize: 60 },
+            pagination: { pageSize: 100 }, // Fetch more for better aggregation
             populate: { 
                 productAttributes: {
                     populate: { attribute: true }
                 } 
-            },
-            fields: ['id', 'documentId', ...coreFields]
+            }
         });
 
         if (!response?.data || response.data.length === 0) {
@@ -559,7 +591,10 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
                 relatedProducts: {
                     populate: {
                         image: true,
-                        category: true
+                        category: true,
+                        productAttributes: {
+                            populate: { attribute: true }
+                        }
                     }
                 }
             }
@@ -725,6 +760,7 @@ export interface FooterSection {
 
 export interface FooterData {
     phone: string;
+    siteName: string;
     phoneDescription: string;
     telegramUrl: string;
     vkUrl: string;
@@ -744,11 +780,19 @@ export async function getFooterData(): Promise<FooterData | null> {
             },
             publicationState: "preview"
         });
-        console.log("[Footer Debug] Raw Response:", JSON.stringify(data, null, 2));
-        return data?.data || null;
+        
+        if (!data?.data) return null;
+
+        const footer = data.data as FooterData;
+        return {
+            ...footer,
+            telegramUrl: formatSocialUrl(footer.telegramUrl, 'telegram'),
+            vkUrl: formatSocialUrl(footer.vkUrl, 'vk')
+        };
     } catch (error) {
         console.error("Failed to fetch footer data:", error);
         return null;
     }
 }
+
 
