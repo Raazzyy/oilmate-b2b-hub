@@ -477,13 +477,12 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         const coreFields = ['brand', 'country'];
         const response = await fetchAPI("/products", {
             filters,
-            pagination: { pageSize: 60 },
+            pagination: { pageSize: 100 }, // Fetch more for better aggregation
             populate: { 
                 productAttributes: {
                     populate: { attribute: true }
                 } 
-            },
-            fields: ['id', 'documentId', ...coreFields]
+            }
         });
 
         if (!response?.data || response.data.length === 0) {
