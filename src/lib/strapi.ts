@@ -394,7 +394,13 @@ export async function getHomepageProducts(): Promise<ProductData[]> {
         const data = await fetchAPI("/homepage", {
             populate: {
                 featuredProducts: {
-                    populate: "*"
+                    populate: {
+                        image: true,
+                        category: true,
+                        productAttributes: {
+                            populate: { attribute: true }
+                        }
+                    }
                 }
             }
         }, { next: { revalidate: 0 } });
@@ -586,7 +592,10 @@ export async function getProductById(id: string): Promise<StrapiProduct | null> 
                 relatedProducts: {
                     populate: {
                         image: true,
-                        category: true
+                        category: true,
+                        productAttributes: {
+                            populate: { attribute: true }
+                        }
                     }
                 }
             }
