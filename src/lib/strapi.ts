@@ -752,6 +752,7 @@ export interface FooterSection {
 
 export interface FooterData {
     phone: string;
+    siteName: string;
     phoneDescription: string;
     telegramUrl: string;
     vkUrl: string;

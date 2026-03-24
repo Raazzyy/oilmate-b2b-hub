@@ -48,6 +48,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
     setOpenSection(openSection === i ? null : i);
   };
 
+  const siteName = data?.siteName || "OilMate";
   const phone = data?.phone || "8 800 770 70 21";
   const phoneDescription = data?.phoneDescription || "круглосуточный телефон";
   const telegramUrl = data?.telegramUrl || "#";
@@ -62,7 +63,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
         <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-8">
           {/* Brand + contacts */}
           <div>
-            <h2 className="text-xl font-bold mb-5 tracking-tight">OilMate</h2>
+            <h2 className="text-xl font-bold mb-5 tracking-tight">{siteName}</h2>
             <div className="mb-4">
               <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-lg font-semibold hover:opacity-80 transition-opacity">
                 {phone}
@@ -129,7 +130,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
       {/* ── Mobile accordion ── */}
       <div className="md:hidden">
         <div className="px-4 pt-6 pb-4">
-          <h2 className="text-lg font-bold tracking-tight">OilMate</h2>
+          <h2 className="text-lg font-bold tracking-tight">{siteName}</h2>
           <div className="mt-3">
             <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-base font-semibold">{phone}</a>
             <p className="text-xs opacity-50 mt-0.5">{phoneDescription}</p>
