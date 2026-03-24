@@ -19,6 +19,33 @@ export function getStrapiMedia(url: string | null) {
     return `${STRAPI_API_URL}${url}`;
 }
 
+/**
+ * Ensures social media links are absolute URLs
+ */
+export function formatSocialUrl(url: string | undefined, type: 'telegram' | 'vk'): string {
+    if (!url || url === "#") return "#";
+    
+    // If it's already an absolute URL, return as is
+    if (url.startsWith("http") || url.startsWith("//")) {
+        return url;
+    }
+
+    // Handle common prefixes without protocol
+    if (url.startsWith("t.me/") || url.startsWith("vk.com/")) {
+        return `https://${url}`;
+    }
+
+    // Handle bare handles
+    if (type === 'telegram') {
+        return `https://t.me/${url.replace(/^@/, '')}`;
+    }
+    if (type === 'vk') {
+        return `https://vk.com/${url}`;
+    }
+
+    return url;
+}
+
 import qs from "qs";
 
 /**
@@ -744,11 +771,19 @@ export async function getFooterData(): Promise<FooterData | null> {
             },
             publicationState: "preview"
         });
-        console.log("[Footer Debug] Raw Response:", JSON.stringify(data, null, 2));
-        return data?.data || null;
+        
+        if (!data?.data) return null;
+
+        const footer = data.data as FooterData;
+        return {
+            ...footer,
+            telegramUrl: formatSocialUrl(footer.telegramUrl, 'telegram'),
+            vkUrl: formatSocialUrl(footer.vkUrl, 'vk')
+        };
     } catch (error) {
         console.error("Failed to fetch footer data:", error);
         return null;
     }
 }
+
 
