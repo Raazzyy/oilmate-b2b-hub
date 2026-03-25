@@ -46,7 +46,7 @@ const ProductsSection = ({ products, title = "Популярные товары"
   };
 
   return (
-    <section className="py-3 md:py-5 bg-card">
+    <section className="py-2.5 md:py-4 bg-card">
       <div className="container">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">{title}</h2>

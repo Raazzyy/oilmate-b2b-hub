@@ -151,9 +151,9 @@ export default async function ProductPage(props: ProductPageProps) {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container py-4 md:py-8">
+      <div className="container pt-2.5 pb-2.5 md:pt-4 md:pb-4">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-6 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-4 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
           <Link href="/" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
             Главная
           </Link>
@@ -249,7 +249,7 @@ export default async function ProductPage(props: ProductPageProps) {
                 <span className="ml-1.5 text-2xl font-bold text-foreground">₽</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-2 ml-1">
-                Цена указана с НДС 20%
+                Цена включает в себя НДС 22%
               </p>
             </div>
 

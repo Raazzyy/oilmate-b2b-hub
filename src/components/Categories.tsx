@@ -25,7 +25,7 @@ export default async function Categories() {
   const strapiCategories = await getHomepageCategories();
 
   return (
-    <section className="py-3 md:py-5">
+    <section className="py-2.5 md:py-4">
       <div className="container">
         {/* Horizontal scroll with drag support on all screen sizes */}
         <CategoriesScroll>
