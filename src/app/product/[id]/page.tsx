@@ -249,7 +249,7 @@ export default async function ProductPage(props: ProductPageProps) {
                 <span className="ml-1.5 text-2xl font-bold text-foreground">₽</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-2 ml-1">
-                Цена указана с НДС 20%
+                Цена включает в себя НДС 22%
               </p>
             </div>
 
