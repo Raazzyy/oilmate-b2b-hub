@@ -20,6 +20,7 @@ import {
   Info,
   ExternalLink,
 } from "lucide-react";
+import { getTransportCompanies, StrapiTransportCompany } from "@/lib/strapi";
 
 interface TransportCompany {
   id: string;
@@ -27,35 +28,10 @@ interface TransportCompany {
   description: string;
   calcUrl: string;
   badge?: string;
+  showBadge?: boolean;
 }
 
-const transportCompanies: TransportCompany[] = [
-  {
-    id: "kit",
-    name: "ТК Кит",
-    description: "Доставка заказа не более 12 кг — 550 ₽ по большинству направлений РФ",
-    calcUrl: "https://tkkit.ru/calculator",
-    badge: "Дешевле всех",
-  },
-  {
-    id: "cdek",
-    name: "СДЭК",
-    description: "Экспресс-доставка по всей России",
-    calcUrl: "https://www.cdek.ru/ru/calculator",
-  },
-  {
-    id: "dellin",
-    name: "Деловые Линии",
-    description: "Надёжная доставка для крупных грузов",
-    calcUrl: "https://www.dellin.ru/calculator/",
-  },
-  {
-    id: "troika",
-    name: "Тройка ДВ",
-    description: "Доставка по Дальнему Востоку",
-    calcUrl: "https://troikadv.ru",
-  },
-];
+// Transport companies are now fetched dynamically from Strapi
 
 type CustomerType = "individual" | "business";
 type DeliveryType = "pickup" | "city" | "shipping";
@@ -149,6 +125,38 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
   const { items, getTotalPrice, clearCart, selectedCity, setSelectedCity } = useCartStore();
   const { toast } = useToast();
 
+  const [dynamicCompanies, setDynamicCompanies] = useState<TransportCompany[]>([]);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      setIsLoadingCompanies(true);
+      try {
+        const data = await getTransportCompanies();
+        if (data && data.length > 0) {
+          const mapped: TransportCompany[] = data.map(tc => ({
+            id: String(tc.documentId || tc.id),
+            name: tc.name,
+            description: tc.description,
+            calcUrl: tc.calcUrl,
+            badge: tc.badgeText,
+            showBadge: tc.showBadge
+          }));
+          setDynamicCompanies(mapped);
+          // Set default TC if it exists
+          if (mapped.length > 0) {
+            setSelectedTC(mapped[0].id);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching transport companies:", err);
+      } finally {
+        setIsLoadingCompanies(false);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
   const [step, setStep] = useState<1 | 2>(1);
   const [customerType, setCustomerType] = useState<CustomerType>("individual");
   const [deliveryType, setDeliveryType] = useState<DeliveryType>(
@@ -237,7 +245,7 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
     const tcName =
       selectedTC === "custom"
         ? customTCName
-        : transportCompanies.find((tc) => tc.id === selectedTC)?.name || selectedTC;
+        : dynamicCompanies.find((tc) => tc.id === selectedTC)?.name || selectedTC;
 
     const deliveryLabel =
       deliveryType === "pickup"
@@ -534,60 +542,70 @@ const CheckoutForm = ({ onBack, onComplete }: CheckoutFormProps) => {
                                 <div className="text-xs font-medium text-foreground mb-1.5">
                                   Выберите ТК
                                 </div>
-                                {transportCompanies.map((tc) => (
-                                  <button
-                                    key={tc.id}
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedTC(tc.id);
-                                    }}
-                                    className={cn(
-                                      "w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left bg-background",
-                                      selectedTC === tc.id
-                                        ? "border-primary ring-1 ring-primary"
-                                        : "border-border/60 hover:border-muted-foreground/30"
-                                    )}
-                                  >
-                                    <div
+                                {isLoadingCompanies ? (
+                                  <div className="flex flex-col gap-2">
+                                    {[1, 2, 3].map(i => (
+                                      <div key={i} className="h-16 w-full bg-muted animate-pulse rounded-lg" />
+                                    ))}
+                                  </div>
+                                ) : (
+                                  dynamicCompanies.map((tc) => (
+                                    <button
+                                      key={tc.id}
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedTC(tc.id);
+                                      }}
                                       className={cn(
-                                        "mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0",
+                                        "w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left bg-background",
                                         selectedTC === tc.id
-                                          ? "border-primary"
-                                          : "border-muted-foreground/30"
+                                          ? "border-primary ring-1 ring-primary"
+                                          : "border-border/60 hover:border-muted-foreground/30"
                                       )}
                                     >
-                                      {selectedTC === tc.id && (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                      )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-xs font-medium text-foreground">
-                                          {tc.name}
-                                        </span>
-                                        {tc.badge && (
-                                          <span className="text-[10px] font-semibold text-green-700 bg-green-100 border border-green-300 rounded-full px-2 py-0.5 leading-none">
-                                            {tc.badge}
-                                          </span>
+                                      <div
+                                        className={cn(
+                                          "mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0",
+                                          selectedTC === tc.id
+                                            ? "border-primary"
+                                            : "border-muted-foreground/30"
+                                        )}
+                                      >
+                                        {selectedTC === tc.id && (
+                                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                                         )}
                                       </div>
-                                      <div className="text-[11px] text-muted-foreground mt-0.5">
-                                        {tc.description}
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs font-medium text-foreground">
+                                            {tc.name}
+                                          </span>
+                                          {tc.showBadge && tc.badge && (
+                                            <span className="text-[10px] font-semibold text-green-700 bg-green-100 border border-green-300 rounded-full px-2 py-0.5 leading-none">
+                                              {tc.badge}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="text-[11px] text-muted-foreground mt-0.5 whitespace-pre-wrap">
+                                          {tc.description}
+                                        </div>
+                                        {tc.calcUrl && (
+                                          <a
+                                            href={tc.calcUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 mt-1 underline underline-offset-2"
+                                          >
+                                            Рассчитать стоимость
+                                            <ExternalLink className="h-2.5 w-2.5" />
+                                          </a>
+                                        )}
                                       </div>
-                                      <a
-                                        href={tc.calcUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 mt-1 underline underline-offset-2"
-                                      >
-                                        Рассчитать стоимость
-                                        <ExternalLink className="h-2.5 w-2.5" />
-                                      </a>
-                                    </div>
-                                  </button>
-                                ))}
+                                    </button>
+                                  ))
+                                )}
 
                                 {/* Custom TC */}
                                 <button

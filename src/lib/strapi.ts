@@ -165,6 +165,18 @@ export interface StrapiProduct {
     [key: string]: unknown;
 }
 
+export interface StrapiTransportCompany {
+    id: number | string;
+    documentId?: string;
+    name: string;
+    description: string;
+    calcUrl: string;
+    badgeText?: string;
+    showBadge: boolean;
+    publishedAt?: string;
+}
+
+
 import { HeroSlide, Promotion } from "@/types";
 import { ProductData } from "@/data/products";
 
@@ -792,6 +804,18 @@ export async function getFooterData(): Promise<FooterData | null> {
     } catch (error) {
         console.error("Failed to fetch footer data:", error);
         return null;
+    }
+}
+
+export async function getTransportCompanies(): Promise<StrapiTransportCompany[]> {
+    try {
+        const data = await fetchAPI("/transport-companies", {
+            sort: "name:asc"
+        }, { next: { revalidate: 60 } });
+        return data?.data || [];
+    } catch (error) {
+        console.error("Failed to fetch transport companies:", error);
+        return [];
     }
 }
 
