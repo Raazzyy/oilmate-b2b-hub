@@ -10,6 +10,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { StrapiFilter } from "@/lib/strapi";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 const CheckboxFilter = ({ 
   items, 
   selected, 
@@ -84,13 +91,11 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
   const [localMin, setLocalMin] = useState(searchParams?.get('minPrice') || "");
   const [localMax, setLocalMax] = useState(searchParams?.get('maxPrice') || "");
 
-  // Sync local state when URL changes externally
   useEffect(() => {
     setLocalMin(searchParams?.get('minPrice') || "");
     setLocalMax(searchParams?.get('maxPrice') || "");
   }, [searchParams]);
 
-  // Collect all current non-price filter values from URL
   const getCurrentFilters = () => {
     const allFilters: Record<string, string[]> = {};
     searchParams?.forEach((value, key) => {
@@ -101,23 +106,15 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
     return allFilters;
   };
 
-  const pushFilters = (
-    filters: Record<string, string[]>,
-    min: string,
-    max: string
-  ) => {
+  const pushFilters = (filters: Record<string, string[]>, min: string, max: string) => {
     const params = new URLSearchParams();
-    // preserve search and sort
     if (searchParams?.get('search')) params.set('search', searchParams.get('search')!);
     if (searchParams?.get('sort')) params.set('sort', searchParams.get('sort')!);
-
     Object.entries(filters).forEach(([key, values]) => {
       if (values.length > 0) params.set(key, values.join(','));
     });
-
     if (min && Number(min) > priceMin) params.set('minPrice', min);
     if (max && Number(max) < priceMax) params.set('maxPrice', max);
-
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -127,16 +124,10 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
     filters[filterSlug] = current.includes(option)
       ? current.filter(v => v !== option)
       : [...current, option];
-    pushFilters(
-      filters,
-      searchParams?.get('minPrice') || "",
-      searchParams?.get('maxPrice') || ""
-    );
+    pushFilters(filters, searchParams?.get('minPrice') || "", searchParams?.get('maxPrice') || "");
   };
 
-  const handlePriceApply = () => {
-    pushFilters(getCurrentFilters(), localMin, localMax);
-  };
+  const handlePriceApply = () => pushFilters(getCurrentFilters(), localMin, localMax);
 
   const handleSliderCommit = ([from, to]: number[]) => {
     const mn = from > priceMin ? String(from) : "";
@@ -146,12 +137,8 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
     pushFilters(getCurrentFilters(), mn, mx);
   };
 
-  const handleReset = () => {
-    router.push(pathname || "/catalog", { scroll: false });
-  };
-
-  const getSelected = (slug: string) =>
-    searchParams?.get(slug)?.split(',').filter(Boolean) || [];
+  const handleReset = () => router.push(pathname || "/catalog", { scroll: false });
+  const getSelected = (slug: string) => searchParams?.get(slug)?.split(',').filter(Boolean) || [];
 
   return (
     <div className="w-full flex flex-col">
@@ -170,13 +157,13 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
         )}
       </div>
 
-      <div className="bg-card rounded-2xl p-5 mb-4 border border-border/50">
-        <h3 className="font-medium text-foreground mb-5 text-base">Фильтры</h3>
+      <div className="bg-card rounded-2xl p-5 mb-4 border border-border/50 overflow-hidden">
+        <h3 className="font-medium text-foreground mb-6 text-base">Фильтры</h3>
 
-        {/* ── Price filter — dynamic range ── */}
-        <div className="mb-8">
-          <span className="text-sm font-semibold text-foreground mb-3 block">Цена, ₽</span>
-          <div className="flex gap-2 mb-3">
+        {/* Price section — permanently visible */}
+        <div className="mb-8 px-0.5">
+          <span className="text-sm font-semibold text-foreground mb-4 block">Цена, ₽</span>
+          <div className="flex gap-2 mb-4">
             <Input
               type="number"
               placeholder={`от ${priceMin}`}
@@ -184,7 +171,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
               onChange={(e) => setLocalMin(e.target.value)}
               onBlur={handlePriceApply}
               onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-              className="rounded-lg border-border text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+              className="rounded-lg border-border h-9 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
             <Input
               type="number"
@@ -193,7 +180,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
               onChange={(e) => setLocalMax(e.target.value)}
               onBlur={handlePriceApply}
               onKeyDown={(e) => { if (e.key === 'Enter') handlePriceApply(); }}
-              className="rounded-lg border-border text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+              className="rounded-lg border-border h-9 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
           </div>
           <Slider
@@ -214,24 +201,32 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
           />
         </div>
 
-        {/* ── Dynamic filter sections from Strapi ── */}
-        {autoFilters.map(filter => (
-          filter.options && filter.options.length > 0 && (
-            <div key={filter.slug} className="mb-8">
-              <span className="text-sm font-semibold text-foreground mb-3 block">{filter.name}</span>
-              <CheckboxFilter
-                items={filter.options}
-                selected={getSelected(filter.slug)}
-                onToggle={(item) => toggleFilter(filter.slug, item)}
-                visibleCount={5}
-              />
-            </div>
-          )
-        ))}
+        <Accordion type="multiple" className="w-full">
+          {/* Dynamic groups */}
+          {autoFilters.map((filter) => {
+            if (!filter.options?.length) return null;
+            return (
+              <AccordionItem key={filter.slug} value={filter.slug} className="border-none mt-2">
+                <AccordionTrigger className="text-sm font-semibold hover:no-underline py-3 px-0">
+                  {filter.name}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pt-1 pb-4">
+                    <CheckboxFilter
+                      items={filter.options}
+                      selected={getSelected(filter.slug)}
+                      onToggle={(item) => toggleFilter(filter.slug, item)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
 
         <Button
           variant="ghost"
-          className="w-full text-muted-foreground mt-2"
+          className="w-full text-muted-foreground mt-4 h-9"
           onClick={handleReset}
         >
           Сбросить фильтры
