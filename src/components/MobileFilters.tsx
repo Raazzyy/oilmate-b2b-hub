@@ -30,7 +30,7 @@ export default function MobileFilters({ category, categorySlugProp, autoFilters,
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 flex flex-col pt-12 bg-background">
         <SheetTitle className="sr-only">Фильтры каталога</SheetTitle>
-        <div className="flex-1 overflow-hidden px-4">
+        <div className="flex-1 overflow-y-auto px-4 py-8">
             <CatalogFilters category={category} categorySlugProp={categorySlugProp} autoFilters={autoFilters} priceRange={priceRange} />
         </div>
       </SheetContent>
