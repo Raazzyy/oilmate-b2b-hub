@@ -59,7 +59,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
   return (
     <footer className="relative z-10 bg-[hsl(220,9%,98%)] dark:bg-card text-foreground pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">
       {/* ── Desktop ── */}
-      <div className="container hidden md:block py-10">
+      <div className="container hidden md:block py-4">
         <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-8">
           {/* Brand + contacts */}
           <div>
@@ -129,7 +129,7 @@ const Footer = ({ data }: { data: FooterData | null }) => {
 
       {/* ── Mobile accordion ── */}
       <div className="md:hidden">
-        <div className="px-4 pt-6 pb-4">
+        <div className="px-4 pt-2.5 pb-4">
           <h2 className="text-lg font-bold tracking-tight">{siteName}</h2>
           <div className="mt-3">
             <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-base font-semibold">{phone}</a>

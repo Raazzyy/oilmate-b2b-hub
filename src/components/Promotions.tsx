@@ -22,7 +22,7 @@ const Promotions = ({ promotions }: PromotionsProps) => {
   if (!promotions || promotions.length === 0) return null;
 
   return (
-    <section className="py-3 md:py-5 bg-background">
+    <section className="py-2.5 md:py-4 bg-background">
       <div className="container">
         <Carousel
           opts={{
