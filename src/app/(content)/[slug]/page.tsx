@@ -38,9 +38,9 @@ export default async function DynamicPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-background flex flex-col">
-      <div className="container max-w-4xl mx-auto py-8 md:py-16">
+      <div className="container max-w-4xl mx-auto pt-2.5 pb-2.5 md:pt-4 md:pb-4">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-8 animate-in fade-in slide-in-from-left-4 duration-700 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-4 animate-in fade-in slide-in-from-left-4 duration-700 overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
           <Link href="/" className="hover:text-primary transition-colors bg-muted/60 hover:bg-muted px-3 py-1 rounded-full">
             Главная
           </Link>
