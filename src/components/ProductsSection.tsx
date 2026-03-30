@@ -73,7 +73,7 @@ const ProductsSection = ({ products, title = "Популярные товары"
 
         <div
           ref={ref}
-          className="flex flex-nowrap gap-3 overflow-x-auto pb-4 scrollbar-hide cursor-grab active:cursor-grabbing"
+          className="flex flex-nowrap gap-3 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
           onMouseDown={(e) => {
             isDown.current = true;
             startX.current = e.pageX - (ref.current?.offsetLeft ?? 0);
