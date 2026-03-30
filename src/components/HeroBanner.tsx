@@ -37,7 +37,7 @@ const HeroBanner = ({ slides }: HeroBannerProps) => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="pt-2 pb-2.5 md:pt-4 md:pb-4">
+    <section className="py-2.5 md:py-4">
       <div className="container">
         {/* Full-width Carousel banner */}
         <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[2.5/1] lg:aspect-[3/1] rounded-2xl overflow-hidden shadow-sm">
