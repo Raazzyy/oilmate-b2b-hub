@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
 import BottomNav from "@/components/BottomNav";
+import YandexMetrika from "@/components/YandexMetrika";
 import { getNavCategories, getNavigationItems, getFooterData } from "@/lib/strapi";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
@@ -41,12 +42,15 @@ export default async function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Header categories={categories} navigation={navigation} />
-            <main className="pb-[4.25rem] md:pb-0">{children}</main>
+            <main className="pb-5 md:pb-0">{children}</main>
           <Footer data={footerData} />
           <CartDrawer />
           <BottomNav />
           <CookieConsent />
         </Providers>
+        {process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID && (
+          <YandexMetrika ymid={process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID} />
+        )}
       </body>
     </html>
   );
