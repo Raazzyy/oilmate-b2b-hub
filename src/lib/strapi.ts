@@ -176,6 +176,12 @@ export interface StrapiTransportCompany {
     publishedAt?: string;
 }
 
+export interface CheckoutSettings {
+    pickupEnabled: boolean;
+    cityDeliveryEnabled: boolean;
+    shippingEnabled: boolean;
+}
+
 
 import { HeroSlide, Promotion } from "@/types";
 import { ProductData } from "@/data/products";
@@ -398,6 +404,38 @@ export async function getHomepageCategories(): Promise<StrapiCategory[]> {
     } catch (error) {
         console.warn("Failed to fetch homepage categories, falling back to all categories:", error);
         return getCategories();
+    }
+}
+
+export async function getCheckoutSettings(): Promise<CheckoutSettings> {
+    try {
+        const data = await fetchAPI("/checkout-setting", {
+            publicationState: "preview"
+        });
+        
+        // If no settings found or API error, return all enabled as fallback
+        if (!data?.data) {
+            return {
+                pickupEnabled: true,
+                cityDeliveryEnabled: true,
+                shippingEnabled: true
+            };
+        }
+
+        const attrs = data.data.attributes || data.data;
+
+        return {
+            pickupEnabled: attrs.pickupEnabled ?? true,
+            cityDeliveryEnabled: attrs.cityDeliveryEnabled ?? true,
+            shippingEnabled: attrs.shippingEnabled ?? true
+        };
+    } catch (error) {
+        console.warn("Failed to fetch checkout settings, using defaults:", error);
+        return {
+            pickupEnabled: true,
+            cityDeliveryEnabled: true,
+            shippingEnabled: true
+        };
     }
 }
 
