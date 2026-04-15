@@ -831,7 +831,7 @@ export async function getFooterData(): Promise<FooterData | null> {
                 }
             },
             publicationState: "preview"
-        });
+        }, { next: { revalidate: 0 } });
         
         if (!data?.data) return null;
 
