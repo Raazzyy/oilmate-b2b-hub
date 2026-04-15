@@ -9,25 +9,37 @@ import CartDrawer from "@/components/CartDrawer";
 import CookieConsent from "@/components/CookieConsent";
 import BottomNav from "@/components/BottomNav";
 import YandexMetrika from "@/components/YandexMetrika";
-import { getNavCategories, getNavigationItems, getFooterData } from "@/lib/strapi";
-
+import { getNavCategories, getNavigationItems, getFooterData, getWebsiteSettings } from "@/lib/strapi";
+ 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
-
-export const metadata: Metadata = {
-  title: {
-    template: "%s | OilMate",
-    default: "OilMate — Масла и автохимия оптом | B2B интернет-магазин",
-  },
-  description: "OilMate — оптовый интернет-магазин моторных масел, автохимии и смазочных материалов.",
-  metadataBase: new URL("https://oilmate-b2b-hub.vercel.app"),
-  openGraph: {
-    type: "website",
-    locale: "ru_RU",
-    url: "https://oilmate-b2b-hub.vercel.app",
-    siteName: "OilMate B2B",
-  },
-  manifest: "/manifest.json",
-};
+ 
+export const dynamic = "force-dynamic";
+ 
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getWebsiteSettings();
+  const siteTitle = settings.siteName || "OilMate";
+  
+  const metadata: Metadata = {
+    title: {
+      template: `%s | ${siteTitle}`,
+      default: siteTitle,
+    },
+    description: "OilMate — оптовый интернет-магазин моторных масел, автохимии и смазочных материалов.",
+    metadataBase: new URL("https://oilmate-b2b-hub.vercel.app"),
+    icons: {
+      icon: settings.faviconUrl || "/favicon.ico",
+    },
+    openGraph: {
+      type: "website",
+      locale: "ru_RU",
+      url: "https://oilmate-b2b-hub.vercel.app",
+      siteName: siteTitle,
+    },
+    manifest: "/manifest.json",
+  };
+ 
+  return metadata;
+}
 
 export default async function RootLayout({
   children,

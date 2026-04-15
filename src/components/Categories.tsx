@@ -4,6 +4,8 @@ import { Car, Cog, Droplets, Factory, Snowflake, Wrench, LayoutGrid, HelpCircle 
 import { getHomepageCategories, getStrapiMedia } from "@/lib/strapi";
 import CategoriesScroll from "@/components/CategoriesScroll";
 
+import AllProductsCard from "@/components/AllProductsCard";
+ 
 const getCategoryIcon = (slug: string) => {
   if (!slug) return HelpCircle;
   if (slug.includes('motor')) return Car;
@@ -59,20 +61,9 @@ export default async function Categories() {
               </Link>
             );
           })}
-
-          {/* All Products button */}
-          <Link
-            href="/catalog"
-            className="group flex flex-col items-center text-center shrink-0"
-            style={{ minWidth: '80px' }}
-          >
-            <div className="mb-2 md:mb-3 relative h-32 w-32 md:h-[176px] md:w-[176px] flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-sm">
-              <LayoutGrid className="h-8 w-8 md:h-12 md:w-12 text-foreground" strokeWidth={1.5} />
-            </div>
-            <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
-              Все товары
-            </span>
-          </Link>
+ 
+          {/* All Products button (Client Component) */}
+          <AllProductsCard />
         </CategoriesScroll>
       </div>
     </section>

@@ -127,7 +127,13 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
     pushFilters(filters, searchParams?.get('minPrice') || "", searchParams?.get('maxPrice') || "");
   };
 
-  const handlePriceApply = () => pushFilters(getCurrentFilters(), localMin, localMax);
+  const handlePriceApply = () => {
+    const currentMin = searchParams?.get('minPrice') || "";
+    const currentMax = searchParams?.get('maxPrice') || "";
+    if (localMin !== currentMin || localMax !== currentMax) {
+      pushFilters(getCurrentFilters(), localMin, localMax);
+    }
+  };
 
   const handleSliderCommit = ([from, to]: number[]) => {
     const mn = from > priceMin ? String(from) : "";
@@ -166,7 +172,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
           <div className="flex gap-2 mb-4">
             <Input
               type="number"
-              placeholder={`от ${priceMin}`}
+              placeholder={`${priceMin}`}
               value={localMin}
               onChange={(e) => setLocalMin(e.target.value)}
               onBlur={handlePriceApply}
@@ -175,7 +181,7 @@ const CatalogFilters = ({ category, categorySlugProp, autoFilters = [], priceRan
             />
             <Input
               type="number"
-              placeholder={`до ${priceMax.toLocaleString()}`}
+              placeholder={`${priceMax.toLocaleString()}`}
               value={localMax}
               onChange={(e) => setLocalMax(e.target.value)}
               onBlur={handlePriceApply}
