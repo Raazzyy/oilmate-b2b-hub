@@ -545,7 +545,7 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         const aggregatedOptions: Record<string, Set<string>> = {};
         const coreNames: Record<string, string> = {
             brand: 'Бренд',
-            country: 'Страна-производитель'
+            country: 'Страна'
         };
 
         // If manual filters exist, only aggregate for those
@@ -822,6 +822,7 @@ export async function getFooterData(): Promise<FooterData | null> {
     try {
         const data = await fetchAPI("/footer", {
             populate: {
+                favicon: true,
                 sections: {
                     populate: {
                         links: true
@@ -833,15 +834,35 @@ export async function getFooterData(): Promise<FooterData | null> {
         
         if (!data?.data) return null;
 
-        const footer = data.data as FooterData;
+        const footer = data.data as FooterData & { favicon?: { url: string } };
         return {
             ...footer,
+            faviconUrl: footer.favicon?.url ? getStrapiMedia(footer.favicon.url) as string : undefined,
             telegramUrl: formatSocialUrl(footer.telegramUrl, 'telegram'),
             vkUrl: formatSocialUrl(footer.vkUrl, 'vk')
         };
     } catch (error) {
         console.error("Failed to fetch footer data:", error);
         return null;
+    }
+}
+ 
+export interface WebsiteSettings {
+    siteName: string;
+    faviconUrl?: string;
+}
+
+export async function getWebsiteSettings(): Promise<WebsiteSettings> {
+    try {
+        const footer = await getFooterData();
+        
+        return {
+            siteName: footer?.siteName || "OilMate",
+            faviconUrl: footer?.faviconUrl || "/favicon.ico"
+        };
+    } catch (error) {
+        console.warn("Failed to fetch site settings, using defaults:", error);
+        return { siteName: "OilMate", faviconUrl: "/favicon.ico" };
     }
 }
 
