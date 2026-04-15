@@ -814,6 +814,7 @@ export interface FooterData {
     phoneDescription: string;
     telegramUrl: string;
     vkUrl: string;
+    faviconUrl?: string;
     sections: FooterSection[];
     copyrightText: string;
 }
