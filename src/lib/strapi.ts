@@ -811,6 +811,7 @@ export interface FooterSection {
 export interface FooterData {
     phone: string;
     siteName: string;
+    siteTabTitle?: string;
     phoneDescription: string;
     telegramUrl: string;
     vkUrl: string;
@@ -858,7 +859,7 @@ export async function getWebsiteSettings(): Promise<WebsiteSettings> {
         const footer = await getFooterData();
         
         return {
-            siteName: footer?.siteName || "OilMate",
+            siteName: footer?.siteTabTitle || footer?.siteName || "OilMate",
             faviconUrl: footer?.faviconUrl || "/favicon.ico"
         };
     } catch (error) {
