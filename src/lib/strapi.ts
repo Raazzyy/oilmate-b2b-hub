@@ -388,8 +388,7 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | 
 
 export async function getHomepageCategories(): Promise<{ 
     categories: StrapiCategory[], 
-    allProductsImage?: string,
-    globalFilterOrder?: string[]
+    allProductsImage?: string
 }> {
     try {
         const data = await fetchAPI("/homepage", {
@@ -399,22 +398,17 @@ export async function getHomepageCategories(): Promise<{
                         image: true
                     }
                 },
-                allProductsImage: true,
-                globalFilterOrder: {
-                    populate: true
-                }
+                allProductsImage: true
             }
         }, { next: { revalidate: 0 } });
 
         const attrs = data?.data?.attributes || data?.data || {};
         const categories = attrs.featuredCategories || [];
         const allProductsImage = attrs.allProductsImage?.url ? getStrapiMedia(attrs.allProductsImage.url) as string : undefined;
-        const globalFilterOrder = attrs.globalFilterOrder?.map((a: any) => a.slug).filter(Boolean) || [];
 
         return { 
             categories, 
-            allProductsImage,
-            globalFilterOrder
+            allProductsImage
         };
     } catch (error) {
         console.warn("Failed to fetch homepage categories, falling back to all categories:", error);
@@ -636,9 +630,6 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         if (categorySlug && categorySlug !== "all") {
             const cat = await getCategoryBySlug(categorySlug);
             sortOrderSlugs = cat?.availableAttributes?.map((a: any) => a.slug).filter(Boolean) || [];
-        } else {
-            const home = await getHomepageCategories();
-            sortOrderSlugs = home.globalFilterOrder || [];
         }
 
         // 5. Apply Sorting
