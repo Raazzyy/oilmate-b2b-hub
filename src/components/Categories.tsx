@@ -24,7 +24,7 @@ const getCategoryColor = (slug: string) => {
 };
 
 export default async function Categories() {
-  const strapiCategories = await getHomepageCategories();
+  const { categories: strapiCategories, allProductsImage } = await getHomepageCategories();
 
   return (
     <section className="py-2.5 md:py-4">
@@ -63,7 +63,7 @@ export default async function Categories() {
           })}
  
           {/* All Products button (Client Component) */}
-          <AllProductsCard />
+          <AllProductsCard imageUrl={allProductsImage} />
         </CategoriesScroll>
       </div>
     </section>

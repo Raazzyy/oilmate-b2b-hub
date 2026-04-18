@@ -335,6 +335,7 @@ export interface StrapiCategory {
     description?: string;
     image?: StrapiImage;
     filters?: StrapiFilter[];
+    availableAttributes?: StrapiAttribute[];
     showInNav?: boolean;
 }
 
@@ -370,7 +371,11 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | 
     try {
         const data = await fetchAPI("/categories", {
             filters: { slug: { $eq: slug } },
-            populate: { filters: true, image: true }
+            populate: { 
+                filters: true, 
+                image: true,
+                availableAttributes: true 
+            }
         });
         if (!data?.data || data.data.length === 0) return null;
         return data.data[0];
@@ -381,7 +386,11 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | 
 }
 
 
-export async function getHomepageCategories(): Promise<StrapiCategory[]> {
+export async function getHomepageCategories(): Promise<{ 
+    categories: StrapiCategory[], 
+    allProductsImage?: string,
+    globalFilterOrder?: string[]
+}> {
     try {
         const data = await fetchAPI("/homepage", {
             populate: {
@@ -389,21 +398,28 @@ export async function getHomepageCategories(): Promise<StrapiCategory[]> {
                     populate: {
                         image: true
                     }
+                },
+                allProductsImage: true,
+                globalFilterOrder: {
+                    populate: true
                 }
             }
         }, { next: { revalidate: 0 } });
 
-        const categories = data?.data?.featuredCategories;
+        const attrs = data?.data?.attributes || data?.data || {};
+        const categories = attrs.featuredCategories || [];
+        const allProductsImage = attrs.allProductsImage?.url ? getStrapiMedia(attrs.allProductsImage.url) as string : undefined;
+        const globalFilterOrder = attrs.globalFilterOrder?.map((a: any) => a.slug).filter(Boolean) || [];
 
-        if (!categories || categories.length === 0) {
-            console.log("No featured categories found on homepage, falling back to all categories.");
-            return getCategories();
-        }
-
-        return categories;
+        return { 
+            categories, 
+            allProductsImage,
+            globalFilterOrder
+        };
     } catch (error) {
         console.warn("Failed to fetch homepage categories, falling back to all categories:", error);
-        return getCategories();
+        const allCats = await getCategories();
+        return { categories: allCats };
     }
 }
 
@@ -592,30 +608,57 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         });
 
         // 3. Construct final filters
+        let finalFilters: StrapiFilter[] = [];
+
         if (manualFilters.length > 0) {
-            return manualFilters.map(f => ({
+            finalFilters = manualFilters.map(f => ({
                 ...f,
                 options: Array.from(aggregatedOptions[f.slug] || []).sort()
             })).filter(f => f.options && f.options.length > 0);
+        } else {
+            // Construct auto-logic
+            Array.from(autoSlugs).forEach(field => {
+                const options = Array.from(aggregatedOptions[field] || []).sort();
+                if (options.length > 0) {
+                    finalFilters.push({
+                        id: Math.random(), // transient id
+                        name: coreNames[field] || field,
+                        slug: field,
+                        type: 'chips',
+                        options
+                    });
+                }
+            });
         }
 
-        // Fallback: existing auto-logic
-        const autoFilters: StrapiFilter[] = [];
+        // 4. Determine Sort Order
+        let sortOrderSlugs: string[] = [];
+        if (categorySlug && categorySlug !== "all") {
+            const cat = await getCategoryBySlug(categorySlug);
+            sortOrderSlugs = cat?.availableAttributes?.map((a: any) => a.slug).filter(Boolean) || [];
+        } else {
+            const home = await getHomepageCategories();
+            sortOrderSlugs = home.globalFilterOrder || [];
+        }
 
-        Array.from(autoSlugs).forEach(field => {
-            const options = Array.from(aggregatedOptions[field] || []).sort();
-            if (options.length > 0) {
-                autoFilters.push({
-                    id: Math.random(), // transient id
-                    name: coreNames[field] || field,
-                    slug: field,
-                    type: 'chips',
-                    options
-                });
-            }
-        });
+        // 5. Apply Sorting
+        if (sortOrderSlugs.length > 0) {
+            finalFilters.sort((a, b) => {
+                const indexA = sortOrderSlugs.indexOf(a.slug);
+                const indexB = sortOrderSlugs.indexOf(b.slug);
+                
+                // If both are in the sort list, use their positions
+                if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                // If only A is in the list, it comes first
+                if (indexA !== -1) return -1;
+                // If only B is in the list, it comes first
+                if (indexB !== -1) return 1;
+                // Otherwise, keep original order (or alphabetical)
+                return a.name.localeCompare(b.name);
+            });
+        }
 
-        return autoFilters;
+        return finalFilters;
 
     } catch (error) {
         console.error("Failed to generate category filters:", error);
