@@ -635,7 +635,7 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         let sortOrderSlugs: string[] = [];
         if (categorySlug && categorySlug !== "all") {
             const cat = await getCategoryBySlug(categorySlug);
-            const attrs = cat?.attributes || cat;
+            const attrs = (cat as any)?.attributes || cat;
             const rawAttrs = attrs?.availableAttributes?.data || attrs?.availableAttributes || [];
             sortOrderSlugs = (Array.isArray(rawAttrs) ? rawAttrs : [])
                 .map((a: any) => (a.attributes?.slug || a.slug))
