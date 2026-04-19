@@ -31,22 +31,27 @@ export default async function Categories() {
       <div className="container">
         {/* Horizontal scroll with drag support on all screen sizes */}
         <CategoriesScroll>
-          {strapiCategories.map((category) => {
-            const IconComponent = getCategoryIcon(category.slug || '');
-            const iconColor = getCategoryColor(category.slug || '');
+          {strapiCategories.map((category: any) => {
+            const attrs = category.attributes || category;
+            const slug = attrs.slug || '';
+            const name = attrs.name || '';
+            const IconComponent = getCategoryIcon(slug);
+            const iconColor = getCategoryColor(slug);
+            const imageUrl = attrs.image?.data?.attributes?.url || attrs.image?.url;
+            
             return (
               <Link
                 key={category.id}
-                href={`/catalog/${category.slug}`}
+                href={`/catalog/${slug}`}
                 className="group flex flex-col items-center text-center shrink-0"
                 style={{ minWidth: '80px' }}
               >
                 {/* Square container 176x176 on desktop, 128x128 on mobile */}
                 <div className="mb-2 md:mb-3 relative h-32 w-32 md:h-[176px] md:w-[176px] rounded-2xl bg-gray-100 dark:bg-gray-800 overflow-hidden transition-all hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-sm flex items-center justify-center">
-                  {category.image?.url ? (
+                  {imageUrl ? (
                     <Image
-                      src={getStrapiMedia(category.image.url) as string}
-                      alt={category.name}
+                      src={getStrapiMedia(imageUrl) as string}
+                      alt={name}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 128px, 176px"
@@ -56,7 +61,7 @@ export default async function Categories() {
                   )}
                 </div>
                 <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
-                  {category.name}
+                  {name}
                 </span>
               </Link>
             );

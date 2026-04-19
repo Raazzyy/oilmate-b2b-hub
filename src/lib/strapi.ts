@@ -403,8 +403,14 @@ export async function getHomepageCategories(): Promise<{
         }, { next: { revalidate: 0 } });
 
         const attrs = data?.data?.attributes || data?.data || {};
-        const categories = attrs.featuredCategories || [];
-        const allProductsImage = attrs.allProductsImage?.url ? getStrapiMedia(attrs.allProductsImage.url) as string : undefined;
+        
+        // Handle both Strapi 4 ({ data: [] }) and Strapi 5 ([]) relation formats
+        const rawCategories = attrs.featuredCategories?.data || attrs.featuredCategories || [];
+        const categories = Array.isArray(rawCategories) ? rawCategories : [];
+
+        const allProductsImage = attrs.allProductsImage?.url 
+            ? getStrapiMedia(attrs.allProductsImage.url) as string 
+            : undefined;
 
         return { 
             categories, 
@@ -629,7 +635,11 @@ export async function getCategoryFilterOptions(categorySlug?: string): Promise<S
         let sortOrderSlugs: string[] = [];
         if (categorySlug && categorySlug !== "all") {
             const cat = await getCategoryBySlug(categorySlug);
-            sortOrderSlugs = cat?.availableAttributes?.map((a: any) => a.slug).filter(Boolean) || [];
+            const attrs = cat?.attributes || cat;
+            const rawAttrs = attrs?.availableAttributes?.data || attrs?.availableAttributes || [];
+            sortOrderSlugs = (Array.isArray(rawAttrs) ? rawAttrs : [])
+                .map((a: any) => (a.attributes?.slug || a.slug))
+                .filter(Boolean) || [];
         }
 
         // 5. Apply Sorting

@@ -27,8 +27,8 @@ export default function AllProductsCard({ imageUrl }: { imageUrl?: string }) {
           }}
           onError={(e) => {
                const target = e.target as HTMLImageElement;
-               // If there was an error with custom image, try fallback once if allowed or just hide
-               if (imageUrl && target.src !== window.location.origin + "/all-products.png") {
+               // Simple fallback: if current src is already the fallback, hide it, otherwise try fallback
+               if (imageUrl && !target.src.endsWith("/all-products.png")) {
                  target.src = "/all-products.png";
                } else {
                  target.style.display = "none";
