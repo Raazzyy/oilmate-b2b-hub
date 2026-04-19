@@ -35,10 +35,12 @@ export default function AllProductsCard({ imageUrl }: { imageUrl?: string }) {
                }
           }}
         />
-        <LayoutGrid
-          className="h-8 w-8 md:h-12 md:w-12 text-foreground absolute"
-          strokeWidth={1.5}
-        />
+        {!imageUrl && (
+          <LayoutGrid
+            className="h-8 w-8 md:h-12 md:w-12 text-foreground absolute"
+            strokeWidth={1.5}
+          />
+        )}
       </div>
       <span className="text-xs md:text-sm font-medium text-foreground leading-tight text-center">
         Все товары
