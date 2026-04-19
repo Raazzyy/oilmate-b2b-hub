@@ -13,28 +13,25 @@ export default function AllProductsCard({ imageUrl }: { imageUrl?: string }) {
     >
       <div className="mb-2 md:mb-3 relative h-32 w-32 md:h-[176px] md:w-[176px] flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800 transition-all hover:bg-gray-200 dark:hover:bg-gray-700 hover:shadow-sm overflow-hidden">
         {/* Support custom image from Strapi or public folder */}
-        <Image
-          src={imageUrl || "/all-products.png"}
-          alt="Все товары"
-          fill
-          unoptimized
-          className="object-cover opacity-0 transition-opacity duration-300"
-          onLoad={(e) => {
-            const img = e.target as HTMLImageElement;
-            if (img.naturalWidth > 0) {
-              img.classList.remove("opacity-0");
-            }
-          }}
-          onError={(e) => {
-               const target = e.target as HTMLImageElement;
-               // Simple fallback: if current src is already the fallback, hide it, otherwise try fallback
-               if (imageUrl && !target.src.endsWith("/all-products.png")) {
-                 target.src = "/all-products.png";
-               } else {
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt="Все товары"
+            fill
+            unoptimized
+            className="object-cover opacity-0 transition-opacity duration-300"
+            onLoad={(e) => {
+              const img = e.target as HTMLImageElement;
+              if (img.naturalWidth > 0) {
+                img.classList.remove("opacity-0");
+              }
+            }}
+            onError={(e) => {
+                 const target = e.target as HTMLImageElement;
                  target.style.display = "none";
-               }
-          }}
-        />
+            }}
+          />
+        )}
         {!imageUrl && (
           <LayoutGrid
             className="h-8 w-8 md:h-12 md:w-12 text-foreground absolute"
