@@ -49,12 +49,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <Link href={`/product/${documentId || id}`} className="block">
         {/* Image container with 3:4 Aspect Ratio */}
         <div className="relative mb-2">
-          <div className="aspect-[3/4] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative">
+          <div className="aspect-[3/4] overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 relative p-6 xl:p-8">
             <Image
               src={imageSrc}
               alt={name}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
