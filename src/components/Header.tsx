@@ -517,11 +517,7 @@ const Header = ({
                     {allProductsImage ? (
                       <Image src={allProductsImage} alt="Все товары" fill className="object-cover" />
                     ) : (
-                      {allProductsImage ? (
-                      <Image src={allProductsImage} alt="Все товары" fill className="object-cover" />
-                    ) : (
                       <LayoutGrid className="h-5 w-5 text-foreground" />
-                    )}
                     )}
                   </div>
                   <span className="font-medium">Все товары</span>
