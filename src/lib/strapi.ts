@@ -896,15 +896,20 @@ export async function getFooterData(): Promise<FooterData | null> {
 export interface WebsiteSettings {
     siteName: string;
     faviconUrl?: string;
+    allProductsImageUrl?: string;
 }
 
 export async function getWebsiteSettings(): Promise<WebsiteSettings> {
     try {
-        const footer = await getFooterData();
+        const [footer, homepage] = await Promise.all([
+            getFooterData(),
+            getHomepageCategories()
+        ]);
         
         return {
             siteName: footer?.siteTabTitle || footer?.siteName || "OilMate",
-            faviconUrl: footer?.faviconUrl || "/favicon.ico"
+            faviconUrl: footer?.faviconUrl || "/favicon.ico",
+            allProductsImageUrl: homepage.allProductsImage
         };
     } catch (error) {
         console.warn("Failed to fetch site settings, using defaults:", error);

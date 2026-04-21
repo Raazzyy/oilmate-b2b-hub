@@ -31,7 +31,15 @@ const getCategoryColor = (slug: string) => {
 
 
 
-const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCategory[], navigation?: StrapiNavigationItem[] }) => {
+const Header = ({ 
+  categories = [], 
+  navigation = [], 
+  allProductsImage 
+}: { 
+  categories?: StrapiCategory[], 
+  navigation?: StrapiNavigationItem[],
+  allProductsImage?: string
+}) => {
   const { getTotalItems, setIsCartOpen, isClient, setClient, selectedCity, setSelectedCity } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ProductData[]>([]);
@@ -323,7 +331,7 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                    <div className="p-2 border-t border-border">
                      <Button
                        variant="ghost"
-                       className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10"
+                       className="w-full justify-center text-primary hover:text-primary hover:bg-primary/10 flex items-center gap-2"
                        onClick={() => {
                          setIsCatalogOpen(false);
                          router.push("/catalog");
@@ -505,8 +513,16 @@ const Header = ({ categories = [], navigation = [] }: { categories?: StrapiCateg
                     router.push("/catalog");
                   }}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                    <LayoutGrid className="h-5 w-5 text-foreground" />
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden relative">
+                    {allProductsImage ? (
+                      <Image src={allProductsImage} alt="Все товары" fill className="object-cover" />
+                    ) : (
+                      {allProductsImage ? (
+                      <Image src={allProductsImage} alt="Все товары" fill className="object-cover" />
+                    ) : (
+                      <LayoutGrid className="h-5 w-5 text-foreground" />
+                    )}
+                    )}
                   </div>
                   <span className="font-medium">Все товары</span>
                 </button>

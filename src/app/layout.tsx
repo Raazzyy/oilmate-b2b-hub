@@ -49,11 +49,17 @@ export default async function RootLayout({
   const categories = await getNavCategories();
   const navigation = await getNavigationItems();
   const footerData = await getFooterData();
+  const settings = await getWebsiteSettings();
+  
   return (
     <html lang="ru">
       <body className={inter.className}>
         <Providers>
-          <Header categories={categories} navigation={navigation} />
+          <Header 
+            categories={categories} 
+            navigation={navigation} 
+            allProductsImage={settings.allProductsImageUrl}
+          />
             <main className="pb-5 md:pb-0">{children}</main>
           <Footer data={footerData} />
           <CartDrawer />
